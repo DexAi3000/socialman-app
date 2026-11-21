@@ -109,6 +109,14 @@ export function MultiPublishView() {
     setPublishProgress({ ...progressMap });
 
     try {
+      // Build accounts config from user's connected channels
+      const accountsConfig: Record<string, { channelId?: string }> = {};
+      for (const p of selectedPlatforms) {
+        if (connectedAccounts[p]?.handle) {
+          accountsConfig[p] = { channelId: connectedAccounts[p].handle };
+        }
+      }
+
       // Call real publisher API
       const res = await fetch('/socialman/api/publish', {
         method: 'POST',
@@ -123,6 +131,7 @@ export function MultiPublishView() {
           isImmediate: true,
           scheduledDateShamsi: 'امروز',
           scheduledTime: 'هم‌اکنون',
+          accountsConfig,
         }),
       });
       const data = await res.json().catch(() => null);

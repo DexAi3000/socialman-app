@@ -31,8 +31,8 @@ export async function dispatchMultiPlatformPublish(
       switch (platform) {
         case 'telegram':
           results.telegram = await publishToTelegram({
-            botToken: config.botToken || process.env.TELEGRAM_DEFAULT_BOT_TOKEN,
-            channelId: config.channelId || process.env.TELEGRAM_DEFAULT_CHANNEL_ID,
+            botToken: config.botToken || process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_DEFAULT_BOT_TOKEN,
+            channelId: config.channelId || process.env.TELEGRAM_CHANNEL_ID || process.env.TELEGRAM_DEFAULT_CHANNEL_ID,
             text: fullText,
             mediaUrl,
           });
@@ -40,8 +40,8 @@ export async function dispatchMultiPlatformPublish(
 
         case 'bale':
           results.bale = await publishToBale({
-            botToken: config.botToken || process.env.BALE_DEFAULT_BOT_TOKEN,
-            channelId: config.channelId || process.env.BALE_DEFAULT_CHANNEL_ID,
+            botToken: config.botToken || process.env.BALE_BOT_TOKEN || process.env.BALE_DEFAULT_BOT_TOKEN,
+            channelId: config.channelId || process.env.BALE_CHANNEL_ID || process.env.BALE_DEFAULT_CHANNEL_ID,
             text: fullText,
             mediaUrl,
           });
@@ -49,8 +49,8 @@ export async function dispatchMultiPlatformPublish(
 
         case 'rubika':
           results.rubika = await publishToRubika({
-            botToken: config.botToken || process.env.RUBIKA_DEFAULT_AUTH,
-            channelId: config.channelId || process.env.RUBIKA_DEFAULT_GUID,
+            botToken: config.botToken || process.env.RUBIKA_BOT_TOKEN || process.env.RUBIKA_DEFAULT_AUTH,
+            channelId: config.channelId || process.env.RUBIKA_GUID || process.env.RUBIKA_DEFAULT_GUID,
             text: fullText,
             mediaUrl,
           });

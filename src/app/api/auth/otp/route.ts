@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     // Helper: Send SMS via SMS.ir
     const sendSmsVerify = async (mobile: string, verifyCode: string) => {
       const apiKey = process.env.SMS_IR_API_KEY || 'fOjFtJeSej7K6wZz4uS7JfUpVd9EXslED2gffCutQLLTjspT';
-      const templateId = process.env.SMS_IR_TEMPLATE_ID || '722530';
+      const templateId = process.env.SMS_IR_TEMPLATE_ID || '118761';
 
       let smsDelivered = false;
       let smsResponseData = null;
@@ -39,7 +39,6 @@ export async function POST(request: Request) {
               templateId: Number(templateId),
               parameters: [
                 { name: 'CODE', value: verifyCode },
-                { name: 'Code', value: verifyCode },
               ],
             }),
           });
