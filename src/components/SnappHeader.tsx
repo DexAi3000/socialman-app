@@ -79,44 +79,37 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
 
   return (
     <header className="w-full bg-white border-b border-gray-100 sticky top-0 z-40 shadow-xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between gap-4">
-        {/* Right side: Real Brand Logo: سوشال من! + Nav Links */}
-        <div className="flex items-center gap-8">
-          {/* Brand Logo: سوشال‌من! */}
-          <div
-            onClick={() => setActiveTab('dashboard')}
-            className="cursor-pointer flex items-center gap-2.5 group"
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between gap-4 relative">
+        {/* Right side: 3-line Hamburger Menu Button (No text) */}
+        <div className="flex items-center">
+          <button
+            onClick={() => setIsHamburgerMenuOpen(true)}
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gray-50 hover:bg-sky-50 text-gray-700 hover:text-[#3b96cc] border border-gray-200 hover:border-sky-200 flex items-center justify-center transition-all shadow-2xs group cursor-pointer"
+            title="منو"
+            aria-label="منو"
           >
-            <div className="w-11 h-11 rounded-2xl overflow-hidden shadow-md shadow-rose-900/15 border border-gray-100 group-hover:scale-105 transition-transform shrink-0">
-              <img
-                src="/app-icon.jpg"
-                alt="لوگوی سوشال‌من"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="flex flex-col -space-y-0.5">
-              <span className="text-2xl font-black text-gray-900 tracking-tight font-sans">
-                Social Man
-              </span>
-            </div>
-          </div>
-
-          {/* Header Actions: Hamburger Menu */}
-          <div className="flex items-center">
-            <button
-              onClick={() => setIsHamburgerMenuOpen(true)}
-              className="flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-gray-50 hover:bg-sky-50 text-gray-800 hover:text-[#3b96cc] border border-gray-200 hover:border-sky-200 transition-all font-bold text-xs shadow-2xs group cursor-pointer"
-              title="باز کردن منوی همبرگری سوشال‌من"
-            >
-              <div className="w-7 h-7 rounded-xl bg-white border border-gray-200/80 flex items-center justify-center text-gray-700 group-hover:text-[#3b96cc] group-hover:border-sky-200 shadow-2xs transition-colors">
-                <Menu className="w-4 h-4" />
-              </div>
-              <span className="font-black text-xs">منو</span>
-            </button>
-          </div>
+            <Menu className="w-5 h-5 text-gray-700 group-hover:text-[#3b96cc] transition-colors" />
+          </button>
         </div>
 
-        {/* Left side: User Auth (SMS.ir) */}
+        {/* Center: Brand Logo + Social Man */}
+        <div
+          onClick={() => setActiveTab('dashboard')}
+          className="absolute left-1/2 -translate-x-1/2 cursor-pointer flex items-center gap-2 sm:gap-2.5 group select-none"
+        >
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl overflow-hidden shadow-sm border border-gray-100 group-hover:scale-105 transition-transform shrink-0">
+            <img
+              src="/app-icon.jpg"
+              alt="Social Man"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <span className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight font-sans">
+            Social Man
+          </span>
+        </div>
+
+        {/* Left side: User Auth */}
         <div className="flex items-center gap-3">
           {/* User Auth Profile / Login Button via SMS.ir */}
           {currentUser?.isLoggedIn ? (
