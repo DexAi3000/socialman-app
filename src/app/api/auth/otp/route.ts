@@ -135,7 +135,6 @@ export async function POST(request: Request) {
         message: 'کد تایید پیامکی ارسال شد.',
         smsDelivered,
         smsDetails: smsResponseData,
-        testCode: generatedCode,
       });
     }
 
@@ -394,7 +393,6 @@ export async function POST(request: Request) {
         message: 'کد تایید پیامکی ارسال شد.',
         smsDelivered,
         smsDetails: smsResponseData,
-        testCode: generatedCode,
       });
     }
 

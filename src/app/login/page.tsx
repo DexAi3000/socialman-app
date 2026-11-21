@@ -40,7 +40,6 @@ export default function LoginPage() {
   // OTP states
   const [otpPhone, setOtpPhone] = useState('');
   const [otpValues, setOtpValues] = useState(['', '', '', '', '']);
-  const [testOtpHint, setTestOtpHint] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(120);
 
   // Common UI states
@@ -172,7 +171,6 @@ export default function LoginPage() {
 
       const data = await res.json();
       if (res.ok) {
-        setTestOtpHint(data.testCode || '12345');
         setOtpPhone(cleanPhone);
         setOtpPurpose('register');
         setOtpValues(['', '', '', '', '']);
@@ -216,7 +214,6 @@ export default function LoginPage() {
 
       const data = await res.json();
       if (res.ok) {
-        setTestOtpHint(data.testCode || '12345');
         setOtpPhone(cleanPhone);
         setOtpPurpose('login');
         setOtpValues(['', '', '', '', '']);
@@ -320,7 +317,6 @@ export default function LoginPage() {
         });
         const data = await res.json();
         if (res.ok) {
-          setTestOtpHint(data.testCode || '12345');
           setCountdown(120);
         } else {
           setErrorMsg(data.error || 'خطا در ارسال مجدد.');
@@ -731,24 +727,6 @@ export default function LoginPage() {
                 ))}
               </div>
             </div>
-
-            {/* Test code hint for easy reviewer access */}
-            {testOtpHint && (
-              <div className="text-center pt-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const digits = (testOtpHint || '12345').split('').slice(0, 5);
-                    setOtpValues(digits);
-                    otpInputRefs.current[4]?.focus();
-                  }}
-                  className="inline-flex items-center gap-1.5 text-[11px] font-bold text-sky-700 bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-xl border border-sky-200 transition-colors cursor-pointer"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>کد تست تایید: {testOtpHint} (کلیک برای درج)</span>
-                </button>
-              </div>
-            )}
 
             {/* Timer & Edit Number */}
             <div className="flex items-center justify-between text-xs text-gray-500 pt-1 px-1">

@@ -46,7 +46,6 @@ export function AuthModal() {
   // OTP fields
   const [otpPhone, setOtpPhone] = useState('');
   const [otpValues, setOtpValues] = useState(['', '', '', '', '']);
-  const [testOtpHint, setTestOtpHint] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(120);
 
   // Common UI states
@@ -168,7 +167,6 @@ export function AuthModal() {
 
       const data = await res.json();
       if (res.ok) {
-        setTestOtpHint(data.testCode || '12345');
         setOtpPhone(cleanPhone);
         setOtpPurpose('register');
         setOtpValues(['', '', '', '', '']);
@@ -212,7 +210,6 @@ export function AuthModal() {
 
       const data = await res.json();
       if (res.ok) {
-        setTestOtpHint(data.testCode || '12345');
         setOtpPhone(cleanPhone);
         setOtpPurpose('login');
         setOtpValues(['', '', '', '', '']);
@@ -667,23 +664,6 @@ export function AuthModal() {
                 />
               ))}
             </div>
-
-            {testOtpHint && (
-              <div className="text-center">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const digits = (testOtpHint || '12345').split('').slice(0, 5);
-                    setOtpValues(digits);
-                    otpInputRefs.current[4]?.focus();
-                  }}
-                  className="inline-flex items-center gap-1 text-[10px] font-bold text-sky-700 bg-sky-50 px-2.5 py-1 rounded-xl border border-sky-200 cursor-pointer"
-                >
-                  <ShieldCheck className="w-3 h-3" />
-                  <span>کد تست تایید: {testOtpHint}</span>
-                </button>
-              </div>
-            )}
 
             <div className="flex items-center justify-between text-[11px] text-gray-500 pt-0.5">
               <button
