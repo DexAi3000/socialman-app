@@ -7,7 +7,6 @@ import {
   Clock,
   CheckCircle2,
   ArrowUpRight,
-  Sparkles,
   Zap,
   Search,
   Link2,
@@ -117,18 +116,13 @@ export function DashboardView({ onNavigateTab, onSetAiPlatform }: DashboardViewP
     <div className="space-y-6">
       {/* 0. Mobile Search Bar (Directly matching Snapp mobile app top bar) */}
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-2">
-        <div className="bg-white rounded-2xl border border-gray-200/90 shadow-xs px-4 py-3 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 text-gray-400 flex-1">
-            <Search className="w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="جست‌وجو در کانال‌ها، زمان‌بندی‌ها و ابزارهای انتشار سوشال‌من..."
-              className="w-full bg-transparent text-xs sm:text-sm font-medium text-gray-800 placeholder-gray-400 outline-none text-right"
-            />
-          </div>
-          <div className="w-8 h-8 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 shrink-0">
-            <Sparkles className="w-4 h-4 fill-purple-600" />
-          </div>
+        <div className="bg-white rounded-2xl border border-gray-200/90 shadow-xs px-4 py-3 flex items-center gap-3">
+          <Search className="w-5 h-5 text-gray-400 shrink-0" />
+          <input
+            type="text"
+            placeholder="جست‌وجو در کانال‌ها، زمان‌بندی‌ها و ابزارهای انتشار سوشال‌من..."
+            className="w-full bg-transparent text-xs sm:text-sm font-medium text-gray-800 placeholder-gray-400 outline-none text-right"
+          />
         </div>
       </div>
 

@@ -59,10 +59,6 @@ export function SnappHero({ onOpenPublish, onOpenCalendar }: SnappHeroProps) {
               <CheckCircle2 className="w-4 h-4 text-[#3b96cc]" />
               پشتیبانی از زبان فارسی
             </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-[#3b96cc]" />
-              درگاه رسمی شاپرک
-            </span>
           </div>
         </div>
 
