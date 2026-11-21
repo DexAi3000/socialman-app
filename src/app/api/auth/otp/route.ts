@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { setSessionCookie } from '@/lib/session';
 
 export async function POST(request: Request) {
   try {
@@ -134,6 +135,29 @@ export async function POST(request: Request) {
           role: 'admin',
           plan: 'pro',
         },
+        include: {
+          workspaces: true,
+        },
+      });
+
+      // Ensure user has at least one workspace
+      if (!user.workspaces || user.workspaces.length === 0) {
+        await prisma.workspace.create({
+          data: {
+            name: `فضای کاری ${user.fullName || 'اصلی'}`,
+            category: 'کسب‌وکار',
+            userId: user.id,
+            connectedPlatforms: JSON.stringify(['telegram', 'instagram', 'whatsapp', 'bale', 'rubika']),
+          },
+        });
+      }
+
+      // Set secure HttpOnly session cookie
+      await setSessionCookie({
+        userId: user.id,
+        phone: user.phone,
+        role: user.role,
+        fullName: user.fullName,
       });
 
       // Return logged-in user profile from DB

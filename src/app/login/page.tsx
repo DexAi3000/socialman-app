@@ -77,21 +77,38 @@ export default function LoginPage() {
   };
 
   // Quick 1-click Test Login for development
-  const handleQuickDemoLogin = () => {
+  const handleQuickDemoLogin = async () => {
     setLoading(true);
-    setTimeout(() => {
-      loginUser({
-        id: 'usr-8192',
-        fullName: 'نیما آرین فر',
-        phone: '09123456789',
-        role: 'مدیر محتوا و ادمین',
-        verifiedVia: 'SMS.ir',
+    try {
+      const res = await fetch('/api/auth/otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'verify-otp',
+          phone: '09123456789',
+          code: '12345',
+          fullName: 'نیما آرین فر',
+        }),
       });
-      setStep('success');
-      setTimeout(() => {
-        router.push('/');
-      }, 1200);
-    }, 400);
+      const data = await res.json();
+      if (res.ok && data.user) {
+        loginUser({
+          id: data.user.id,
+          fullName: data.user.fullName,
+          phone: data.user.phone,
+          role: data.user.role,
+          verifiedVia: 'SMS.ir',
+        });
+        setStep('success');
+        setTimeout(() => {
+          router.push('/');
+        }, 1200);
+      }
+    } catch {
+      setErrorMsg('خطایی در ورود رخ داد.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // OTP inputs handling

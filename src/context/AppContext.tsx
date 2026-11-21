@@ -275,8 +275,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const [targetPlatformForConnect, setTargetPlatformForConnect] = useState<SocialPlatform | null>(null);
 
-  // Sync initial data from real database on mount
+  // Sync initial data from real database and check session on mount
   useEffect(() => {
+    // 0. Check real authentication session
+    fetch('/api/auth/me')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.authenticated && d.user) {
+          setCurrentUser({
+            id: d.user.id,
+            fullName: d.user.fullName,
+            phone: d.user.phone,
+            role: d.user.role,
+            avatarUrl: d.user.avatarUrl,
+            isLoggedIn: !d.isGuestDemo,
+          });
+          if (d.user.plan) {
+            setCurrentPlan(d.user.plan as PlanType);
+          }
+        }
+      })
+      .catch((err) => console.log('Auth session check error:', err));
+
     // 1. Fetch Workspaces from DB
     fetch('/api/workspaces')
       .then((r) => r.json())
@@ -353,8 +373,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setIsAuthModalOpen(false);
   };
 
-  const logoutUser = () => {
+  const logoutUser = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (e) {
+      console.error('Logout error:', e);
+    }
     setCurrentUser(null);
+    window.location.href = '/login';
   };
 
   const updateUserAvatar = (avatarUrl?: string) => {
