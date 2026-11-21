@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from 'react';
+import Link from 'next/link';
 import { useApp } from '@/context/AppContext';
 import {
   ChevronDown,
@@ -241,13 +242,21 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
               )}
             </div>
           ) : (
-            <button
-              onClick={openAuthModal}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black text-gray-800 bg-gray-100 hover:bg-gray-200 border border-gray-200 transition-colors"
-            >
-              <Smartphone className="w-3.5 h-3.5 text-amber-600" />
-              <span>ورود / ثبت‌نام با SMS.ir</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/login"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-200 transition-colors"
+              >
+                <span>صفحه ورود</span>
+              </Link>
+              <button
+                onClick={openAuthModal}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black text-white bg-[#21aa58] hover:bg-[#1e9b50] shadow-sm transition-colors cursor-pointer"
+              >
+                <Smartphone className="w-3.5 h-3.5 text-white" />
+                <span>ورود با SMS.ir</span>
+              </button>
+            </div>
           )}
         </div>
       </div>

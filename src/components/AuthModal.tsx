@@ -1,31 +1,38 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import {
   X,
   Smartphone,
   ShieldCheck,
   ArrowRight,
+  ArrowLeft,
   CheckCircle2,
   Clock,
   RotateCcw,
   Sparkles,
   Send,
+  ExternalLink,
 } from 'lucide-react';
 import { toPersianDigits } from '@/lib/utils';
 
 export function AuthModal() {
+  const router = useRouter();
   const { isAuthModalOpen, closeAuthModal, loginUser } = useApp();
 
-  const [step, setStep] = useState<'phone' | 'otp' | 'profile'>('phone');
+  const [step, setStep] = useState<'phone' | 'otp' | 'success'>('phone');
   const [phone, setPhone] = useState('09123456789');
-  const [otpCode, setOtpCode] = useState('');
+  const [otpValues, setOtpValues] = useState(['', '', '', '', '']);
   const [fullName, setFullName] = useState('نیما آرین فر');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [testOtpHint, setTestOtpHint] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(120);
+
+  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // Countdown timer for OTP
   useEffect(() => {
@@ -40,8 +47,8 @@ export function AuthModal() {
 
   if (!isAuthModalOpen) return null;
 
-  const handleSendOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSendOtp = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setErrorMsg('');
 
     if (!phone || !/^09[0-9]{9}$/.test(phone)) {
@@ -62,6 +69,9 @@ export function AuthModal() {
         setTestOtpHint(data.testCode || '12345');
         setStep('otp');
         setCountdown(120);
+        setTimeout(() => {
+          otpInputRefs.current[0]?.focus();
+        }, 150);
       } else {
         setErrorMsg(data.error || 'خطایی در ارسال پیامک رخ داد.');
       }
@@ -72,12 +82,70 @@ export function AuthModal() {
     }
   };
 
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleQuickDemoLogin = () => {
+    setLoading(true);
+    setTimeout(() => {
+      loginUser({
+        id: 'usr-8192',
+        fullName: 'نیما آرین فر',
+        phone: '09123456789',
+        role: 'مدیر محتوا و ادمین',
+        verifiedVia: 'SMS.ir',
+      });
+      closeAuthModal();
+    }, 400);
+  };
+
+  const handleOtpChange = (index: number, value: string) => {
+    const cleanVal = value.replace(/[^0-9]/g, '');
+    if (!cleanVal) {
+      const newOtp = [...otpValues];
+      newOtp[index] = '';
+      setOtpValues(newOtp);
+      return;
+    }
+
+    if (cleanVal.length > 1) {
+      const chars = cleanVal.slice(0, 5).split('');
+      const newOtp = [...otpValues];
+      chars.forEach((c, i) => {
+        if (i < 5) newOtp[i] = c;
+      });
+      setOtpValues(newOtp);
+      const nextIndex = Math.min(chars.length, 4);
+      otpInputRefs.current[nextIndex]?.focus();
+      return;
+    }
+
+    const newOtp = [...otpValues];
+    newOtp[index] = cleanVal.slice(-1);
+    setOtpValues(newOtp);
+
+    if (index < 4 && cleanVal) {
+      otpInputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otpValues[index] && index > 0) {
+      otpInputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleFillTestCode = () => {
+    const code = testOtpHint || '12345';
+    const digits = code.split('').slice(0, 5);
+    setOtpValues(digits);
+    otpInputRefs.current[4]?.focus();
+  };
+
+  const handleVerifyOtp = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setErrorMsg('');
 
-    if (!otpCode || otpCode.length < 4) {
-      setErrorMsg('لطفاً کد تایید پیامکی را به طور کامل وارد کنید.');
+    const fullCode = otpValues.join('');
+    if (fullCode.length < 5) {
+      setErrorMsg('لطفاً کد تایید ۵ رقمی را به طور کامل وارد کنید.');
       return;
     }
 
@@ -89,7 +157,7 @@ export function AuthModal() {
         body: JSON.stringify({
           action: 'verify-otp',
           phone,
-          code: otpCode,
+          code: fullCode,
           fullName,
         }),
       });
@@ -103,6 +171,7 @@ export function AuthModal() {
           role: data.user.role,
           verifiedVia: 'SMS.ir',
         });
+        closeAuthModal();
       } else {
         setErrorMsg(data.error || 'کد تایید اشتباه است.');
       }
@@ -120,18 +189,31 @@ export function AuthModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 select-none">
-      <div className="relative bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-2xl border border-gray-100 space-y-6">
-        {/* Close Button */}
-        <button
-          onClick={closeAuthModal}
-          className="absolute top-5 left-5 p-2 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 select-none animate-in fade-in duration-200">
+      <div className="relative bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-2xl border border-gray-100 space-y-5 animate-in zoom-in-95 duration-200">
+        {/* Top Controls: Close & Fullscreen Page Link */}
+        <div className="flex items-center justify-between">
+          <button
+            onClick={closeAuthModal}
+            className="p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+            title="بستن پنجره"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          <Link
+            href="/login"
+            onClick={closeAuthModal}
+            className="flex items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-[#21aa58] transition-colors"
+            title="باز کردن در صفحه تمام‌صفحه"
+          >
+            <span>صفحه کامل</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </Link>
+        </div>
 
         {/* Brand App Mascot + SMS.ir Header */}
-        <div className="flex flex-col items-center text-center space-y-2.5 pt-2">
+        <div className="flex flex-col items-center text-center space-y-2.5 pt-1">
           {/* App Mascot Icon */}
           <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg border border-gray-100 shadow-rose-900/10 shrink-0">
             <img src="/app-icon.jpg" alt="لوگوی سوشال‌من" className="w-full h-full object-cover" />
@@ -139,9 +221,8 @@ export function AuthModal() {
 
           {/* SMS.ir Emblem Badge */}
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-amber-50 border border-amber-200">
-            {/* SMS.ir Firebird Icon */}
-            <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-amber-500 via-orange-500 to-yellow-400 flex items-center justify-center text-white shadow-xs">
-              <Send className="w-4 h-4 fill-white rotate-45 -mr-0.5" />
+            <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-amber-500 via-orange-500 to-yellow-400 flex items-center justify-center text-white shadow-xs">
+              <Send className="w-3.5 h-3.5 fill-white rotate-45 -mr-0.5" />
             </div>
             <div className="flex items-baseline gap-1 font-sans">
               <span className="font-black text-sm text-gray-900 tracking-tight">SMS</span>
@@ -158,13 +239,13 @@ export function AuthModal() {
           <p className="text-xs text-gray-500 max-w-xs leading-relaxed">
             {step === 'phone'
               ? 'شماره موبایل خود را وارد کنید تا کد تایید یکبار مصرف ارسال شود.'
-              : `کد تایید پیامک شده به شماره ${toPersianDigits(phone)} را وارد کنید.`}
+              : `کد تایید ۵ رقمی پیامک شده به شماره ${toPersianDigits(phone)} را وارد کنید.`}
           </p>
         </div>
 
         {/* Error Alert */}
         {errorMsg && (
-          <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2">
+          <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2 animate-in fade-in">
             <span>⚠️</span>
             <span>{errorMsg}</span>
           </div>
@@ -185,8 +266,12 @@ export function AuthModal() {
                   placeholder="09123456789"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
-                  className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#21aa58] rounded-2xl px-4 py-3.5 text-center font-mono font-bold text-base text-gray-800 outline-none tracking-widest transition-all"
+                  className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#21aa58] focus:ring-4 focus:ring-emerald-500/10 rounded-2xl px-4 py-3.5 text-center font-mono font-black text-base text-gray-800 outline-none tracking-widest transition-all"
                 />
+                <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1 pl-2 border-l border-gray-200 text-gray-500 text-xs font-mono font-bold">
+                  <span>🇮🇷</span>
+                  <span>+۹۸</span>
+                </div>
                 <Smartphone className="w-5 h-5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               </div>
             </div>
@@ -194,7 +279,7 @@ export function AuthModal() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-2xl font-black text-xs sm:text-sm bg-[#21aa58] hover:bg-[#1e9b50] text-white shadow-md shadow-[#21aa58]/25 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
+              className="w-full py-3.5 rounded-2xl font-black text-xs sm:text-sm bg-[#21aa58] hover:bg-[#1e9b50] text-white shadow-md shadow-[#21aa58]/25 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -208,23 +293,34 @@ export function AuthModal() {
                 </>
               )}
             </button>
+
+            {/* Quick 1-Click Demo Login */}
+            <div className="pt-1">
+              <button
+                type="button"
+                onClick={handleQuickDemoLogin}
+                className="w-full py-2.5 rounded-2xl font-black text-xs bg-emerald-50 hover:bg-emerald-100 text-[#21aa58] border border-emerald-200/80 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                <span>ورود آزمایشی با پروفایل نیما آرین‌فر</span>
+              </button>
+            </div>
           </form>
         )}
 
-        {/* Step 2: OTP Verification Form */}
+        {/* Step 2: 5-Digit Pin OTP Verification Form */}
         {step === 'otp' && (
           <form onSubmit={handleVerifyOtp} className="space-y-4">
-            {/* Test hint for development */}
             {testOtpHint && (
               <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 font-bold">
                   <Sparkles className="w-4 h-4 text-[#21aa58]" />
-                  <span>کد تست دریافتی از پیامک:</span>
+                  <span>کد تست دریافتی:</span>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setOtpCode(testOtpHint)}
-                  className="font-mono font-black text-sm bg-white px-2 py-0.5 rounded-lg border border-emerald-300 text-[#21aa58] cursor-pointer hover:bg-emerald-100"
+                  onClick={handleFillTestCode}
+                  className="font-mono font-black text-sm bg-white px-2.5 py-1 rounded-xl border border-emerald-300 text-[#21aa58] cursor-pointer hover:bg-emerald-100 shadow-2xs"
                 >
                   {toPersianDigits(testOtpHint)} (درج خودکار)
                 </button>
@@ -232,19 +328,30 @@ export function AuthModal() {
             )}
 
             <div>
-              <label className="block text-xs font-black text-gray-700 mb-1.5 text-right">
+              <label className="block text-xs font-black text-gray-700 mb-2 text-center">
                 کد تایید ۵ رقمی:
               </label>
-              <input
-                type="text"
-                dir="ltr"
-                maxLength={5}
-                required
-                placeholder="• • • • •"
-                value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value.replace(/[^0-9]/g, ''))}
-                className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#21aa58] rounded-2xl px-4 py-3.5 text-center font-mono font-black text-xl text-gray-800 outline-none tracking-widest transition-all"
-              />
+              <div className="flex items-center justify-center gap-2" dir="ltr">
+                {otpValues.map((val, idx) => (
+                  <input
+                    key={idx}
+                    ref={(el) => {
+                      otpInputRefs.current[idx] = el;
+                    }}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={val}
+                    onChange={(e) => handleOtpChange(idx, e.target.value)}
+                    onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+                    className={`w-11 h-13 text-center text-xl font-mono font-black rounded-2xl border transition-all outline-none ${
+                      val
+                        ? 'border-[#21aa58] bg-white text-[#21aa58] shadow-xs'
+                        : 'border-gray-200 bg-gray-50 focus:bg-white focus:border-[#21aa58] focus:ring-4 focus:ring-emerald-500/10'
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
 
             {/* Timer & Edit Number */}
@@ -252,7 +359,7 @@ export function AuthModal() {
               <button
                 type="button"
                 onClick={() => setStep('phone')}
-                className="text-gray-500 hover:text-gray-800 font-bold hover:underline"
+                className="text-gray-500 hover:text-gray-800 font-bold hover:underline cursor-pointer"
               >
                 ویرایش شماره موبایل
               </button>
@@ -266,8 +373,8 @@ export function AuthModal() {
                 ) : (
                   <button
                     type="button"
-                    onClick={handleSendOtp}
-                    className="text-[#21aa58] font-bold flex items-center gap-1 hover:underline"
+                    onClick={() => handleSendOtp()}
+                    className="text-[#21aa58] font-bold flex items-center gap-1 hover:underline cursor-pointer"
                   >
                     <RotateCcw className="w-3 h-3" />
                     ارسال مجدد پیامک
@@ -279,7 +386,7 @@ export function AuthModal() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-2xl font-black text-xs sm:text-sm bg-[#21aa58] hover:bg-[#1e9b50] text-white shadow-md shadow-[#21aa58]/25 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
+              className="w-full py-3.5 rounded-2xl font-black text-xs sm:text-sm bg-[#21aa58] hover:bg-[#1e9b50] text-white shadow-md shadow-[#21aa58]/25 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
                 <>

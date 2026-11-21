@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef } from 'react';
+import Link from 'next/link';
 import { useApp } from '@/context/AppContext';
 import {
   X,
@@ -368,15 +369,24 @@ export function HamburgerMenuDrawer({
               <span>خروج از حساب</span>
             </button>
           ) : (
-            <button
-              onClick={() => {
-                openAuthModal();
-                setIsHamburgerMenuOpen(false);
-              }}
-              className="px-3.5 py-1.5 rounded-xl bg-[#21aa58] text-white font-black text-[11px] hover:bg-[#1e9b50] transition-colors"
-            >
-              ورود با SMS.ir
-            </button>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/login"
+                onClick={() => setIsHamburgerMenuOpen(false)}
+                className="px-3 py-1.5 rounded-xl bg-emerald-50 text-[#21aa58] font-black text-[11px] border border-emerald-200 hover:bg-emerald-100 transition-colors"
+              >
+                صفحه ورود
+              </Link>
+              <button
+                onClick={() => {
+                  openAuthModal();
+                  setIsHamburgerMenuOpen(false);
+                }}
+                className="px-3 py-1.5 rounded-xl bg-[#21aa58] text-white font-black text-[11px] hover:bg-[#1e9b50] transition-colors cursor-pointer"
+              >
+                ورود سریع SMS.ir
+              </button>
+            </div>
           )}
         </div>
       </div>
