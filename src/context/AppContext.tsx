@@ -84,44 +84,39 @@ const INITIAL_POSTS: Post[] = [];
 const INITIAL_CONNECTED_ACCOUNTS: Record<SocialPlatform, ConnectedAccountInfo> = {
   instagram: {
     platform: 'instagram',
-    isConnected: true,
-    accountName: 'آکادمی رشد و مارکتینگ',
-    handle: '@growth_academy_ir',
-    connectedAt: '۱۴۰۳/۰۸/۱۵',
+    isConnected: false,
+    accountName: 'پیج اینستاگرام',
+    handle: '',
   },
   telegram: {
     platform: 'telegram',
-    isConnected: true,
-    accountName: 'کانال تلگرام Novexa',
-    handle: '@novexalab',
+    isConnected: false,
+    accountName: 'کانال یا گروه تلگرام',
+    handle: '',
     botUsername: '@SocialManPublishBot',
     botToken: '9115798954:AAHHygpdWUJlhI3k-FX7rtU2egGt7wwHwrg',
-    connectedAt: 'متصل به Bot API تلگرام ✓',
   },
   whatsapp: {
     platform: 'whatsapp',
-    isConnected: true,
-    accountName: 'پشتیبانی و برودکست آکادمی',
-    handle: '+989123456789',
-    connectedAt: '۱۴۰۳/۰۸/۱۶',
+    isConnected: false,
+    accountName: 'شماره یا کانال واتساپ',
+    handle: '',
   },
   rubika: {
     platform: 'rubika',
-    isConnected: true,
-    accountName: 'ربات انتشار روبیکا SocialMan',
-    handle: '@SocialManPublishBot',
+    isConnected: false,
+    accountName: 'کانال یا ربات روبیکا',
+    handle: '',
     botUsername: '@SocialManPublishBot',
     botToken: 'CJIJEG0ICJPDQSHEUWTHRWIDFFITRQUHWBZFEAQAYUJHCUZUGSYBGUQXCUZHERIR',
-    connectedAt: 'متصل به پلتفرم بات روبیکا ✓',
   },
   bale: {
     platform: 'bale',
-    isConnected: true,
-    accountName: 'بازوی رسمی بله SocialMan',
-    handle: 'ble.ir/SocialManPublishBot',
+    isConnected: false,
+    accountName: 'کانال یا بازوی بله',
+    handle: '',
     botUsername: '@SocialManPublishBot',
     botToken: '369114062:R7BeEnjLaDSiFv26-wsP-4ol_aGbTKmBNo',
-    connectedAt: 'متصل به بازوی بله ✓',
   },
 };
 
@@ -298,13 +293,35 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (_) {}
 
-    // Restore cached connected channels from localStorage
+    // Restore cached connected channels from localStorage (with clean migration)
     try {
-      const cachedAccounts = localStorage.getItem('socialman_connected_accounts');
-      if (cachedAccounts) {
-        const parsed = JSON.parse(cachedAccounts);
-        if (parsed && typeof parsed === 'object') {
-          setConnectedAccounts((prev) => ({ ...prev, ...parsed }));
+      const cacheVersion = localStorage.getItem('socialman_accounts_v3');
+      if (!cacheVersion) {
+        localStorage.removeItem('socialman_connected_accounts');
+        localStorage.setItem('socialman_accounts_v3', 'true');
+      } else {
+        const cachedAccounts = localStorage.getItem('socialman_connected_accounts');
+        if (cachedAccounts) {
+          const parsed = JSON.parse(cachedAccounts);
+          if (parsed && typeof parsed === 'object') {
+            const sanitized: Record<string, any> = {};
+            for (const [key, val] of Object.entries(parsed as Record<string, any>)) {
+              if (
+                val &&
+                val.handle &&
+                val.handle !== '@growth_academy_ir' &&
+                val.handle !== '@novexalab' &&
+                val.handle !== '+989123456789' &&
+                val.handle !== 'ble.ir/SocialManPublishBot' &&
+                val.handle !== '@SocialManPublishBot'
+              ) {
+                sanitized[key] = val;
+              }
+            }
+            if (Object.keys(sanitized).length > 0) {
+              setConnectedAccounts((prev) => ({ ...prev, ...sanitized }));
+            }
+          }
         }
       }
     } catch (_) {}
@@ -409,14 +426,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         [platform]: {
           ...current,
           isConnected: nextState,
-          handle: cleanHandle || current.handle,
-          accountName: name || current.accountName,
+          handle: nextState ? (cleanHandle || current.handle) : '',
+          accountName: nextState ? (name || current.accountName) : current.accountName,
           connectedAt: nextState ? current.connectedAt || 'امروز' : undefined,
         },
       };
 
       try {
         localStorage.setItem('socialman_connected_accounts', JSON.stringify(updated));
+        localStorage.setItem('socialman_accounts_v3', 'true');
       } catch (_) {}
 
       return updated;
@@ -431,7 +449,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     id: 'main',
     name: currentUser?.fullName ? `فضای کاری ${currentUser.fullName}` : 'فضای کاری اصلی',
     category: 'کسب‌وکار',
-    connectedPlatforms: ['telegram', 'instagram', 'whatsapp', 'bale', 'rubika'],
+    connectedPlatforms: Object.keys(connectedAccounts).filter(
+      (k) => connectedAccounts[k as SocialPlatform]?.isConnected
+    ) as SocialPlatform[],
   };
 
   const openAuthModal = () => setIsAuthModalOpen(true);

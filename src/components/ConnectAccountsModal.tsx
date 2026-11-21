@@ -214,16 +214,17 @@ export function ConnectAccountsModal() {
               </div>
             </div>
 
-            <button
-              onClick={() => toggleAccountConnection(activeTab)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-black transition-colors ${
-                currentAccount?.isConnected
-                  ? 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200'
-                  : 'bg-[#3b96cc] text-white hover:bg-[#2c7ead]'
-              }`}
-            >
-              {currentAccount?.isConnected ? 'قطع اتصال' : 'اتصال اکانت'}
-            </button>
+            {currentAccount?.isConnected && (
+              <button
+                onClick={() => {
+                  toggleAccountConnection(activeTab, '', '', false);
+                  setChannelInput('');
+                }}
+                className="px-3.5 py-1.5 rounded-xl text-xs font-black transition-colors bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 cursor-pointer"
+              >
+                قطع اتصال
+              </button>
+            )}
           </div>
 
           {/* TELEGRAM GUIDE */}
@@ -362,18 +363,34 @@ export function ConnectAccountsModal() {
                   <span className="w-5 h-5 rounded-full bg-gradient-to-tr from-pink-500 to-rose-500 text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
                     ۲
                   </span>
-                  <div>
-                    <span className="font-bold text-gray-800 block">اتصال امن با یک کلیک (OAuth Meta):</span>
+                  <div className="w-full">
+                    <span className="font-bold text-gray-800 block mb-1">ثبت نام کاربری پیج اینستاگرام:</span>
                     <span className="text-gray-500 text-[11px] leading-relaxed block mb-2">
-                      با کلیک روی دکمه زیر، وارد درگاه رسمی فیس‌بوک/اینستاگرام شده و دسترسی ارسال پست را تایید نمایید:
+                      آیدی پیج تجاری خود را جهت زمان‌بندی و انتشار وارد فرمایید:
                     </span>
-                    <button
-                      onClick={() => toggleAccountConnection('instagram', '@growth_academy_ir', 'پیج اینستاگرام آکادمی')}
-                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-pink-600 via-rose-500 to-amber-500 text-white text-xs font-black shadow-md shadow-pink-500/20 hover:opacity-90 flex items-center gap-2"
-                    >
-                      <InstagramIcon className="w-4 h-4" />
-                      <span>اتصال سریع به اینستاگرام با لاگین رسمی Meta</span>
-                    </button>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="@username_instagram"
+                        value={channelInput}
+                        onChange={(e) => setChannelInput(e.target.value)}
+                        className="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs text-left font-mono outline-none focus:border-pink-500"
+                      />
+                      <button
+                        onClick={() => {
+                          if (channelInput.trim()) {
+                            const clean = channelInput.trim().startsWith('@') ? channelInput.trim() : `@${channelInput.trim()}`;
+                            toggleAccountConnection('instagram', clean, `پیج اینستاگرام ${clean}`, true);
+                            setTestSuccess(true);
+                            setTestMessage(`پیج ${clean} با موفقیت متصل گردید! ✅`);
+                            setTimeout(() => setTestSuccess(false), 4000);
+                          }
+                        }}
+                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-pink-600 via-rose-500 to-amber-500 text-white text-xs font-black shadow-sm hover:opacity-95 cursor-pointer"
+                      >
+                        تایید و اتصال
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -435,17 +452,34 @@ export function ConnectAccountsModal() {
                   <span className="w-5 h-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
                     ۲
                   </span>
-                  <div>
-                    <span className="font-bold text-gray-800 block">تایید اتصال کانال روبیکا و روبینو:</span>
+                  <div className="w-full">
+                    <span className="font-bold text-gray-800 block mb-1">ثبت شناسه کانال روبیکا:</span>
                     <span className="text-gray-500 text-[11px] leading-relaxed block mb-2">
-                      با ثبت توکن، کانال روبیکا آماده دریافت خودکار پست‌های زمان‌بندی‌شده است.
+                      آیدی کانال خود را وارد کرده و دکمه اتصال را بزنید:
                     </span>
-                    <button
-                      onClick={() => toggleAccountConnection('rubika', '@SocialManPublishBot', 'کانال روبیکا و صفحه روبینو')}
-                      className="px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-black hover:bg-purple-700"
-                    >
-                      تایید اتصال نهایی روبیکا
-                    </button>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="@rubika_channel یا شناسه روبیکا"
+                        value={channelInput}
+                        onChange={(e) => setChannelInput(e.target.value)}
+                        className="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs text-left font-mono outline-none focus:border-purple-600"
+                      />
+                      <button
+                        onClick={() => {
+                          if (channelInput.trim()) {
+                            const clean = channelInput.trim().startsWith('@') ? channelInput.trim() : `@${channelInput.trim()}`;
+                            toggleAccountConnection('rubika', clean, `کانال روبیکا ${clean}`, true);
+                            setTestSuccess(true);
+                            setTestMessage(`کانال روبیکا ${clean} متصل گردید! ✅`);
+                            setTimeout(() => setTestSuccess(false), 4000);
+                          }
+                        }}
+                        className="px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-black hover:bg-purple-700 cursor-pointer"
+                      >
+                        تایید و اتصال
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -468,17 +502,33 @@ export function ConnectAccountsModal() {
                 <div className="w-24 h-24 bg-white rounded-xl border border-gray-200 p-2 flex items-center justify-center shadow-xs shrink-0">
                   <QrCode className="w-20 h-20 text-gray-800" />
                 </div>
-                <div className="text-xs space-y-2">
-                  <span className="font-bold text-gray-800 block">اتصال فوری با اسکن QR کد:</span>
+                <div className="text-xs space-y-2 w-full">
+                  <span className="font-bold text-gray-800 block">اتصال شماره واتساپ یا برودکست:</span>
                   <p className="text-[11px] text-gray-500 leading-relaxed">
-                    در گوشی خود وارد WhatsApp ◂ Linked Devices شوید و کد بالا را اسکن کنید، یا شماره تجاری متصل به WhatsApp Cloud API را وارد نمایید.
+                    شماره یا شناسه متصل به واتساپ بیزینس را وارد کنید:
                   </p>
-                  <button
-                    onClick={() => toggleAccountConnection('whatsapp', '+989123456789', 'واتساپ تجاری آکادمی')}
-                    className="px-4 py-1.5 rounded-xl bg-[#25D366] text-white text-xs font-black hover:bg-[#20ba59]"
-                  >
-                    تایید اتصال واتساپ
-                  </button>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="0912... یا شناسه واتساپ"
+                      value={channelInput}
+                      onChange={(e) => setChannelInput(e.target.value)}
+                      className="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs text-left font-mono outline-none focus:border-[#25D366]"
+                    />
+                    <button
+                      onClick={() => {
+                        if (channelInput.trim()) {
+                          toggleAccountConnection('whatsapp', channelInput.trim(), `واتساپ ${channelInput.trim()}`, true);
+                          setTestSuccess(true);
+                          setTestMessage(`واتساپ با موفقیت متصل گردید! ✅`);
+                          setTimeout(() => setTestSuccess(false), 4000);
+                        }
+                      }}
+                      className="px-4 py-2 rounded-xl bg-[#25D366] text-white text-xs font-black hover:bg-[#20ba59] cursor-pointer"
+                    >
+                      تایید و اتصال
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -539,14 +589,34 @@ export function ConnectAccountsModal() {
                   <span className="w-5 h-5 rounded-full bg-teal-600 text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
                     ۲
                   </span>
-                  <div>
-                    <span className="font-bold text-gray-800 block">تایید شناسه کانال بله:</span>
-                    <button
-                      onClick={() => toggleAccountConnection('bale', 'ble.ir/SocialManPublishBot', 'کانال بله آکادمی')}
-                      className="mt-1 px-4 py-1.5 rounded-xl bg-teal-600 text-white text-xs font-black hover:bg-teal-700"
-                    >
-                      تایید اتصال نهایی بله
-                    </button>
+                  <div className="w-full">
+                    <span className="font-bold text-gray-800 block mb-1">ثبت شناسه کانال بله:</span>
+                    <span className="text-gray-500 text-[11px] leading-relaxed block mb-2">
+                      آیدی کانال بله خود (مثلاً @mychannel یا ble.ir/mychannel) را وارد فرمایید:
+                    </span>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="@bale_channel یا شناسه بله"
+                        value={channelInput}
+                        onChange={(e) => setChannelInput(e.target.value)}
+                        className="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs text-left font-mono outline-none focus:border-teal-600"
+                      />
+                      <button
+                        onClick={() => {
+                          if (channelInput.trim()) {
+                            const clean = channelInput.trim().startsWith('@') ? channelInput.trim() : `@${channelInput.trim()}`;
+                            toggleAccountConnection('bale', clean, `کانال بله ${clean}`, true);
+                            setTestSuccess(true);
+                            setTestMessage(`کانال بله ${clean} متصل گردید! ✅`);
+                            setTimeout(() => setTestSuccess(false), 4000);
+                          }
+                        }}
+                        className="px-4 py-2 rounded-xl bg-teal-600 text-white text-xs font-black hover:bg-teal-700 cursor-pointer"
+                      >
+                        تایید و اتصال
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

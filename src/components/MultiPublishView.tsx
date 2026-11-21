@@ -103,6 +103,20 @@ export function MultiPublishView() {
     setPublishedSuccess(false);
     setPublishErrorMessage(null);
 
+    // Validate if at least one selected platform is actually connected
+    const connectedSelected = selectedPlatforms.filter(
+      (p) => connectedAccounts[p]?.isConnected && connectedAccounts[p]?.handle
+    );
+
+    if (connectedSelected.length === 0) {
+      setIsPublishing(false);
+      setPublishErrorMessage(
+        'هیچ‌کدام از پلتفرم‌های انتخابی متصل نیستند! لطفاً ابتدا با کلیک روی گزینه «تنظیم و اتصال اکانت‌ها» در پنل سمت چپ، آیدی کانال خود را متصل کنید.'
+      );
+      openConnectModal(selectedPlatforms[0]);
+      return;
+    }
+
     // Progressive publishing simulation across selected platforms
     const progressMap: { [key in SocialPlatform]?: 'pending' | 'success' | 'error' } = {};
     for (const p of selectedPlatforms) {
@@ -267,7 +281,7 @@ export function MultiPublishView() {
           {/* 1. Target Platforms Toggle Bar */}
           <div>
             <label className="block text-xs font-black text-gray-800 mb-2.5 text-right">
-              ۱. انتخاب شبکه‌های هدف برای انتشار همزمان ({toPersianDigits(selectedPlatforms.length)} پلتفرم فعال):
+              ۱. انتخاب شبکه‌های هدف برای انتشار همزمان ({toPersianDigits(selectedPlatforms.length)} پلتفرم انتخاب شده):
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
               {[
@@ -278,6 +292,7 @@ export function MultiPublishView() {
                 { id: 'bale' as SocialPlatform, name: 'بله', icon: SnappBaleIcon },
               ].map((item) => {
                 const isSelected = selectedPlatforms.includes(item.id);
+                const isConnected = !!(connectedAccounts[item.id]?.isConnected && connectedAccounts[item.id]?.handle);
                 const IconComponent = item.icon;
                 return (
                   <button
@@ -286,16 +301,32 @@ export function MultiPublishView() {
                     onClick={() => togglePlatform(item.id)}
                     className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border transition-all text-center ${
                       isSelected
-                        ? 'bg-sky-50/70 border-[#3b96cc] shadow-xs'
+                        ? isConnected
+                          ? 'bg-sky-50/70 border-[#3b96cc] shadow-xs'
+                          : 'bg-amber-50/50 border-amber-300 shadow-xs'
                         : 'bg-gray-50 border-gray-200 opacity-60 hover:opacity-100'
                     }`}
                   >
                     <IconComponent className="w-8 h-8" />
-                    <span className={`text-[11px] font-black ${isSelected ? 'text-[#3b96cc]' : 'text-gray-600'}`}>
+                    <span className={`text-[11px] font-black ${isSelected ? 'text-gray-900' : 'text-gray-600'}`}>
                       {item.name}
                     </span>
-                    <span className="text-[9px] font-bold text-gray-400">
-                      {isSelected ? '✓ انتخاب شده' : 'غیرفعال'}
+                    <span
+                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${
+                        isSelected
+                          ? isConnected
+                            ? 'text-emerald-700 bg-emerald-50'
+                            : 'text-amber-800 bg-amber-100'
+                          : 'text-gray-400'
+                      }`}
+                    >
+                      {isSelected
+                        ? isConnected
+                          ? '✓ متصل و فعال'
+                          : '⚠ نیاز به اتصال'
+                        : isConnected
+                        ? 'متصل'
+                        : 'غیرفعال'}
                     </span>
                   </button>
                 );
@@ -571,9 +602,18 @@ export function MultiPublishView() {
           {/* Publishing Dispatch Status Monitor */}
           <div className="bg-white rounded-3xl border border-gray-100 p-5 shadow-xs space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-black text-gray-800 block">
-                وضعیت کانال‌های متصل ({toPersianDigits(selectedPlatforms.length)} کانال فعال):
-              </span>
+              {(() => {
+                const connectedCount = Object.values(connectedAccounts || {}).filter(
+                  (a) => a?.isConnected && a?.handle
+                ).length;
+                return (
+                  <span className="text-xs font-black text-gray-800 block">
+                    {connectedCount === 0
+                      ? 'وضعیت کانال‌ها (هیچ کانالی متصل نیست):'
+                      : `وضعیت کانال‌های متصل (${toPersianDigits(connectedCount)} از ۵ کانال فعال):`}
+                  </span>
+                );
+              })()}
               <button
                 type="button"
                 onClick={() => openConnectModal()}
@@ -593,15 +633,16 @@ export function MultiPublishView() {
                 { id: 'bale' as SocialPlatform, name: 'پیام‌رسان بله (Bale Bot)', desc: 'کانال رسمی', icon: null },
               ].map((c) => {
                 const isSelected = selectedPlatforms.includes(c.id);
-                const isConnected = connectedAccounts[c.id]?.isConnected;
+                const account = connectedAccounts[c.id];
+                const isConnected = !!(account?.isConnected && account?.handle);
                 return (
                   <div
                     key={c.id}
                     onClick={() => openConnectModal(c.id)}
                     className={`flex items-center justify-between p-2.5 rounded-xl border cursor-pointer hover:border-[#3b96cc] transition-colors ${
-                      isSelected && isConnected
+                      isConnected
                         ? 'bg-sky-50/40 border-sky-100'
-                        : 'bg-gray-50/60 border-gray-100 opacity-60'
+                        : 'bg-gray-50/70 border-gray-100 hover:bg-white'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
@@ -612,18 +653,24 @@ export function MultiPublishView() {
                           <span className="w-3.5 h-3.5 rounded-full bg-teal-600 flex items-center justify-center text-[8px] text-white font-bold">ب</span>
                         )}
                       </div>
-                      <span className="font-bold text-gray-800">{c.name}</span>
+                      <div className="flex flex-col text-right">
+                        <span className="font-bold text-gray-800">{c.name}</span>
+                        {isConnected && account?.handle ? (
+                          <span className="text-[10px] text-sky-700 font-mono font-bold">{account.handle}</span>
+                        ) : (
+                          <span className="text-[10px] text-gray-400 font-medium">{c.desc}</span>
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-gray-400 font-medium">{c.desc}</span>
                       <span
-                        className={`text-[9px] px-1.5 py-0.5 rounded-md font-bold ${
+                        className={`text-[9px] px-2 py-0.5 rounded-md font-bold transition-all ${
                           isConnected
-                            ? 'bg-sky-100 text-[#3b96cc]'
-                            : 'bg-amber-100 text-amber-700'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
                         }`}
                       >
-                        {isConnected ? 'متصل' : 'قطع'}
+                        {isConnected ? 'متصل ✓' : '+ اتصال اکانت'}
                       </span>
                     </div>
                   </div>

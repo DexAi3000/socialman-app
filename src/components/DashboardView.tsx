@@ -30,8 +30,12 @@ interface DashboardViewProps {
 }
 
 export function DashboardView({ onNavigateTab, onSetAiPlatform }: DashboardViewProps) {
-  const { posts, activeWorkspace, openConnectModal } = useApp();
+  const { posts, activeWorkspace, openConnectModal, connectedAccounts } = useApp();
   const [activeCategory, setActiveCategory] = useState<string>('all');
+
+  const connectedChannelsCount = Object.values(connectedAccounts || {}).filter(
+    (a) => a?.isConnected && a?.handle
+  ).length;
 
   const workspacePosts = posts.filter(
     (p) =>
@@ -158,25 +162,39 @@ export function DashboardView({ onNavigateTab, onSetAiPlatform }: DashboardViewP
         {/* 2.5 Quick Account Connection Strip */}
         <div className="bg-white rounded-2xl border border-gray-100 p-3.5 px-5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-sky-50 text-[#3b96cc] flex items-center justify-center shrink-0">
+            <div
+              className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                connectedChannelsCount > 0
+                  ? 'bg-sky-50 text-[#3b96cc]'
+                  : 'bg-amber-50 text-amber-600'
+              }`}
+            >
               <Link2 className="w-4 h-4" />
             </div>
             <div className="text-right">
               <span className="text-xs font-black text-gray-900 block">
-                وضعیت کانال‌های متصل به پیج {activeWorkspace.name}
+                {connectedChannelsCount === 0
+                  ? 'کانال‌های ارتباطی هنوز متصل نشده‌اند'
+                  : `وضعیت کانال‌های متصل به پیج ${activeWorkspace.name}`}
               </span>
-              <span className="text-[10px] text-gray-400">
-                هر ۵ پلتفرم (اینستاگرام، تلگرام، واتساپ، روبیکا، بله) برای انتشار خودکار متصل و فعال هستند
+              <span className="text-[10px] text-gray-500">
+                {connectedChannelsCount === 0
+                  ? 'برای فعال‌سازی انتشار خودکار در شبکه‌های اجتماعی، ابتدا اکانت خود را متصل کنید'
+                  : `${toPersianDigits(connectedChannelsCount)} از ۵ پلتفرم برای انتشار خودکار متصل و فعال هستند`}
               </span>
             </div>
           </div>
           <button
             type="button"
             onClick={() => openConnectModal()}
-            className="px-4 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-[#3b96cc] text-xs font-black transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer ${
+              connectedChannelsCount > 0
+                ? 'bg-sky-50 hover:bg-sky-100 border border-sky-200 text-[#3b96cc]'
+                : 'bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800'
+            }`}
           >
             <Link2 className="w-3.5 h-3.5" />
-            <span>تنظیم و اتصال اکانت‌ها</span>
+            <span>{connectedChannelsCount === 0 ? '+ اتصال اولین اکانت' : 'تنظیم و اتصال اکانت‌ها'}</span>
           </button>
         </div>
 
