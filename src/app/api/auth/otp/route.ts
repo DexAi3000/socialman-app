@@ -253,13 +253,13 @@ export async function POST(request: Request) {
         },
       });
 
-      const apiKey = process.env.SMS_IR_API_KEY;
-      const templateId = process.env.SMS_IR_TEMPLATE_ID;
+      const apiKey = process.env.SMS_IR_API_KEY || 'wQXNOwaL75yUIMjRgdMBzYcQ1w3o8WRmuvhnhSwYAoBOweiC';
+      const templateId = process.env.SMS_IR_TEMPLATE_ID || '123456';
 
       let smsDelivered = false;
       let smsResponseData = null;
 
-      if (apiKey && templateId) {
+      if (apiKey) {
         try {
           const smsRes = await fetch('https://api.sms.ir/v1/send/verify', {
             method: 'POST',
@@ -271,7 +271,7 @@ export async function POST(request: Request) {
             body: JSON.stringify({
               mobile: cleanPhone,
               templateId: Number(templateId),
-              parameters: [{ name: 'CODE', value: generatedCode }],
+              parameters: [{ name: 'Code', value: generatedCode }],
             }),
           });
 
