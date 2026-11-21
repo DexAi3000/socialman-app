@@ -81,40 +81,62 @@ export function SupportView() {
     if (!textToSend) setChatInput('');
     setIsBotTyping(true);
 
-    // Dynamic Intelligent Bot Answers
-    await new Promise((r) => setTimeout(r, 1000));
-
+    // Call GapGPT AI Chatbot API
     let botReply = '';
-    const q = text.toLowerCase();
+    try {
+      const history = chatMessages.map((m) => ({
+        role: m.sender === 'bot' ? ('assistant' as const) : ('user' as const),
+        content: m.text,
+      }));
 
-    if (q.includes('تلگرام') || q.includes('telegram')) {
-      botReply = `📌 **راهنمای اتصال کانال تلگرام:**
+      const res = await fetch('/socialman/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text.trim(), history }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.reply) {
+          botReply = data.reply;
+        }
+      }
+    } catch (e) {
+      console.error('Chatbot fetch error, using fallback:', e);
+    }
+
+    if (!botReply) {
+      const q = text.toLowerCase();
+
+      if (q.includes('تلگرام') || q.includes('telegram')) {
+        botReply = `📌 **راهنمای اتصال کانال تلگرام:**
 ۱. در تلگرام وارد کانال خود شوید و به بخش **Administrators** بروید.
 ۲. ربات رسمی **@SocialManPublishBot** را جستجو و اد کنید.
 ۳. دسترسی **Post Messages (ارسال پیام)** را به ربات بدهید.
 ۴. در اپلیکیشن ما به پنجره «تنظیم و اتصال اکانت‌ها» بروید و آیدی کانال را ثبت کنید.
 پس از آن، تمام پست‌های زمان‌بندی‌شده شما دقیقاً سر وقت در کانال منتشر می‌شوند.`;
-    } else if (q.includes('اینستاگرام') || q.includes('instagram') || q.includes('متا')) {
-      botReply = `📷 **نحوه اتصال اینستاگرام با Meta Graph API:**
+      } else if (q.includes('اینستاگرام') || q.includes('instagram') || q.includes('متا')) {
+        botReply = `📷 **نحوه اتصال اینستاگرام با Meta Graph API:**
 ۱. پیج اینستاگرام شما باید از نوع حرفه‌ای (Professional / Creator / Business) باشد.
 ۲. پیج را به یک صفحه فیس‌بوک متصل کنید.
 ۳. در اپلیکیشن، دکمه «اتصال با اینستاگرام (Meta)» را بزنید و لاگین رسمی فیس‌بوک را تایید کنید.
 این روش کاملاً قانونی و بدون خطر دیسیبل شدن پیج است و نیازی به پسورد شما ندارد.`;
-    } else if (q.includes('فیلترشکن') || q.includes('vpn') || q.includes('پراکسی')) {
-      botReply = `🛡️ **پاسخ به سوال فیلترشکن:**
+      } else if (q.includes('فیلترشکن') || q.includes('vpn') || q.includes('پراکسی')) {
+        botReply = `🛡️ **پاسخ به سوال فیلترشکن:**
 خیر! سرورهای پردازش ابری سوشال‌من در خارج از کشور و بر روی سرورهای پایدار مستقر هستند. بنابراین شما و مخاطبانتان بدون نیاز به روشن بودن فیلترشکن می‌توانید پست‌ها را زمان‌بندی کنید و سیستم خودکار در زمان مشخص پست را در تلگرام و اینستاگرام و بله و روبیکا منتشر می‌کند.`;
-    } else if (q.includes('زمان‌بندی') || q.includes('سه‌شنبه') || q.includes('تقویم')) {
-      botReply = `⏰ **نحوه زمان‌بندی پست:**
+      } else if (q.includes('زمان‌بندی') || q.includes('سه‌شنبه') || q.includes('تقویم')) {
+        botReply = `⏰ **نحوه زمان‌بندی پست:**
 در صفحه «انتشار ۵ پلتفرم»، عکس و متن کپشن را آماده کنید. سپس در پایین فرم، گزینه **«زمان‌بندی در تاریخ و ساعت مشخص»** را فعال کنید. تاریخ شمسی (مثلاً ۱۴۰۳/۰۹/۱۰) و ساعت دلخواه را انتخاب کرده و دکمه زمان‌بندی را بزنید. سرور ما رأس ثانیه تعیین‌شده پست را ارسال می‌کند.`;
-    } else if (q.includes('پلن') || q.includes('طلایی') || q.includes('قیمت') || q.includes('هوش مصنوعی')) {
-      botReply = `👑 **تفاوت پلن‌ها و هوش مصنوعی:**
+      } else if (q.includes('پلن') || q.includes('طلایی') || q.includes('قیمت') || q.includes('هوش مصنوعی')) {
+        botReply = `👑 **تفاوت پلن‌ها و هوش مصنوعی:**
 • **پلن برنز (رایگان):** اتصال ۲ پلتفرم و تا ۱۰ پست در ماه.
 • **پلن نقره‌ای (۱۸۹ هزار تومان):** انتشار نامحدود در تمام ۵ پلتفرم و تا ۵ پیج کاری.
-• **پلن طلایی / آژانس (۵۸۰ هزار تومان):** علاوه بر انتشار نامحدود ۵ پلتفرم، دسترسی کامل به دستیار هوش مصنوعی Google Gemini برای نوشتن خودکار ایده، کپشن و هوک ویروسی + پورتال کارفرما را دارد.`;
-    } else {
-      botReply = `متوجه سوال شما شدم! 💡 
+• **پلن طلایی / آژانس (۵۸۰ هزار تومان):** علاوه بر انتشار نامحدود ۵ پلتفرم، دسترسی کامل به دستیار هوش مصنوعی GapGPT برای نوشتن خودکار ایده، کپشن و هوک ویروسی + پورتال کارفرما را دارد.`;
+      } else {
+        botReply = `متوجه سوال شما شدم! 💡 
 سوشال‌من هاب متمرکز انتشار و زمان‌بندی همزمان در ۵ پلتفرم (اینستاگرام، تلگرام، واتساپ، روبیکا و بله) است.
 اگر موضوع شما نیاز به بررسی کارشناسی یا دسترسی‌های فنی دارد، می‌توانید از تب کناری **«ثبت و پیگیری تیکت»** یک تیکت رسمی ثبت فرمایید تا کارشناسان ما فوراً به آن رسیدگی کنند.`;
+      }
     }
 
     setIsBotTyping(false);

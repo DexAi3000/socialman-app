@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 import { AiGenerationParams, AiGenerationResponse } from '@/types';
+import { callGapGpt, getModelForPlan } from '@/lib/gapgpt';
+import { getSession } from '@/lib/session';
+import prisma from '@/lib/prisma';
 
 export async function POST(request: Request) {
   try {
@@ -10,68 +13,89 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'موضوع پست الزامی است.' }, { status: 400 });
     }
 
+    // Determine current user plan
+    let userPlan = 'free';
+    try {
+      const session = await getSession();
+      if (session?.userId) {
+        const user = await prisma.user.findUnique({
+          where: { id: session.userId },
+          select: { plan: true },
+        });
+        if (user?.plan) {
+          userPlan = user.plan;
+        }
+      }
+    } catch (e) {
+      // Ignore session errors and proceed with default
+    }
+
     const platformLabels: Record<string, string> = {
-      instagram: 'اینستاگرام (ریلز و اسلایدی)',
-      telegram: 'کانال تلگرام',
-      whatsapp: 'کانال و برودکست واتساپ',
-      bale: 'پیام‌رسان بله (کانال تجاری)',
+      instagram: 'اینستاگرام (ریلز، اسلایدی و استوری)',
+      telegram: 'کانال تلگرام با فرمت‌بندی رسمی و بولت‌پوینت',
+      whatsapp: 'کانال و گروه‌های واتساپ',
+      bale: 'پیام‌رسان بله (کانال‌های فروشگاهی و تجاری)',
       rubika: 'سوپراپلیکیشن روبیکا و روبینو',
     };
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const toneDescriptions: Record<string, string> = {
+      friendly: 'دوستانه، صمیمی، پرانرژی و جذاب',
+      formal: 'رسمی، حرفه‌ای، محترمانه و معتبر',
+      persuasive: 'فروشگاهی و ترغیب‌کننده با قدرت اقناع بالا',
+      educational: 'آموزشی، گام‌به‌گام و دارای ارزش افزوده بالا',
+    };
 
-    if (apiKey) {
-      try {
-        const prompt = `تو کارشناس ارشد تولید محتوا و شبکه‌های اجتماعی در ایران هستی.
-یک پست فوق‌العاده متناسب با پلتفرم "${platformLabels[platform] || platform}" و با لحن "${tone}" بنویس.
-موضوع: ${topic}
-کلمات کلیدی: ${keywords || 'ندارد'}
+    const targetModel = getModelForPlan(userPlan);
 
-نکات اختصاصی پلتفرم:
-- برای تلگرام و واتساپ از ساختار بولت‌پوینت، ایموجی‌های مناسب و فرمت‌بندی خوانا استفاده کن.
-- برای اینستاگرام و روبیکا هوک توقف‌کننده، متن جذاب و هشتگ‌های ترند قرار بده.
-- برای بله لحن تعاملی و کاربردی انتخاب کن.
-
-پاسخ را دقیقاً در قالب JSON زیر برگردان:
+    const systemPrompt = `تو یک کارشناس ارشد دیجیتال مارکتینگ و کپی‌رایتر فوق‌حرفه‌ای برای شبکه‌های اجتماعی در بازار ایران هستی.
+وظیفه تو نوشتن یک پست کامل، ویروسی، جذاب و استاندارد متناسب با پلتفرم انتخابی است.
+نکات مهم:
+۱. برای اینستاگرام و روبیکا حتماً هوک اولیه شوکه‌کننده یا کنجکاوی‌برانگیز باشد.
+۲. برای تلگرام و واتساپ ساختار شکیل با بولت‌پوینت‌های متنی و ایموجی‌های مرتبط داشته باشد.
+۳. هشتگ‌ها بدون علامت # و دقیقاً هماهنگ با موضوع باشند.
+۴. لحن محتوا باید کاملاً رعایت شود: "${toneDescriptions[tone] || tone}".
+۵. پاسخ باید منحصراً و بدون هیچ متن اضافه‌ای، یک JSON معتبر با ساختار زیر باشد:
 {
   "hook": "جمله اول توقف‌کننده کاربر",
-  "content": "متن بدنه اصلی پست همراه با ایموجی",
-  "cta": "کال تو اکشن و دعوت به اقدام",
+  "content": "متن بدنه اصلی پست همراه با پاراگراف‌بندی و ایموجی‌های متناسب",
+  "cta": "دعوت به اقدام پایانی (CTA) جذاب",
   "hashtags": ["هشتگ۱", "هشتگ۲", "هشتگ۳", "هشتگ۴"],
-  "suggestedBestTime": "ساعت طلایی پیشنهادی"
+  "suggestedBestTime": "ساعت طلایی پیشنهادی بر اساس پیک حضور مخاطبان پلتفرم"
 }`;
 
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: {
-                responseMimeType: 'application/json',
-                temperature: 0.7,
-              },
-            }),
-          }
-        );
+    const userPrompt = `پلتفرم: ${platformLabels[platform] || platform}
+موضوع پست: ${topic}
+کلمات کلیدی مدنظر: ${keywords || 'ندارد'}
+لحن درخواستی: ${toneDescriptions[tone] || tone}
+پلن اشتراک کاربر: ${userPlan} (سطح پردازش: ${userPlan === 'agency' ? 'ویژه طلایی / حداکثر عمق خلاقیت' : 'استاندارد'})`;
 
-        if (response.ok) {
-          const data = await response.json();
-          const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (rawText) {
-            return NextResponse.json(JSON.parse(rawText));
-          }
+    try {
+      const rawAiResponse = await callGapGpt({
+        model: targetModel,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: userPlan === 'agency' ? 0.8 : 0.7,
+        response_format: { type: 'json_object' },
+      });
+
+      if (rawAiResponse) {
+        const cleaned = rawAiResponse.trim().replace(/^```json\s*/i, '').replace(/\s*```$/, '');
+        const parsed = JSON.parse(cleaned);
+        if (parsed.hook && parsed.content) {
+          return NextResponse.json(parsed);
         }
-      } catch (geminiError) {
-        console.error('Gemini error, fallback to smart engine:', geminiError);
       }
+    } catch (gapGptErr) {
+      console.error('GapGPT execution error, falling back to smart engine:', gapGptErr);
     }
 
+    // High quality intelligent fallback if API is unreachable
     return NextResponse.json(generateSmartFallback(topic, platform, tone, keywords));
   } catch (error) {
     console.error('Error generating AI post:', error);
-    return NextResponse.json({ error: 'خطایی رخ داد' }, { status: 500 });
+    return NextResponse.json({ error: 'خطایی در پردازش رخ داد' }, { status: 500 });
   }
 }
 
