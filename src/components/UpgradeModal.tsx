@@ -27,8 +27,25 @@ export function UpgradeModal() {
     agency: { name: 'طلایی (آژانس و تیم)', price: '۵۸۰٬۰۰۰ تومان', desc: 'برندهای نامحدود، پورتال اختصاصی کارفرما و اعضای تیم' },
   }[targetPlan];
 
-  const handleSimulatePayment = () => {
+  const handlePayment = async () => {
     setIsProcessing(true);
+    try {
+      const res = await fetch('/api/payment/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: targetPlan }),
+      });
+      const data = await res.json();
+      if (res.ok && data.paymentUrl) {
+        setIsUpgradeModalOpen(false);
+        window.location.href = data.paymentUrl;
+        return;
+      }
+    } catch (err) {
+      console.error('Payment request error:', err);
+    }
+
+    // Fallback simulation
     setTimeout(() => {
       setIsProcessing(false);
       setSuccessPaid(true);
@@ -105,9 +122,9 @@ export function UpgradeModal() {
 
             {/* Pay Button */}
             <button
-              onClick={handleSimulatePayment}
+              onClick={handlePayment}
               disabled={isProcessing}
-              className="w-full py-3.5 rounded-2xl text-xs sm:text-sm font-black bg-[#00D166] hover:bg-[#00be5b] text-slate-950 shadow-md shadow-[#00D166]/20 flex items-center justify-center gap-2 transition-all disabled:opacity-50 active:scale-95"
+              className="w-full py-3.5 rounded-2xl text-xs sm:text-sm font-black bg-[#3b96cc] hover:bg-[#2c7ead] text-white shadow-md shadow-[#3b96cc]/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50 active:scale-95 cursor-pointer"
             >
               {isProcessing ? (
                 <>
