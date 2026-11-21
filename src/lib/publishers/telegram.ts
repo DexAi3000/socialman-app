@@ -39,6 +39,13 @@ export function normalizeTelegramChatId(input?: string): string {
   return `@${cleaned}`;
 }
 
+export function getTelegramApiBase(): string {
+  const base =
+    process.env.TELEGRAM_API_BASE_URL ||
+    'https://novexa-bot.dnanima895.workers.dev/tg-relay';
+  return base.replace(/\/+$/, '');
+}
+
 export async function publishToTelegram(options: TelegramPublishOptions): Promise<PublishResult> {
   const { botToken, channelId: rawChannelId, text, mediaUrl } = options;
   const now = new Date().toISOString();
@@ -53,6 +60,8 @@ export async function publishToTelegram(options: TelegramPublishOptions): Promis
 
   // If user provided a real bot token and channel ID, execute real live API call
   if (botToken && targetChat) {
+    const apiBase = getTelegramApiBase();
+
     try {
       // 1. If mediaUrl is provided
       if (mediaUrl && mediaUrl.trim()) {
@@ -76,7 +85,7 @@ export async function publishToTelegram(options: TelegramPublishOptions): Promis
               formData.append('parse_mode', 'HTML');
             }
 
-            let res = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+            let res = await fetch(`${apiBase}/bot${botToken}/sendPhoto`, {
               method: 'POST',
               body: formData,
             });
@@ -91,7 +100,7 @@ export async function publishToTelegram(options: TelegramPublishOptions): Promis
               if (text) {
                 retryForm.append('caption', text.replace(/<[^>]*>/g, ''));
               }
-              res = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+              res = await fetch(`${apiBase}/bot${botToken}/sendPhoto`, {
                 method: 'POST',
                 body: retryForm,
               });
@@ -121,7 +130,7 @@ export async function publishToTelegram(options: TelegramPublishOptions): Promis
 
         // Standard HTTP/HTTPS URL
         if (trimmedMedia.startsWith('http://') || trimmedMedia.startsWith('https://')) {
-          let res = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+          let res = await fetch(`${apiBase}/bot${botToken}/sendPhoto`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -135,7 +144,7 @@ export async function publishToTelegram(options: TelegramPublishOptions): Promis
           let data = await res.json().catch(() => null);
 
           if (!res.ok && data?.description?.includes("can't parse entities")) {
-            res = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+            res = await fetch(`${apiBase}/bot${botToken}/sendPhoto`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -169,7 +178,7 @@ export async function publishToTelegram(options: TelegramPublishOptions): Promis
       }
 
       // 2. Pure text message (when no mediaUrl or as text-first dispatch)
-      let res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      let res = await fetch(`${apiBase}/bot${botToken}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -182,7 +191,7 @@ export async function publishToTelegram(options: TelegramPublishOptions): Promis
       let data = await res.json().catch(() => null);
 
       if (!res.ok && data?.description?.includes("can't parse entities")) {
-        res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        res = await fetch(`${apiBase}/bot${botToken}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

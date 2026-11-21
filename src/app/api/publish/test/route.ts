@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { normalizeTelegramChatId } from '@/lib/publishers/telegram';
+import { normalizeTelegramChatId, getTelegramApiBase } from '@/lib/publishers/telegram';
 
 export async function POST(request: Request) {
   try {
@@ -27,8 +27,9 @@ export async function POST(request: Request) {
         );
       }
 
+      const apiBase = getTelegramApiBase();
       const res = await fetch(
-        `https://api.telegram.org/bot${token}/getChat?chat_id=${encodeURIComponent(targetChat)}`
+        `${apiBase}/bot${token}/getChat?chat_id=${encodeURIComponent(targetChat)}`
       );
       const data = await res.json().catch(() => null);
 
