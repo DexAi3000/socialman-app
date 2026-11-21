@@ -32,10 +32,13 @@ export function ClientPortalView() {
     setCommentInput(prev => ({ ...prev, [postId]: '' }));
   };
 
-  const dummyShareLink = `https://socialman.ir/review/${activeWorkspace.id}-token789`;
+  const shareLink =
+    typeof window !== 'undefined' && pendingPosts[0]
+      ? `${window.location.origin}/approve/${pendingPosts[0].id}`
+      : `https://socialman.ir/approve/${activeWorkspace.id}`;
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(dummyShareLink);
+    navigator.clipboard.writeText(shareLink);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
   };
@@ -72,7 +75,7 @@ export function ClientPortalView() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#00D166] animate-ping" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#3b96cc] animate-ping" />
               <h1 className="text-base font-black text-slate-900">
                 پورتال تایید آنلاین محتوا: {activeWorkspace.name}
               </h1>
@@ -87,12 +90,12 @@ export function ClientPortalView() {
             <input
               type="text"
               readOnly
-              value={dummyShareLink}
+              value={shareLink}
               className="bg-transparent text-xs text-slate-600 font-mono px-2 outline-none w-48 sm:w-60 truncate"
             />
             <button
               onClick={handleCopyLink}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#00D166] hover:bg-[#00be5b] text-slate-950 flex items-center gap-1.5 transition-colors shadow-xs"
+              className="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#3b96cc] hover:bg-[#2c7ead] text-white flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
             >
               {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copiedLink ? 'کپی شد' : 'کپی لینک'}</span>
