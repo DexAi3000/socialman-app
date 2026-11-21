@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/context/AppContext';
 import {
@@ -63,6 +63,34 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
 
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close profile dropdown when clicking outside or pressing Escape
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsUserDropdownOpen(false);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setIsUserDropdownOpen(false);
+      }
+    }
+
+    if (isUserDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isUserDropdownOpen]);
 
   const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -113,7 +141,16 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
         <div className="w-auto flex items-center justify-end shrink-0">
           {/* User Auth Profile / Login Button */}
           {currentUser?.isLoggedIn ? (
-            <div className="relative">
+            <div className="relative" ref={dropdownRef}>
+              {/* Invisible backdrop overlay to capture outside taps/clicks immediately */}
+              {isUserDropdownOpen && (
+                <div
+                  className="fixed inset-0 z-40 bg-transparent"
+                  onClick={() => setIsUserDropdownOpen(false)}
+                  aria-hidden="true"
+                />
+              )}
+
               {/* Hidden File Input for Avatar Upload */}
               <input
                 ref={fileInputRef}
