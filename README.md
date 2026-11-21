@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# سوشال من (Social Man) 🚀
+> دستیار هوشمند و تقویم محتوای شبکه‌های اجتماعی ویژه بازار ایران
 
-## Getting Started
+اپلیکیشن کامل مدیریت محتوا و شبکه‌های اجتماعی با قابلیت‌های پلن‌بندی اشتراکی (SaaS)، موتور تولید محتوای هوش مصنوعی Google Gemini، تقویم تعاملی شمسی (جلالی) و پورتال تایید آنلاین کارفرما.
 
-First, run the development server:
+---
+
+## ✨ ویژگی‌های پیاده‌سازی شده
+
+1. **مدل پلن‌های اشتراکی چند سطحی (Tiered Plans):**
+   * **پلن برنز (رایگان):** ۱ برند، ۱۰ بار تولید محتوا با هوش مصنوعی در ماه، تقویم جاری.
+   * **پلن نقره‌ای (حرفه‌ای - ۱۸۹٬۰۰۰ تومان):** تا ۵ برند، تولید نامحدود AI، تقویم سالانه با رویدادهای ملی، تحلیل ساعت طلایی.
+   * **پلن طلایی (آژانس - ۵۸۰٬۰۰۰ تومان):** برندهای نامحدود، پورتال اختصاصی تایید کارفرما، گزارش عملکرد، دسترسی اعضای تیم.
+
+2. **استودیوی هوش مصنوعی (AI Studio):**
+   * سازگار با **Google AI Studio (Gemini 1.5 / 2.0)**.
+   * تولید خودکار قلاب (Hook) جذاب برای ۳ ثانیه اول ویدیو یا اسلاید.
+   * تولید کپشن کامل با ایموجی‌های متناسب و فراخوان به اقدام (CTA).
+   * دسته‌بندی هشتگ‌های تخصصی و پیشنهاد ساعت طلایی انتشار.
+   * قابلیت افزودن مستقیم پست تولید شده به تقویم شمسی با یک کلیک.
+
+3. **تقویم شمسی هوشمند (Jalali Content Calendar):**
+   * تفکیک روزهای ماه شمسی (آذر ۱۴۰۳).
+   * نشانه‌گذاری مناسبت‌های ملی و تجاری (روز دانشجو، شب یلدا و پیک‌های فروش).
+   * فیلتر بر اساس شبکه اجتماعی (اینستاگرام، تلگرام، لینکدین، توییتر).
+   * امکان تعریف، ویرایش و تغییر وضعیت پست‌ها.
+
+4. **پورتال تایید کارفرما (Client Approval Portal - ویژه پلن طلایی):**
+   * لینک اختصاصی و امن برای کارفرما بدون نیاز به لاگین.
+   * امکان ثبت نظر/اصلاحیه و تایید نهایی پست‌ها به صورت آنلاین.
+
+5. **شبیه‌ساز درگاه زرین‌پال و شاپرک:**
+   * امکان ارتقای حساب و فعال‌سازی فوری پلن‌ها در رابط کاربری.
+
+---
+
+## 🛠️ راهنمای اجرا
+
+برای اجرای پروژه در محیط توسعه (Local):
 
 ```bash
+cd "C:\Users\PCMOD\.gemini\antigravity\scratch\social-man"
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+سپس در مرورگر آدرس `http://localhost:3000` را باز کنید.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🔑 اتصال کلید هوش مصنوعی Google AI Studio
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+برای اتصال مستقیم به اکانت گوگل AI استودیو:
+1. یک فایل با نام `.env.local` در ریشه پروژه بسازید.
+2. کلید خود را داخل آن قرار دهید:
+```env
+GEMINI_API_KEY=کلید_دریافتی_شما_از_گوگل_استودیو
+```
+*(نکته: حتی بدون کلید نیز موتور شبیه‌ساز هوشمند داخلی فعال است و خروجی‌های واقعی فارسی تولید می‌کند).*

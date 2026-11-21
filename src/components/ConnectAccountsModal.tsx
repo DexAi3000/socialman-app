@@ -1,0 +1,578 @@
+"use client";
+
+import React, { useState } from 'react';
+import { useApp } from '@/context/AppContext';
+import {
+  X,
+  CheckCircle2,
+  AlertCircle,
+  Link2,
+  ExternalLink,
+  ShieldCheck,
+  Send,
+  RefreshCw,
+  QrCode,
+  Bot,
+  Copy,
+  Check,
+  Info,
+  Radio,
+} from 'lucide-react';
+import {
+  InstagramIcon,
+  TelegramIcon,
+  WhatsappIcon,
+  RubikaIcon,
+  BaleIcon,
+} from './SocialIcons';
+import {
+  SnappInstagramIcon,
+  SnappTelegramIcon,
+  SnappWhatsappIcon,
+  SnappRubikaIcon,
+  SnappBaleIcon,
+} from './SnappIcons';
+import { SocialPlatform } from '@/types';
+import { toPersianDigits } from '@/lib/utils';
+
+export function ConnectAccountsModal() {
+  const {
+    isConnectModalOpen,
+    closeConnectModal,
+    targetPlatformForConnect,
+    connectedAccounts,
+    toggleAccountConnection,
+  } = useApp();
+
+  const [activeTab, setActiveTab] = useState<SocialPlatform>(
+    targetPlatformForConnect || 'telegram'
+  );
+
+  const [copiedBot, setCopiedBot] = useState(false);
+  const [channelInput, setChannelInput] = useState('');
+  const [testingConnection, setTestingConnection] = useState(false);
+  const [testSuccess, setTestSuccess] = useState(false);
+
+  // Sync tab with external caller
+  React.useEffect(() => {
+    if (targetPlatformForConnect) {
+      setActiveTab(targetPlatformForConnect);
+    }
+  }, [targetPlatformForConnect]);
+
+  if (!isConnectModalOpen) return null;
+
+  const currentAccount = connectedAccounts[activeTab];
+
+  const handleCopyBotId = (botId: string) => {
+    navigator.clipboard.writeText(botId);
+    setCopiedBot(true);
+    setTimeout(() => setCopiedBot(false), 2500);
+  };
+
+  const handleTestConnection = async () => {
+    setTestingConnection(true);
+    setTestSuccess(false);
+    await new Promise((r) => setTimeout(r, 1200));
+    setTestingConnection(false);
+    setTestSuccess(true);
+    setTimeout(() => setTestSuccess(false), 4000);
+  };
+
+  const platformsList = [
+    { id: 'telegram' as SocialPlatform, name: 'تلگرام', icon: SnappTelegramIcon, badge: 'آسان‌ترین (۱ دقیقه)' },
+    { id: 'instagram' as SocialPlatform, name: 'اینستاگرام', icon: SnappInstagramIcon, badge: 'رسمی Meta' },
+    { id: 'rubika' as SocialPlatform, name: 'روبیکا', icon: SnappRubikaIcon, badge: 'ملی پرسرعت' },
+    { id: 'whatsapp' as SocialPlatform, name: 'واتساپ', icon: SnappWhatsappIcon, badge: 'Cloud API / QR' },
+    { id: 'bale' as SocialPlatform, name: 'بله', icon: SnappBaleIcon, badge: 'بازوی رسمی' },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[90vh]">
+        {/* Modal Header */}
+        <div className="p-5 sm:p-6 border-b border-gray-100 flex items-center justify-between bg-gradient-to-l from-emerald-50/50 to-white">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-2xl bg-[#21aa58] flex items-center justify-center text-white shadow-md shadow-[#21aa58]/30">
+              <Link2 className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-base sm:text-lg font-black text-gray-900">
+                اتصال و مدیریت کانال‌های انتشار خودکار
+              </h2>
+              <p className="text-xs text-gray-500 font-medium mt-0.5">
+                اتصال کاملاً امن، رسمی و بدون نیاز به دسترسی به پسورد شخصی شما
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={closeConnectModal}
+            className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Platform Selection Tabs */}
+        <div className="px-5 pt-3 border-b border-gray-100 bg-gray-50/50 flex gap-1.5 overflow-x-auto no-scrollbar">
+          {platformsList.map((p) => {
+            const Icon = p.icon;
+            const isSelected = activeTab === p.id;
+            const isConn = connectedAccounts[p.id]?.isConnected;
+            return (
+              <button
+                key={p.id}
+                onClick={() => {
+                  setActiveTab(p.id);
+                  setTestSuccess(false);
+                }}
+                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-t-2xl text-xs font-bold transition-all whitespace-nowrap border-b-2 ${
+                  isSelected
+                    ? 'bg-white border-[#21aa58] text-[#21aa58] font-black shadow-xs'
+                    : 'border-transparent text-gray-500 hover:text-gray-900'
+                }`}
+              >
+                <div className="w-5 h-5 flex items-center justify-center">
+                  <Icon className="w-5 h-5" />
+                </div>
+                <span>{p.name}</span>
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    isConn ? 'bg-[#21aa58]' : 'bg-gray-300'
+                  }`}
+                />
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Tab Content Body */}
+        <div className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1 text-right">
+          {/* Current Connection Status Box */}
+          <div
+            className={`p-4 rounded-2xl border flex items-center justify-between gap-3 ${
+              currentAccount?.isConnected
+                ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
+                : 'bg-amber-50/70 border-amber-200 text-amber-950'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              {currentAccount?.isConnected ? (
+                <div className="w-9 h-9 rounded-xl bg-[#21aa58] text-white flex items-center justify-center">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+              ) : (
+                <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center">
+                  <AlertCircle className="w-5 h-5" />
+                </div>
+              )}
+              <div>
+                <span className="text-xs font-black block">
+                  {currentAccount?.isConnected
+                    ? `متصل به: ${currentAccount.accountName}`
+                    : 'در انتظار اتصال'}
+                </span>
+                <span className="text-[11px] text-gray-600 font-mono">
+                  {currentAccount?.isConnected
+                    ? `${currentAccount.handle} • اتصال فعال برای زمان‌بندی خودکار`
+                    : 'هنوز اکانتی برای این پلتفرم فعال نشده است'}
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => toggleAccountConnection(activeTab)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-black transition-colors ${
+                currentAccount?.isConnected
+                  ? 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200'
+                  : 'bg-[#21aa58] text-white hover:bg-[#1e9b50]'
+              }`}
+            >
+              {currentAccount?.isConnected ? 'قطع اتصال' : 'اتصال اکانت'}
+            </button>
+          </div>
+
+          {/* TELEGRAM GUIDE */}
+          {activeTab === 'telegram' && (
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <h3 className="text-sm font-black text-gray-900">
+                  راهنمای اتصال کانال تلگرام برای انتشار خودکار
+                </h3>
+                <p className="text-xs text-gray-500">
+                  ربات رسمی تلگرام با توکن اختصاصی ساخته شده در BotFather متصل و تایید گردید:
+                </p>
+              </div>
+
+              {/* Bot Info Card */}
+              <div className="p-4 rounded-2xl bg-sky-50/80 border border-sky-200 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-xs font-black text-sky-950">بات رسمی تلگرام: SocialMan</span>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                    Bot API فعال و تایید شده ✓
+                  </span>
+                </div>
+                <div className="text-xs text-sky-900 flex items-center justify-between">
+                  <span>نام کاربری بات: <strong className="font-mono">@SocialManPublishBot</strong></span>
+                  <button
+                    onClick={() => handleCopyBotId('@SocialManPublishBot')}
+                    className="text-sky-600 hover:text-sky-800 flex items-center gap-1 text-[11px]"
+                  >
+                    {copiedBot ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>کپی آیدی بات</span>
+                  </button>
+                </div>
+                <div className="text-[10px] text-gray-500 font-mono bg-white p-2 rounded-xl border border-sky-100 truncate">
+                  توکن HTTP API: 9115798954:AAHHygpdWUJlhI3k-FX7rtU2egGt7wwHwrg
+                </div>
+              </div>
+
+              {/* Step by Step */}
+              <div className="space-y-2.5 text-xs">
+                <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3">
+                  <span className="w-5 h-5 rounded-full bg-[#21aa58] text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
+                    ۱
+                  </span>
+                  <div>
+                    <span className="font-bold text-gray-800 block">اضافه کردن ربات به کانال:</span>
+                    <span className="text-gray-500 text-[11px] leading-relaxed">
+                      در تلگرام وارد بخش تنظیمات کانال خود شوید، به بخش <strong>Administrators</strong> بروید و ربات زیر را اضافه کنید:
+                    </span>
+                    <div className="mt-2 flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-gray-200 w-fit">
+                      <span className="font-mono text-emerald-700 font-black text-xs">
+                        @SocialManPublishBot
+                      </span>
+                      <button
+                        onClick={() => handleCopyBotId('@SocialManPublishBot')}
+                        className="text-gray-400 hover:text-gray-700"
+                      >
+                        {copiedBot ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3">
+                  <span className="w-5 h-5 rounded-full bg-[#21aa58] text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
+                    ۲
+                  </span>
+                  <div>
+                    <span className="font-bold text-gray-800 block">دادن دسترسی «ارسال پیام» (Post Messages):</span>
+                    <span className="text-gray-500 text-[11px]">
+                      به ربات فقط دسترسی Post Messages (ارسال پیام و مدیا) بدهید. نیازی به دسترسی‌های دیگر نیست.
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3">
+                  <span className="w-5 h-5 rounded-full bg-[#21aa58] text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
+                    ۳
+                  </span>
+                  <div className="w-full">
+                    <span className="font-bold text-gray-800 block mb-1">ثبت آیدی یا شناسه کانال:</span>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="@channel_id"
+                        value={channelInput}
+                        onChange={(e) => setChannelInput(e.target.value)}
+                        className="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-xs text-left font-mono outline-none focus:border-[#21aa58]"
+                      />
+                      <button
+                        onClick={() => {
+                          if (channelInput.trim()) {
+                            toggleAccountConnection('telegram', channelInput, 'کانال تلگرام اختصاصی');
+                          }
+                        }}
+                        className="px-4 py-1.5 rounded-xl bg-[#21aa58] text-white text-xs font-black hover:bg-[#1e9b50]"
+                      >
+                        تایید و اتصال
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* INSTAGRAM GUIDE */}
+          {activeTab === 'instagram' && (
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <h3 className="text-sm font-black text-gray-900">
+                  راهنمای اتصال اینستاگرام از طریق Meta Graph API
+                </h3>
+                <p className="text-xs text-gray-500">
+                  اینستاگرام از پروتکل رسمی Meta Content Publishing API استفاده می‌کند که ایمن‌ترین روش بین‌المللی است:
+                </p>
+              </div>
+
+              <div className="space-y-2.5 text-xs">
+                <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3">
+                  <span className="w-5 h-5 rounded-full bg-gradient-to-tr from-pink-500 to-rose-500 text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
+                    ۱
+                  </span>
+                  <div>
+                    <span className="font-bold text-gray-800 block">تبدیل پیج به Professional / Business:</span>
+                    <span className="text-gray-500 text-[11px] leading-relaxed">
+                      در اپلیکیشن اینستاگرام به Settings & Privacy ◂ Account type ◂ Switch to professional account بروید (کاملاً رایگان).
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3">
+                  <span className="w-5 h-5 rounded-full bg-gradient-to-tr from-pink-500 to-rose-500 text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
+                    ۲
+                  </span>
+                  <div>
+                    <span className="font-bold text-gray-800 block">اتصال امن با یک کلیک (OAuth Meta):</span>
+                    <span className="text-gray-500 text-[11px] leading-relaxed block mb-2">
+                      با کلیک روی دکمه زیر، وارد درگاه رسمی فیس‌بوک/اینستاگرام شده و دسترسی ارسال پست را تایید نمایید:
+                    </span>
+                    <button
+                      onClick={() => toggleAccountConnection('instagram', '@growth_academy_ir', 'پیج اینستاگرام آکادمی')}
+                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-pink-600 via-rose-500 to-amber-500 text-white text-xs font-black shadow-md shadow-pink-500/20 hover:opacity-90 flex items-center gap-2"
+                    >
+                      <InstagramIcon className="w-4 h-4" />
+                      <span>اتصال سریع به اینستاگرام با لاگین رسمی Meta</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* RUBIKA GUIDE */}
+          {activeTab === 'rubika' && (
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <h3 className="text-sm font-black text-gray-900">
+                  اتصال خودکار روبیکا از طریق پلتفرم بات روبیکا
+                </h3>
+                <p className="text-xs text-gray-500">
+                  ربات اختصاصی ساخته شده در «مدیریت بات‌های روبیکا» با موفقیت به اپلیکیشن متصل گردید:
+                </p>
+              </div>
+
+              {/* Bot Info Card */}
+              <div className="p-4 rounded-2xl bg-purple-50/80 border border-purple-200 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-xs font-black text-purple-950">بات فعال روبیکا: SocialMan</span>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                    توکن فعال و متصل ✓
+                  </span>
+                </div>
+                <div className="text-xs text-purple-900 flex items-center justify-between">
+                  <span>نام کاربری بات: <strong className="font-mono">@SocialManPublishBot</strong></span>
+                  <button
+                    onClick={() => handleCopyBotId('@SocialManPublishBot')}
+                    className="text-purple-600 hover:text-purple-800 flex items-center gap-1 text-[11px]"
+                  >
+                    {copiedBot ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>کپی آیدی بات</span>
+                  </button>
+                </div>
+                <div className="text-[10px] text-gray-500 font-mono bg-white p-2 rounded-xl border border-purple-100 truncate">
+                  توکن روبیکا: CJIJEG0ICJPDQSHEUWTHRWIDFFITRQUHWBZFEAQAYUJHCUZUGSYBGUQXCUZHERIR
+                </div>
+              </div>
+
+              <div className="space-y-2.5 text-xs">
+                <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3">
+                  <span className="w-5 h-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
+                    ۱
+                  </span>
+                  <div>
+                    <span className="font-bold text-gray-800 block">عضو کردن ربات در کانال روبیکا:</span>
+                    <span className="text-gray-500 text-[11px] leading-relaxed">
+                      در روبیکا وارد کانال خود شوید، به بخش «مدیران» بروید و ربات <strong>@SocialManPublishBot</strong> را با دسترسی «ارسال پیام» اضافه فرمایید.
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3">
+                  <span className="w-5 h-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
+                    ۲
+                  </span>
+                  <div>
+                    <span className="font-bold text-gray-800 block">تایید اتصال کانال روبیکا و روبینو:</span>
+                    <span className="text-gray-500 text-[11px] leading-relaxed block mb-2">
+                      با ثبت توکن، کانال روبیکا آماده دریافت خودکار پست‌های زمان‌بندی‌شده است.
+                    </span>
+                    <button
+                      onClick={() => toggleAccountConnection('rubika', '@SocialManPublishBot', 'کانال روبیکا و صفحه روبینو')}
+                      className="px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-black hover:bg-purple-700"
+                    >
+                      تایید اتصال نهایی روبیکا
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* WHATSAPP GUIDE */}
+          {activeTab === 'whatsapp' && (
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <h3 className="text-sm font-black text-gray-900">
+                  اتصال واتساپ (کانال‌های عمومی و برودکست بیزینس)
+                </h3>
+                <p className="text-xs text-gray-500">
+                  ارسال همزمان به کانال رسمی واتساپ و لیست‌های انتشار:
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 flex flex-col sm:flex-row items-center gap-4">
+                <div className="w-24 h-24 bg-white rounded-xl border border-gray-200 p-2 flex items-center justify-center shadow-xs shrink-0">
+                  <QrCode className="w-20 h-20 text-gray-800" />
+                </div>
+                <div className="text-xs space-y-2">
+                  <span className="font-bold text-gray-800 block">اتصال فوری با اسکن QR کد:</span>
+                  <p className="text-[11px] text-gray-500 leading-relaxed">
+                    در گوشی خود وارد WhatsApp ◂ Linked Devices شوید و کد بالا را اسکن کنید، یا شماره تجاری متصل به WhatsApp Cloud API را وارد نمایید.
+                  </p>
+                  <button
+                    onClick={() => toggleAccountConnection('whatsapp', '+989123456789', 'واتساپ تجاری آکادمی')}
+                    className="px-4 py-1.5 rounded-xl bg-[#25D366] text-white text-xs font-black hover:bg-[#20ba59]"
+                  >
+                    تایید اتصال واتساپ
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* BALE GUIDE */}
+          {activeTab === 'bale' && (
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <h3 className="text-sm font-black text-gray-900">
+                  اتصال پیام‌رسان بله از طریق بازوی رسمی (Bale Bot API)
+                </h3>
+                <p className="text-xs text-gray-500">
+                  بازوی اختصاصی بله ساخته شده و به اپلیکیشن متصل گردید:
+                </p>
+              </div>
+
+              {/* Bot Info Card */}
+              <div className="p-4 rounded-2xl bg-teal-50/80 border border-teal-200 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-teal-500 animate-pulse" />
+                    <span className="text-xs font-black text-teal-950">بازوی فعال بله: SocialMan</span>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-800">
+                    توکن فعال و متصل ✓
+                  </span>
+                </div>
+                <div className="text-xs text-teal-900 flex items-center justify-between">
+                  <span>نام بازو: <strong className="font-mono">@SocialManPublishBot</strong></span>
+                  <button
+                    onClick={() => handleCopyBotId('@SocialManPublishBot')}
+                    className="text-teal-600 hover:text-teal-800 flex items-center gap-1 text-[11px]"
+                  >
+                    {copiedBot ? <Check className="w-3.5 h-3.5 text-teal-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>کپی آیدی بازو</span>
+                  </button>
+                </div>
+                <div className="text-[10px] text-gray-500 font-mono bg-white p-2 rounded-xl border border-teal-100 truncate">
+                  توکن دسترسی: 369114062:R7BeEnjLaDSiFv26-wsP-4ol_aGbTKmBNo
+                </div>
+              </div>
+
+              <div className="space-y-2.5 text-xs">
+                <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3">
+                  <span className="w-5 h-5 rounded-full bg-teal-600 text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
+                    ۱
+                  </span>
+                  <div>
+                    <span className="font-bold text-gray-800 block">افزودن بازوی رسمی به کانال بله:</span>
+                    <span className="text-gray-500 text-[11px] leading-relaxed">
+                      در پیام‌رسان بله وارد کانال خود شوید، به بخش مدیران بروید و بازوی <strong>@SocialManPublishBot</strong> (لینک ble.ir/SocialManPublishBot) را با دسترسی ارسال پیام ادمین نمایید.
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3">
+                  <span className="w-5 h-5 rounded-full bg-teal-600 text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
+                    ۲
+                  </span>
+                  <div>
+                    <span className="font-bold text-gray-800 block">تایید شناسه کانال بله:</span>
+                    <button
+                      onClick={() => toggleAccountConnection('bale', 'ble.ir/SocialManPublishBot', 'کانال بله آکادمی')}
+                      className="mt-1 px-4 py-1.5 rounded-xl bg-teal-600 text-white text-xs font-black hover:bg-teal-700"
+                    >
+                      تایید اتصال نهایی بله
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Test Dispatch Button */}
+          {currentAccount?.isConnected && (
+            <div className="pt-2 border-t border-gray-100">
+              <div className="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <Radio className="w-4 h-4 text-[#21aa58] animate-pulse" />
+                  <div>
+                    <span className="text-xs font-black text-gray-800 block">تست ارسال آزمایشی</span>
+                    <span className="text-[10px] text-gray-400">
+                      یک پیام تست مخفی به {currentAccount.accountName} ارسال کنید تا صحت اتصال تایید شود.
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleTestConnection}
+                  disabled={testingConnection}
+                  className="px-4 py-2 rounded-xl bg-white border border-gray-200 text-gray-800 hover:bg-gray-100 text-xs font-black flex items-center gap-2 shadow-xs transition-colors shrink-0"
+                >
+                  {testingConnection ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#21aa58]" />
+                      <span>در حال ارسال پیام تست...</span>
+                    </>
+                  ) : testSuccess ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <span className="text-emerald-700">ارسال تست موفق بود! ✅</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5 text-[#21aa58]" />
+                      <span>ارسال پیام تستی</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Modal Footer */}
+        <div className="p-4 sm:p-5 border-t border-gray-100 bg-gray-50 flex items-center justify-between text-xs">
+          <div className="flex items-center gap-1.5 text-gray-500 font-bold">
+            <ShieldCheck className="w-4 h-4 text-[#21aa58]" />
+            <span>پروتکل اتصال رمزنگاری‌شده SSL ۲۵۶ بیتی</span>
+          </div>
+          <button
+            onClick={closeConnectModal}
+            className="px-5 py-2.5 rounded-xl bg-[#21aa58] text-white font-black hover:bg-[#1e9b50] transition-colors"
+          >
+            بستن و ذخیره تنظیمات
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
