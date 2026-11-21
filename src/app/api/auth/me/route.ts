@@ -7,30 +7,7 @@ export async function GET() {
     const session = await getSession();
 
     if (!session) {
-      // Fallback: If no session, return default admin user for initial dev/preview experience
-      const defaultUser = await prisma.user.findFirst({
-        include: {
-          workspaces: true,
-        },
-      });
-
-      if (!defaultUser) {
-        return NextResponse.json({ authenticated: false, user: null });
-      }
-
-      return NextResponse.json({
-        authenticated: true,
-        isGuestDemo: true,
-        user: {
-          id: defaultUser.id,
-          fullName: defaultUser.fullName,
-          phone: defaultUser.phone,
-          role: defaultUser.role,
-          plan: defaultUser.plan,
-          avatarUrl: defaultUser.avatarUrl,
-        },
-        workspaces: defaultUser.workspaces,
-      });
+      return NextResponse.json({ authenticated: false, user: null });
     }
 
     // Authenticated via valid session cookie
@@ -47,13 +24,12 @@ export async function GET() {
 
     return NextResponse.json({
       authenticated: true,
-      isGuestDemo: false,
       user: {
         id: user.id,
         fullName: user.fullName,
         phone: user.phone,
         role: user.role,
-        plan: user.plan,
+        plan: user.plan || 'free',
         avatarUrl: user.avatarUrl,
       },
       workspaces: user.workspaces,

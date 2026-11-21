@@ -79,12 +79,12 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
 
   return (
     <header className="w-full bg-white border-b border-gray-100 sticky top-0 z-40 shadow-xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between gap-4 relative">
+      <div className="max-w-md mx-auto px-3 h-16 flex items-center justify-between gap-2">
         {/* Right side: 3-line Hamburger Menu Button (No text) */}
-        <div className="flex items-center">
+        <div className="w-10 flex items-center justify-start shrink-0">
           <button
             onClick={() => setIsHamburgerMenuOpen(true)}
-            className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gray-50 hover:bg-sky-50 text-gray-700 hover:text-[#3b96cc] border border-gray-200 hover:border-sky-200 flex items-center justify-center transition-all shadow-2xs group cursor-pointer"
+            className="w-10 h-10 rounded-2xl bg-gray-50 hover:bg-sky-50 text-gray-700 hover:text-[#3b96cc] border border-gray-200 hover:border-sky-200 flex items-center justify-center transition-all shadow-2xs group cursor-pointer active:scale-95"
             title="منو"
             aria-label="منو"
           >
@@ -92,26 +92,26 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
           </button>
         </div>
 
-        {/* Center: Brand Logo + Social Man */}
+        {/* Center: Brand Logo + Social Man (Centered in flex flow, never overlaps) */}
         <div
           onClick={() => setActiveTab('dashboard')}
-          className="absolute left-1/2 -translate-x-1/2 cursor-pointer flex items-center gap-2 sm:gap-2.5 group select-none"
+          className="flex-1 flex items-center justify-center gap-2 cursor-pointer select-none min-w-0"
         >
-          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl overflow-hidden shadow-sm border border-gray-100 group-hover:scale-105 transition-transform shrink-0">
+          <div className="w-8 h-8 rounded-xl overflow-hidden shadow-xs border border-gray-100 shrink-0">
             <img
               src="/app-icon.jpg"
               alt="Social Man"
               className="w-full h-full object-cover"
             />
           </div>
-          <span className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight font-sans">
+          <span className="text-base sm:text-lg font-black text-gray-900 tracking-tight font-sans truncate">
             Social Man
           </span>
         </div>
 
         {/* Left side: User Auth */}
-        <div className="flex items-center gap-3">
-          {/* User Auth Profile / Login Button via SMS.ir */}
+        <div className="w-auto flex items-center justify-end shrink-0">
+          {/* User Auth Profile / Login Button */}
           {currentUser?.isLoggedIn ? (
             <div className="relative">
               {/* Hidden File Input for Avatar Upload */}
@@ -229,10 +229,10 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
           ) : (
             <Link
               href="/login"
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-black text-white bg-[#3b96cc] hover:bg-[#2c7ead] shadow-xs transition-all active:scale-95"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black text-white bg-[#3b96cc] hover:bg-[#2c7ead] shadow-xs transition-all active:scale-95 whitespace-nowrap"
             >
               <Smartphone className="w-3.5 h-3.5 text-white" />
-              <span>ورود / ثبت‌نام</span>
+              <span>ورود</span>
             </Link>
           )}
         </div>

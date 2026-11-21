@@ -98,13 +98,13 @@ export function PricingView() {
               key={p.id}
               className={`relative flex flex-col justify-between rounded-3xl p-5 sm:p-6 transition-all ${
                 p.popular
-                  ? 'bg-white border-2 border-[#00D166] shadow-xl shadow-sky-500/10'
+                  ? 'bg-white border-2 border-[#3b96cc] shadow-xl shadow-[#3b96cc]/10'
                   : 'bg-white border border-slate-200/90 shadow-xs'
               }`}
             >
               {p.popular && (
-                <div className="absolute -top-3 right-1/2 translate-x-1/2 bg-[#00D166] text-slate-950 text-[10px] font-black px-3 py-0.5 rounded-full shadow-sm">
-                  محبوب‌ترین انتخاب ادمین‌ها 🔥
+                <div className="absolute -top-3 right-1/2 translate-x-1/2 bg-gradient-to-r from-sky-500 to-[#3b96cc] text-white text-xs font-black px-4 py-1 rounded-full shadow-md whitespace-nowrap border border-white/80 tracking-wide">
+                  محبوب ترین
                 </div>
               )}
 
@@ -125,8 +125,8 @@ export function PricingView() {
                   <span className="text-[11px] font-black text-slate-700 block">امکانات:</span>
                   {p.features.map((feat, idx) => (
                     <div key={idx} className="flex items-start gap-2 text-xs text-slate-700">
-                      <div className="p-0.5 rounded-full bg-sky-100 text-[#00A852] mt-0.5 shrink-0">
-                        <Check className="w-3 h-3" />
+                      <div className="p-0.5 rounded-full bg-sky-100 text-[#3b96cc] mt-0.5 shrink-0">
+                        <Check className="w-3 h-3 stroke-[2.5]" />
                       </div>
                       <span>{feat}</span>
                     </div>

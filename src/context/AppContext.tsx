@@ -16,6 +16,7 @@ import {
 
 interface AppContextType {
   currentUser: UserProfile | null;
+  isAuthChecked: boolean;
   isAuthModalOpen: boolean;
   openAuthModal: () => void;
   closeAuthModal: () => void;
@@ -259,7 +260,8 @@ const INITIAL_TICKETS: SupportTicket[] = [
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(INITIAL_USER);
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  const [isAuthChecked, setIsAuthChecked] = useState<boolean>(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
 
   const [currentPlan, setCurrentPlan] = useState<PlanType>('free');
@@ -288,14 +290,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             phone: d.user.phone,
             role: d.user.role,
             avatarUrl: d.user.avatarUrl,
-            isLoggedIn: !d.isGuestDemo,
+            isLoggedIn: true,
           });
           if (d.user.plan) {
             setCurrentPlan(d.user.plan as PlanType);
           }
+        } else {
+          setCurrentUser(null);
         }
       })
-      .catch((err) => console.log('Auth session check error:', err));
+      .catch((err) => {
+        console.log('Auth session check error:', err);
+        setCurrentUser(null);
+      })
+      .finally(() => {
+        setIsAuthChecked(true);
+      });
 
     // 1. Fetch Workspaces from DB
     fetch('/api/workspaces')
@@ -588,6 +598,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     <AppContext.Provider
       value={{
         currentUser,
+        isAuthChecked,
         isAuthModalOpen,
         openAuthModal,
         closeAuthModal,

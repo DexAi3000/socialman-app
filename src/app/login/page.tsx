@@ -16,7 +16,7 @@ import { toPersianDigits } from '@/lib/utils';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { loginUser } = useApp();
+  const { loginUser, currentUser, isAuthChecked } = useApp();
 
   const [step, setStep] = useState<'phone' | 'otp' | 'success'>('phone');
   const [phone, setPhone] = useState('09123456789');
@@ -28,6 +28,13 @@ export default function LoginPage() {
   const [countdown, setCountdown] = useState(120);
 
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // If user is already logged in, redirect directly to dashboard
+  useEffect(() => {
+    if (isAuthChecked && currentUser?.isLoggedIn) {
+      router.replace('/');
+    }
+  }, [isAuthChecked, currentUser, router]);
 
   // Countdown timer for OTP
   useEffect(() => {
