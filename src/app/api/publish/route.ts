@@ -27,6 +27,39 @@ export async function POST(request: Request) {
       );
     }
 
+    // Resolve base64 image to public HTTPS static asset if applicable
+    let resolvedMediaUrl = mediaUrl;
+    if (mediaUrl && typeof mediaUrl === 'string' && mediaUrl.startsWith('data:image/')) {
+      try {
+        const match = mediaUrl.match(/^data:([^;]+);base64,(.+)$/);
+        if (match) {
+          const mimeType = match[1];
+          const base64Data = match[2];
+          const buffer = Buffer.from(base64Data, 'base64');
+          let ext = mimeType.split('/')[1] || 'jpg';
+          if (ext.includes('+')) ext = ext.split('+')[0];
+          if (ext === 'jpeg') ext = 'jpg';
+
+          const fs = await import('fs');
+          const path = await import('path');
+          const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+          if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+          }
+
+          const filename = `post_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${ext}`;
+          fs.writeFileSync(path.join(uploadsDir, filename), buffer);
+
+          const uploadsBase =
+            process.env.PUBLIC_UPLOADS_URL ||
+            'https://nimaariyanfar.com/uploads';
+          resolvedMediaUrl = `${uploadsBase.replace(/\/+$/, '')}/${filename}`;
+        }
+      } catch (err) {
+        console.warn('Failed to persist uploaded image to disk:', err);
+      }
+    }
+
     // 1. If immediate, run publisher engine for all chosen platforms
     let publishResults: any = null;
     if (isImmediate) {
@@ -35,7 +68,7 @@ export async function POST(request: Request) {
         title,
         content,
         hashtags,
-        mediaUrl,
+        mediaUrl: resolvedMediaUrl,
         accountsConfig,
       });
     }
@@ -79,7 +112,7 @@ export async function POST(request: Request) {
             status: isImmediate ? 'published' : 'approved',
             scheduledDateShamsi: scheduledDateShamsi || 'امروز',
             scheduledTime: scheduledTime || 'هم‌اکنون',
-            mediaUrl: mediaUrl || null,
+            mediaUrl: resolvedMediaUrl || null,
           },
         });
       })

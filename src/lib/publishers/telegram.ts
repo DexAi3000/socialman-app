@@ -15,35 +15,46 @@ export interface PublishResult {
   details?: any;
 }
 
-export function normalizeTelegramChatId(input?: string): string {
-  if (!input) return '';
-  let cleaned = input.trim();
-  // Strip url schemes and domains: https://t.me/, http://t.me/, tg://resolve?domain=, t.me/
-  cleaned = cleaned.replace(/^https?:\/\/t\.me\//i, '');
-  cleaned = cleaned.replace(/^t\.me\//i, '');
-  cleaned = cleaned.replace(/^tg:\/\/resolve\?domain=/i, '');
-  cleaned = cleaned.replace(/\/+$/, ''); // trailing slashes
-  // Strip query parameters or hashes
-  cleaned = cleaned.split('?')[0].split('#')[0].trim();
+import { normalizeTelegramChatId, getTelegramApiBase } from '../telegram-utils';
+export { normalizeTelegramChatId, getTelegramApiBase };
 
-  if (!cleaned) return '';
-  // If it's a numeric ID (e.g. -1004202498347 or 12345678), return as-is
-  if (/^-?\d+$/.test(cleaned)) {
-    return cleaned;
+async function resolvePhotoUrl(mediaInput: string): Promise<string | null> {
+  const trimmed = mediaInput.trim();
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
   }
-  // If it already starts with @, return as-is
-  if (cleaned.startsWith('@')) {
-    return cleaned;
-  }
-  // Otherwise prepend @
-  return `@${cleaned}`;
-}
+  if (trimmed.startsWith('data:')) {
+    const match = trimmed.match(/^data:([^;]+);base64,(.+)$/);
+    if (!match) return null;
+    const mimeType = match[1];
+    const base64Data = match[2];
+    const buffer = Buffer.from(base64Data, 'base64');
+    let ext = mimeType.split('/')[1] || 'jpg';
+    if (ext.includes('+')) ext = ext.split('+')[0];
+    if (ext === 'jpeg') ext = 'jpg';
 
-export function getTelegramApiBase(): string {
-  const base =
-    process.env.TELEGRAM_API_BASE_URL ||
-    'https://novexa-bot.dnanima895.workers.dev/tg-relay';
-  return base.replace(/\/+$/, '');
+    try {
+      const fs = await import('fs');
+      const path = await import('path');
+      const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+
+      const filename = `photo_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${ext}`;
+      const filePath = path.join(uploadsDir, filename);
+      fs.writeFileSync(filePath, buffer);
+
+      const uploadsBase =
+        process.env.PUBLIC_UPLOADS_URL ||
+        'https://nimaariyanfar.com/uploads';
+      return `${uploadsBase.replace(/\/+$/, '')}/${filename}`;
+    } catch (e) {
+      console.warn('[Telegram] Could not save photo to disk, will use fallback:', e);
+      return null;
+    }
+  }
+  return null;
 }
 
 export async function publishToTelegram(options: TelegramPublishOptions): Promise<PublishResult> {
@@ -65,9 +76,78 @@ export async function publishToTelegram(options: TelegramPublishOptions): Promis
     try {
       // 1. If mediaUrl is provided
       if (mediaUrl && mediaUrl.trim()) {
-        const trimmedMedia = mediaUrl.trim();
+        const photoUrl = await resolvePhotoUrl(mediaUrl);
 
-        // Check if it's a base64 Data URL (e.g. data:image/jpeg;base64,...)
+        if (photoUrl) {
+          // Send photo via JSON payload (100% reliable through Cloudflare worker relay & DPI bypass)
+          let caption = text || '';
+          let overflowText = '';
+          if (caption.length > 1024) {
+            overflowText = caption;
+            caption = caption.substring(0, 1020) + '...';
+          }
+
+          let res = await fetch(`${apiBase}/bot${botToken}/sendPhoto`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: targetChat,
+              photo: photoUrl,
+              caption: caption,
+              parse_mode: 'HTML',
+            }),
+          });
+
+          let data = await res.json().catch(() => null);
+
+          // If entity parse error, retry with clean stripped caption
+          if (!res.ok && data?.description?.includes("can't parse entities")) {
+            res = await fetch(`${apiBase}/bot${botToken}/sendPhoto`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                chat_id: targetChat,
+                photo: photoUrl,
+                caption: caption.replace(/<[^>]*>/g, ''),
+              }),
+            });
+            data = await res.json().catch(() => null);
+          }
+
+          if (res.ok && data?.ok) {
+            if (overflowText) {
+              await fetch(`${apiBase}/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  chat_id: targetChat,
+                  text: overflowText,
+                  parse_mode: 'HTML',
+                }),
+              }).catch(() => null);
+            }
+
+            return {
+              platform: 'telegram',
+              success: true,
+              messageId: data.result?.message_id,
+              timestamp: now,
+              mode: 'live',
+            };
+          } else {
+            return {
+              platform: 'telegram',
+              success: false,
+              error: data?.description || 'خطا در ارسال تصویر به تلگرام',
+              timestamp: now,
+              mode: 'live',
+              details: data,
+            };
+          }
+        }
+
+        // Fallback for non-saved base64
+        const trimmedMedia = mediaUrl.trim();
         if (trimmedMedia.startsWith('data:')) {
           const match = trimmedMedia.match(/^data:([^;]+);base64,(.+)$/);
           if (match) {
@@ -92,7 +172,6 @@ export async function publishToTelegram(options: TelegramPublishOptions): Promis
 
             let data = await res.json().catch(() => null);
 
-            // If HTML entity parsing fails, retry with clean plain text caption
             if (!res.ok && data?.description?.includes("can't parse entities")) {
               const retryForm = new FormData();
               retryForm.append('chat_id', targetChat);
@@ -125,54 +204,6 @@ export async function publishToTelegram(options: TelegramPublishOptions): Promis
                 details: data,
               };
             }
-          }
-        }
-
-        // Standard HTTP/HTTPS URL
-        if (trimmedMedia.startsWith('http://') || trimmedMedia.startsWith('https://')) {
-          let res = await fetch(`${apiBase}/bot${botToken}/sendPhoto`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id: targetChat,
-              photo: trimmedMedia,
-              caption: text,
-              parse_mode: 'HTML',
-            }),
-          });
-
-          let data = await res.json().catch(() => null);
-
-          if (!res.ok && data?.description?.includes("can't parse entities")) {
-            res = await fetch(`${apiBase}/bot${botToken}/sendPhoto`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                chat_id: targetChat,
-                photo: trimmedMedia,
-                caption: text.replace(/<[^>]*>/g, ''),
-              }),
-            });
-            data = await res.json().catch(() => null);
-          }
-
-          if (res.ok && data?.ok) {
-            return {
-              platform: 'telegram',
-              success: true,
-              messageId: data.result?.message_id,
-              timestamp: now,
-              mode: 'live',
-            };
-          } else {
-            return {
-              platform: 'telegram',
-              success: false,
-              error: data?.description || 'خطا در ارسال تصویر به تلگرام',
-              timestamp: now,
-              mode: 'live',
-              details: data,
-            };
           }
         }
       }

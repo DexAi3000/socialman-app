@@ -13,7 +13,7 @@ import {
   TicketPriority,
   TicketMessage,
 } from '@/types';
-import { normalizeTelegramChatId } from '@/lib/publishers/telegram';
+import { normalizeTelegramChatId } from '@/lib/telegram-utils';
 
 interface AppContextType {
   currentUser: UserProfile | null;

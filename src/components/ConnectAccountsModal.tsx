@@ -34,7 +34,7 @@ import {
 } from './SnappIcons';
 import { SocialPlatform } from '@/types';
 import { toPersianDigits } from '@/lib/utils';
-import { normalizeTelegramChatId } from '@/lib/publishers/telegram';
+import { normalizeTelegramChatId } from '@/lib/telegram-utils';
 
 export function ConnectAccountsModal() {
   const {
