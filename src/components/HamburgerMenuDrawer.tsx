@@ -22,6 +22,7 @@ import {
   HelpCircle,
   PhoneCall,
   Zap,
+  Smartphone,
 } from 'lucide-react';
 import { toPersianDigits } from '@/lib/utils';
 import { SocialPlatform } from '@/types';
@@ -369,24 +370,14 @@ export function HamburgerMenuDrawer({
               <span>خروج از حساب</span>
             </button>
           ) : (
-            <div className="flex items-center gap-2">
-              <Link
-                href="/login"
-                onClick={() => setIsHamburgerMenuOpen(false)}
-                className="px-3 py-1.5 rounded-xl bg-sky-50 text-[#3b96cc] font-black text-[11px] border border-sky-200 hover:bg-sky-100 transition-colors"
-              >
-                صفحه ورود
-              </Link>
-              <button
-                onClick={() => {
-                  openAuthModal();
-                  setIsHamburgerMenuOpen(false);
-                }}
-                className="px-3.5 py-1.5 rounded-xl bg-[#3b96cc] text-white font-black text-[11px] hover:bg-[#2c7ead] transition-colors cursor-pointer"
-              >
-                ورود / ثبت‌نام
-              </button>
-            </div>
+            <Link
+              href="/login"
+              onClick={() => setIsHamburgerMenuOpen(false)}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#3b96cc] hover:bg-[#2c7ead] text-white font-black text-xs transition-colors shadow-2xs"
+            >
+              <Smartphone className="w-3.5 h-3.5" />
+              <span>ورود / ثبت‌نام</span>
+            </Link>
           )}
         </div>
       </div>

@@ -227,21 +227,13 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-2">
-              <Link
-                href="/login"
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-200 transition-colors"
-              >
-                <span>صفحه ورود</span>
-              </Link>
-              <button
-                onClick={openAuthModal}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black text-white bg-[#3b96cc] hover:bg-[#2c7ead] shadow-sm transition-colors cursor-pointer"
-              >
-                <Smartphone className="w-3.5 h-3.5 text-white" />
-                <span>ورود / ثبت‌نام</span>
-              </button>
-            </div>
+            <Link
+              href="/login"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-black text-white bg-[#3b96cc] hover:bg-[#2c7ead] shadow-xs transition-all active:scale-95"
+            >
+              <Smartphone className="w-3.5 h-3.5 text-white" />
+              <span>ورود / ثبت‌نام</span>
+            </Link>
           )}
         </div>
       </div>
