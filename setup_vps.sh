@@ -2,7 +2,8 @@
 set -e
 
 echo "=============================================="
-echo "🚀 نصب و استقرار خودکار سوشال‌من روی سرور ابری"
+echo "🚀 نصب و استقرار امن سوشال‌من روی سرور ابری"
+echo "🛡️ سایت اصلی و پورتفولیو (nima-portfolio) کاملاً حفظ می‌شود"
 echo "=============================================="
 
 # 1. Update & Prerequisites
@@ -25,7 +26,7 @@ if ! command -v pm2 &> /dev/null; then
     npm install -g pm2
 fi
 
-# 4. Clone or pull repository
+# 4. Clone or pull repository in a completely separate directory
 mkdir -p /var/www
 cd /var/www
 
@@ -66,20 +67,19 @@ npm install --legacy-peer-deps
 echo "⚡ در حال بیلد بهینه‌شده Next.js..."
 npm run build
 
-# 7. Start PM2 daemon
+# 7. Start PM2 daemon on port 3000
 echo "🚀 اجرای سرویس در پس‌زمینه با PM2..."
 pm2 delete socialman || true
-pm2 start npm --name "socialman" -- start
+PORT=3000 pm2 start npm --name "socialman" -- start
 pm2 save
 pm2 startup systemd -u root --hp /root || true
 
-# 8. Configure Nginx Reverse Proxy on Port 80
-echo "🌐 پیکربندی Nginx روی پورت ۸۰..."
-cat << 'EOF' > /etc/nginx/sites-available/default
+# 8. Configure SEPARATE Nginx file ONLY for IP and subdomains (DOES NOT TOUCH nimaariyanfar.com)
+echo "🌐 پیکربندی کانفیگ اختصاصی Nginx برای آی‌پی و ساب‌دامین..."
+cat << 'EOF' > /etc/nginx/sites-available/socialman.conf
 server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    server_name _;
+    listen 80;
+    server_name 194.117.64.88 app.nimaariyanfar.com social.nimaariyanfar.com;
 
     location / {
         proxy_pass http://127.0.0.1:3000;
@@ -95,10 +95,13 @@ server {
 }
 EOF
 
+ln -sf /etc/nginx/sites-available/socialman.conf /etc/nginx/sites-enabled/socialman.conf
+
 nginx -t
-systemctl restart nginx
+systemctl reload nginx
 
 echo "=============================================="
 echo "🎉 تبریک! اپلیکیشن سوشال‌من با موفقیت لایو شد!"
 echo "🌐 آدرس آی‌پی مستقیم: http://194.117.64.88"
+echo "🔒 سایت nima-portfolio شما 100% دست‌نخورده و فعال باقی مانده است."
 echo "=============================================="
