@@ -155,14 +155,14 @@ export function Header({ activeTab, setActiveTab }: HeaderProps) {
           </div>
 
           {/* Current Plan Badge & Upgrade Action */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <span
-              className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${planBadgeDetails.color}`}
+              className={`inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-bold border ${planBadgeDetails.color}`}
             >
-              <Crown className="w-3.5 h-3.5" />
-              {planBadgeDetails.name}
+              <Crown className="w-3.5 h-3.5 text-amber-400" />
+              <span>{planBadgeDetails.name}</span>
               {currentPlan === 'free' && (
-                <span className="opacity-75 font-mono">
+                <span className="opacity-75 font-mono hidden sm:inline">
                   ({toPersianDigits(aiUsageCount)}/۱۰)
                 </span>
               )}
@@ -171,10 +171,11 @@ export function Header({ activeTab, setActiveTab }: HeaderProps) {
             {currentPlan !== 'agency' && (
               <button
                 onClick={() => openUpgradeModal('pro')}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md shadow-orange-500/20 transition-transform active:scale-95"
+                className="flex items-center gap-1 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md shadow-orange-500/20 transition-transform active:scale-95"
               >
                 <Crown className="w-3.5 h-3.5" />
-                ارتقای اشتراک
+                <span className="hidden xs:inline">ارتقای اشتراک</span>
+                <span className="xs:hidden">ارتقا</span>
               </button>
             )}
           </div>

@@ -106,7 +106,7 @@ export default function LoginPage() {
           role: data.user.role,
           plan: data.user.plan,
           verifiedVia: 'Password',
-        });
+        }, data.token);
         setStep('success');
         setTimeout(() => {
           router.push('/');
@@ -285,7 +285,7 @@ export default function LoginPage() {
           role: data.user.role,
           plan: data.user.plan,
           verifiedVia: otpPurpose === 'register' ? 'Register-SMS' : 'SMS.ir',
-        });
+        }, data.token);
         setStep('success');
         setTimeout(() => {
           router.push('/');

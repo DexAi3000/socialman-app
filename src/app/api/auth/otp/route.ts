@@ -237,7 +237,7 @@ export async function POST(request: Request) {
       });
 
       // Set session cookie
-      await setSessionCookie({
+      const sessionToken = await setSessionCookie({
         userId: newUser.id,
         phone: newUser.phone,
         role: newUser.role,
@@ -247,6 +247,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         success: true,
         message: 'ثبت‌نام با موفقیت انجام شد.',
+        token: sessionToken,
         user: {
           id: newUser.id,
           fullName: newUser.fullName,
@@ -339,7 +340,7 @@ export async function POST(request: Request) {
       }
 
       // Set session cookie
-      await setSessionCookie({
+      const sessionToken = await setSessionCookie({
         userId: user.id,
         phone: user.phone,
         role: user.role,
@@ -349,6 +350,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         success: true,
         message: 'ورود با موفقیت انجام شد.',
+        token: sessionToken,
         user: {
           id: user.id,
           fullName: user.fullName,
@@ -461,7 +463,7 @@ export async function POST(request: Request) {
       }
 
       // Set secure HttpOnly session cookie
-      await setSessionCookie({
+      const sessionToken = await setSessionCookie({
         userId: user.id,
         phone: user.phone,
         role: user.role,
@@ -470,6 +472,7 @@ export async function POST(request: Request) {
 
       return NextResponse.json({
         success: true,
+        token: sessionToken,
         user: {
           id: user.id,
           fullName: user.fullName,

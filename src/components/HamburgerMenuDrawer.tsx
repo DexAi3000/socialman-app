@@ -198,21 +198,27 @@ export function HamburgerMenuDrawer({
                 )}
                 <span>
                   {currentPlan === 'agency'
-                    ? 'پلن: طلایی'
+                    ? 'پلن: طلایی (نامحدود)'
                     : currentPlan === 'pro'
                     ? 'پلن: نقره‌ای'
                     : 'پلن: برنز (رایگان)'}
                 </span>
               </span>
-              <button
-                onClick={() => {
-                  setIsHamburgerMenuOpen(false);
-                  openUpgradeModal('agency');
-                }}
-                className="text-[9px] text-[#3b96cc] font-black hover:underline cursor-pointer"
-              >
-                ارتقای پلن ⚡
-              </button>
+              {currentPlan !== 'agency' ? (
+                <button
+                  onClick={() => {
+                    setIsHamburgerMenuOpen(false);
+                    openUpgradeModal('agency');
+                  }}
+                  className="text-[9px] text-[#3b96cc] font-black hover:underline cursor-pointer"
+                >
+                  ارتقای پلن ⚡
+                </button>
+              ) : (
+                <span className="text-[9px] text-emerald-600 font-bold">
+                  اشتراک فعال VIP ✓
+                </span>
+              )}
             </div>
           </div>
 

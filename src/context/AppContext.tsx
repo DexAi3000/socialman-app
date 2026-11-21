@@ -20,7 +20,7 @@ interface AppContextType {
   isAuthModalOpen: boolean;
   openAuthModal: () => void;
   closeAuthModal: () => void;
-  loginUser: (user: Omit<UserProfile, 'isLoggedIn'>) => void;
+  loginUser: (user: Omit<UserProfile, 'isLoggedIn'>, token?: string) => void;
   logoutUser: () => void;
   refreshSession: () => void;
   currentPlan: PlanType;
@@ -280,7 +280,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Session refresh helper that syncs user & plan from database
   const refreshSession = () => {
-    fetch('/socialman/api/auth/me')
+    const headers: Record<string, string> = {};
+    try {
+      const cached = localStorage.getItem('socialman_user');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed?.id) headers['x-user-id'] = parsed.id;
+        if (parsed?.phone) headers['x-user-phone'] = parsed.phone;
+      }
+      const token = localStorage.getItem('socialman_token');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+    } catch (_) {}
+
+    fetch('/socialman/api/auth/me', {
+      headers,
+      cache: 'no-store',
+    })
       .then((r) => r.json())
       .then((d) => {
         if (d.authenticated && d.user) {
@@ -300,6 +317,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           }
           try {
             localStorage.setItem('socialman_user', JSON.stringify(profile));
+            if (d.token) {
+              localStorage.setItem('socialman_token', d.token);
+            }
           } catch (_) {}
         }
       })
@@ -337,6 +357,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
     document.addEventListener('visibilitychange', handleVisibility);
 
+    // Periodic live sync (every 6 seconds) so admin approval in Telegram instantly unlocks app
+    const syncInterval = setInterval(refreshSession, 6000);
+
     // 1. Fetch Workspaces from DB
     fetch('/socialman/api/workspaces')
       .then((r) => r.json())
@@ -367,6 +390,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         }
       })
       .catch((err) => console.log('Tickets DB sync:', err));
+
+    return () => {
+      window.removeEventListener('focus', refreshSession);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      clearInterval(syncInterval);
+    };
   }, []);
 
   const openConnectModal = (platform?: SocialPlatform) => {
@@ -405,7 +434,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const openAuthModal = () => setIsAuthModalOpen(true);
   const closeAuthModal = () => setIsAuthModalOpen(false);
 
-  const loginUser = (userData: Omit<UserProfile, 'isLoggedIn'>) => {
+  const loginUser = (userData: Omit<UserProfile, 'isLoggedIn'>, token?: string) => {
     const fullUser: UserProfile = {
       ...userData,
       isLoggedIn: true,
@@ -416,6 +445,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       localStorage.setItem('socialman_user', JSON.stringify(fullUser));
+      if (token) {
+        localStorage.setItem('socialman_token', token);
+      }
     } catch (_) {}
     setIsAuthModalOpen(false);
   };
@@ -430,6 +462,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setCurrentPlan('free');
     try {
       localStorage.removeItem('socialman_user');
+      localStorage.removeItem('socialman_token');
     } catch (_) {}
     window.location.href = '/socialman/login';
   };

@@ -105,7 +105,7 @@ export function AuthModal() {
           role: data.user.role,
           plan: data.user.plan,
           verifiedVia: 'Password',
-        });
+        }, data.token);
         closeAuthModal();
       } else {
         setErrorMsg(data.error || 'اطلاعات ورود اشتباه است.');
@@ -278,7 +278,7 @@ export function AuthModal() {
           role: data.user.role,
           plan: data.user.plan,
           verifiedVia: otpPurpose === 'register' ? 'Register-SMS' : 'SMS.ir',
-        });
+        }, data.token);
         closeAuthModal();
       } else {
         setErrorMsg(data.error || 'کد تایید اشتباه است یا منقضی شده است.');
