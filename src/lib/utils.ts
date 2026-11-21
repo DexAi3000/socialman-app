@@ -25,3 +25,31 @@ export const IRANIAN_EVENTS = [
   { day: 25, month: "آذر", title: "روز پژوهش", type: "tech" },
   { day: 30, month: "آذر", title: "شب یلدا (پیک فروش و کمپین‌های مارکتینگ)", type: "hot" },
 ];
+
+// Get current date in Persian (Shamsi)
+export function getTodayShamsi(): string {
+  try {
+    return new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
+      timeZone: 'Asia/Tehran',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date());
+  } catch {
+    return 'امروز';
+  }
+}
+
+// Get current Tehran time (HH:mm)
+export function getCurrentTehranTime(): string {
+  try {
+    return new Intl.DateTimeFormat('fa-IR', {
+      timeZone: 'Asia/Tehran',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(new Date());
+  } catch {
+    return 'هم‌اکنون';
+  }
+}
