@@ -102,7 +102,7 @@ export default function Home() {
         )}
 
         {activeTab === 'calendar' && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6">
+          <div className="max-w-7xl mx-auto px-2 sm:px-8 py-3 sm:py-6">
             {currentPlan === 'free' ? (
               <LockedFeatureGate
                 feature="calendar"
