@@ -31,7 +31,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] text-[#212121] flex flex-col font-sans selection:bg-[#21aa58] selection:text-white pb-20 sm:pb-24">
+    <div className="min-h-screen bg-[#fcfcfd] text-[#212121] flex flex-col font-sans selection:bg-[#3b96cc] selection:text-white pb-20 sm:pb-24">
       {/* 0. Brand Splash Screen */}
       {showSplash && (
         <SnappSplashScreen

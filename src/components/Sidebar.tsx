@@ -111,7 +111,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
                 <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
                   <Sparkles className="w-5 h-5 text-white" />
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-[#0c121e]" />
+                <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-sky-500 border-2 border-[#0c121e]" />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
@@ -267,7 +267,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-1 text-[11px] text-emerald-400">
+              <div className="flex items-center gap-1 text-[11px] text-sky-400">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>تمام امکانات نامحدود فعال است</span>
               </div>

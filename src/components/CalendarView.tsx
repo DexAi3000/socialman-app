@@ -55,7 +55,7 @@ export function CalendarView() {
   const getStatusBorder = (status: PostStatus) => {
     switch (status) {
       case 'approved':
-        return 'border-r-4 border-[#00D166] bg-emerald-50 text-emerald-900';
+        return 'border-r-4 border-[#00D166] bg-sky-50 text-sky-900';
       case 'pending_approval':
         return 'border-r-4 border-amber-500 bg-amber-50 text-amber-900';
       case 'draft':
@@ -88,13 +88,13 @@ export function CalendarView() {
       {/* Calendar Header Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-2xl bg-emerald-50 text-[#00A852] border border-emerald-200">
+          <div className="p-3 rounded-2xl bg-sky-50 text-[#00A852] border border-sky-200">
             <CalendarIcon className="w-6 h-6" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-base sm:text-lg font-black text-slate-900">تقویم ۵ پلتفرم (آذر ۱۴۰۳)</h1>
-              <span className="text-[11px] bg-emerald-50 text-[#00A852] border border-emerald-200 px-2.5 py-0.5 rounded-full font-mono font-bold">
+              <span className="text-[11px] bg-sky-50 text-[#00A852] border border-sky-200 px-2.5 py-0.5 rounded-full font-mono font-bold">
                 {toPersianDigits(workspacePosts.length)} پست
               </span>
             </div>

@@ -70,8 +70,8 @@ export function DashboardView({ onNavigateTab, onSetAiPlatform }: DashboardViewP
     switch (status) {
       case 'approved':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-[#21aa58] border border-emerald-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#21aa58] animate-pulse" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 text-[#3b96cc] border border-sky-200">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#3b96cc] animate-pulse" />
             تایید شده
           </span>
         );
@@ -140,22 +140,22 @@ export function DashboardView({ onNavigateTab, onSetAiPlatform }: DashboardViewP
 
       <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-6">
         {/* 2. Snapp-Style Promo Banner (Matching Screenshot emerald banner) */}
-        <div className="rounded-3xl bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 p-5 sm:p-7 text-white shadow-lg relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="rounded-3xl bg-gradient-to-r from-sky-950 via-teal-900 to-slate-900 p-5 sm:p-7 text-white shadow-lg relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="space-y-1.5 text-right z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-400/20 text-emerald-300 text-[10px] font-black border border-emerald-400/30">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-400/20 text-sky-300 text-[10px] font-black border border-sky-400/30">
               <span>هاب متمرکز سوشال‌من</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping" />
             </div>
             <h3 className="text-sm sm:text-lg font-black tracking-tight text-white">
               انتشار و زمان‌بندی همزمان در ۵ پلتفرم با ۱ کلیک 🚀
             </h3>
-            <p className="text-xs text-emerald-100 font-medium leading-relaxed">
+            <p className="text-xs text-sky-100 font-medium leading-relaxed">
               اینستاگرام، تلگرام، واتساپ، روبیکا و بله را با یک کلیک مدیریت کنید و طبق تقویم شمسی منتشر کنید.
             </p>
           </div>
           <button
             onClick={() => onNavigateTab('publish')}
-            className="px-6 py-3 rounded-2xl bg-[#21aa58] hover:bg-[#1e9b50] text-white font-black text-xs sm:text-sm shadow-lg shadow-[#21aa58]/35 transition-transform active:scale-95 shrink-0 z-10"
+            className="px-6 py-3 rounded-2xl bg-[#3b96cc] hover:bg-[#2c7ead] text-white font-black text-xs sm:text-sm shadow-lg shadow-[#3b96cc]/35 transition-transform active:scale-95 shrink-0 z-10"
           >
             شروع انتشار همزمان 🚀
           </button>
@@ -164,7 +164,7 @@ export function DashboardView({ onNavigateTab, onSetAiPlatform }: DashboardViewP
         {/* 2.5 Quick Account Connection Strip */}
         <div className="bg-white rounded-2xl border border-gray-100 p-3.5 px-5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-[#21aa58] flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-sky-50 text-[#3b96cc] flex items-center justify-center shrink-0">
               <Link2 className="w-4 h-4" />
             </div>
             <div className="text-right">
@@ -179,7 +179,7 @@ export function DashboardView({ onNavigateTab, onSetAiPlatform }: DashboardViewP
           <button
             type="button"
             onClick={() => openConnectModal()}
-            className="px-4 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-[#21aa58] text-xs font-black transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-[#3b96cc] text-xs font-black transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
           >
             <Link2 className="w-3.5 h-3.5" />
             <span>تنظیم و اتصال اکانت‌ها</span>
@@ -208,7 +208,7 @@ export function DashboardView({ onNavigateTab, onSetAiPlatform }: DashboardViewP
             </div>
             <button
               onClick={() => onNavigateTab('calendar')}
-              className="text-xs font-black text-[#21aa58] hover:underline flex items-center gap-1"
+              className="text-xs font-black text-[#3b96cc] hover:underline flex items-center gap-1"
             >
               مشاهده تقویم کامل
               <ArrowUpRight className="w-3.5 h-3.5" />

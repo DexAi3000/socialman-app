@@ -29,7 +29,7 @@ export function SnappTilesGrid({ onSelectService }: SnappTilesGridProps) {
       desc: 'اینستاگرام، تلگرام، واتساپ، روبیکا و بله',
       icon: (
         <div className="w-16 h-16 sm:w-20 sm:h-20 relative flex items-center justify-center">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#21aa58] to-emerald-400 flex items-center justify-center text-white shadow-lg shadow-[#21aa58]/35 z-10 group-hover:scale-105 transition-transform">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#3b96cc] to-sky-400 flex items-center justify-center text-white shadow-lg shadow-[#3b96cc]/35 z-10 group-hover:scale-105 transition-transform">
             <Send className="w-6 h-6 fill-white rotate-45 -mr-0.5" />
           </div>
           <img src="/instagram-clean.png" alt="Instagram" className="w-5 h-5 absolute -top-1 -right-1 drop-shadow-md z-20 group-hover:-translate-y-0.5 transition-transform" />
@@ -39,7 +39,7 @@ export function SnappTilesGrid({ onSelectService }: SnappTilesGridProps) {
         </div>
       ),
       badge: 'سرویس اصلی 🚀',
-      badgeColor: 'bg-emerald-50 text-[#21aa58] border-emerald-200',
+      badgeColor: 'bg-sky-50 text-[#3b96cc] border-sky-200',
     },
     {
       id: 'calendar',
@@ -91,7 +91,7 @@ export function SnappTilesGrid({ onSelectService }: SnappTilesGridProps) {
       desc: 'کانال و برودکست',
       icon: <SnappWhatsappIcon className="w-11 h-11 sm:w-13 sm:h-13" />,
       badge: 'Cloud API',
-      badgeColor: 'bg-emerald-50 text-[#21aa58]',
+      badgeColor: 'bg-sky-50 text-[#3b96cc]',
     },
     {
       id: 'bale',
@@ -119,7 +119,7 @@ export function SnappTilesGrid({ onSelectService }: SnappTilesGridProps) {
           <div
             key={item.id}
             onClick={() => onSelectService(item.id)}
-            className="relative bg-white rounded-3xl p-5 sm:p-6 border border-gray-100/90 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-xl hover:border-emerald-200 transition-all cursor-pointer flex flex-col items-center justify-center text-center group active:scale-[0.98]"
+            className="relative bg-white rounded-3xl p-5 sm:p-6 border border-gray-100/90 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-xl hover:border-sky-200 transition-all cursor-pointer flex flex-col items-center justify-center text-center group active:scale-[0.98]"
           >
             {/* Top Corner Badge */}
             <span className={`absolute top-3.5 right-3.5 text-[10px] font-black px-2.5 py-0.5 rounded-full border ${item.badgeColor}`}>
@@ -132,7 +132,7 @@ export function SnappTilesGrid({ onSelectService }: SnappTilesGridProps) {
             </div>
 
             {/* Title & Desc */}
-            <h3 className="text-sm sm:text-base font-black text-[#212121] mt-2 group-hover:text-[#21aa58] transition-colors">
+            <h3 className="text-sm sm:text-base font-black text-[#212121] mt-2 group-hover:text-[#3b96cc] transition-colors">
               {item.title}
             </h3>
             <p className="text-xs text-gray-400 font-medium mt-1 max-w-[200px]">
@@ -148,7 +148,7 @@ export function SnappTilesGrid({ onSelectService }: SnappTilesGridProps) {
           <div
             key={item.id}
             onClick={() => onSelectService(item.id)}
-            className="bg-white rounded-2xl p-3.5 sm:p-4 border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-emerald-200 transition-all cursor-pointer flex flex-col items-center text-center group active:scale-[0.98]"
+            className="bg-white rounded-2xl p-3.5 sm:p-4 border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-sky-200 transition-all cursor-pointer flex flex-col items-center text-center group active:scale-[0.98]"
           >
             {/* 3D Icon */}
             <div className="mb-2 group-hover:scale-105 transition-transform duration-300">
@@ -156,7 +156,7 @@ export function SnappTilesGrid({ onSelectService }: SnappTilesGridProps) {
             </div>
 
             {/* Title */}
-            <span className="text-xs sm:text-sm font-black text-[#212121] group-hover:text-[#21aa58] transition-colors">
+            <span className="text-xs sm:text-sm font-black text-[#212121] group-hover:text-[#3b96cc] transition-colors">
               {item.title}
             </span>
 

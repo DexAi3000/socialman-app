@@ -52,7 +52,7 @@ export function UpgradeModal() {
 
         {successPaid ? (
           <div className="text-center py-6 space-y-3">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 text-[#00A852] border border-emerald-300 flex items-center justify-center mx-auto shadow-sm">
+            <div className="w-16 h-16 rounded-full bg-sky-100 text-[#00A852] border border-sky-300 flex items-center justify-center mx-auto shadow-sm">
               <CheckCircle2 className="w-10 h-10" />
             </div>
             <h3 className="text-lg font-black text-slate-900">پرداخت با موفقیت انجام شد!</h3>
@@ -95,7 +95,7 @@ export function UpgradeModal() {
             </div>
 
             {/* Gateway Logo */}
-            <div className="p-3 rounded-2xl bg-emerald-50/60 border border-emerald-200 flex items-center justify-between text-xs text-emerald-950">
+            <div className="p-3 rounded-2xl bg-sky-50/60 border border-sky-200 flex items-center justify-between text-xs text-sky-950">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-[#00A852]" />
                 <span className="font-bold">پروتکل شاپرک شتاب و زرین‌پال</span>

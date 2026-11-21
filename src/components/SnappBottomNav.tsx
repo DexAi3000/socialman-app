@@ -28,13 +28,13 @@ export function SnappBottomNav({ activeTab, setActiveTab }: SnappBottomNavProps)
         <button
           onClick={() => setActiveTab('dashboard')}
           className={`flex flex-col items-center gap-1 py-1 transition-all flex-1 active:scale-90 ${
-            activeTab === 'dashboard' ? 'text-[#21aa58] font-black' : 'text-gray-400 hover:text-gray-600'
+            activeTab === 'dashboard' ? 'text-[#3b96cc] font-black' : 'text-gray-400 hover:text-gray-600'
           }`}
         >
           <Home className={`w-5 h-5 transition-transform ${activeTab === 'dashboard' ? 'scale-110 stroke-[2.5]' : ''}`} />
           <span className="text-[11px] font-bold">خانه</span>
           {activeTab === 'dashboard' && (
-            <span className="w-1.5 h-1.5 rounded-full bg-[#21aa58] -mt-0.5" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#3b96cc] -mt-0.5" />
           )}
         </button>
 
@@ -42,13 +42,13 @@ export function SnappBottomNav({ activeTab, setActiveTab }: SnappBottomNavProps)
         <button
           onClick={() => setActiveTab('publish')}
           className={`flex flex-col items-center gap-1 py-1 transition-all flex-1 active:scale-90 ${
-            activeTab === 'publish' ? 'text-[#21aa58] font-black' : 'text-gray-400 hover:text-gray-600'
+            activeTab === 'publish' ? 'text-[#3b96cc] font-black' : 'text-gray-400 hover:text-gray-600'
           }`}
         >
           <Share2 className={`w-5 h-5 transition-transform ${activeTab === 'publish' ? 'scale-110 stroke-[2.5]' : ''}`} />
           <span className="text-[11px] font-bold">انتشار ۵ پلتفرم</span>
           {activeTab === 'publish' && (
-            <span className="w-1.5 h-1.5 rounded-full bg-[#21aa58] -mt-0.5" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#3b96cc] -mt-0.5" />
           )}
         </button>
 
@@ -58,8 +58,8 @@ export function SnappBottomNav({ activeTab, setActiveTab }: SnappBottomNavProps)
             onClick={() => setActiveTab('publish')}
             className={`w-14 h-14 rounded-full flex flex-col items-center justify-center transition-all shadow-xl active:scale-90 border-4 border-white ${
               activeTab === 'publish'
-                ? 'bg-[#21aa58] text-white shadow-[#21aa58]/40 scale-105 ring-2 ring-[#21aa58]/20'
-                : 'bg-gradient-to-tr from-[#21aa58] to-emerald-400 text-white shadow-[#21aa58]/35 hover:scale-105'
+                ? 'bg-[#3b96cc] text-white shadow-[#3b96cc]/40 scale-105 ring-2 ring-[#3b96cc]/20'
+                : 'bg-gradient-to-tr from-[#3b96cc] to-sky-400 text-white shadow-[#3b96cc]/35 hover:scale-105'
             }`}
           >
             <Send className="w-6 h-6 fill-white rotate-45 -mr-0.5" />
@@ -71,13 +71,13 @@ export function SnappBottomNav({ activeTab, setActiveTab }: SnappBottomNavProps)
         <button
           onClick={() => setActiveTab('calendar')}
           className={`flex flex-col items-center gap-1 py-1 transition-all flex-1 active:scale-90 ${
-            activeTab === 'calendar' ? 'text-[#21aa58] font-black' : 'text-gray-400 hover:text-gray-600'
+            activeTab === 'calendar' ? 'text-[#3b96cc] font-black' : 'text-gray-400 hover:text-gray-600'
           }`}
         >
           <Calendar className={`w-5 h-5 transition-transform ${activeTab === 'calendar' ? 'scale-110 stroke-[2.5]' : ''}`} />
           <span className="text-[11px] font-bold">تقویم</span>
           {activeTab === 'calendar' && (
-            <span className="w-1.5 h-1.5 rounded-full bg-[#21aa58] -mt-0.5" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#3b96cc] -mt-0.5" />
           )}
         </button>
 
@@ -85,7 +85,7 @@ export function SnappBottomNav({ activeTab, setActiveTab }: SnappBottomNavProps)
         <button
           onClick={() => setActiveTab('client-portal')}
           className={`flex flex-col items-center gap-1 py-1 transition-all flex-1 relative active:scale-90 ${
-            activeTab === 'client-portal' ? 'text-[#21aa58] font-black' : 'text-gray-400 hover:text-gray-600'
+            activeTab === 'client-portal' ? 'text-[#3b96cc] font-black' : 'text-gray-400 hover:text-gray-600'
           }`}
         >
           <Users className={`w-5 h-5 transition-transform ${activeTab === 'client-portal' ? 'scale-110 stroke-[2.5]' : ''}`} />
@@ -96,7 +96,7 @@ export function SnappBottomNav({ activeTab, setActiveTab }: SnappBottomNavProps)
             </span>
           )}
           {activeTab === 'client-portal' && (
-            <span className="w-1.5 h-1.5 rounded-full bg-[#21aa58] -mt-0.5" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#3b96cc] -mt-0.5" />
           )}
         </button>
       </div>

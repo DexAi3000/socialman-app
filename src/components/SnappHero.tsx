@@ -14,14 +14,14 @@ export function SnappHero({ onOpenPublish, onOpenCalendar }: SnappHeroProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         {/* Right Column: Snapp Big Title & Buttons (7 cols) */}
         <div className="lg:col-span-7 space-y-5 text-right">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#21aa58] text-xs font-black">
-            <span className="w-2 h-2 rounded-full bg-[#21aa58] animate-ping" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-[#3b96cc] text-xs font-black">
+            <span className="w-2 h-2 rounded-full bg-[#3b96cc] animate-ping" />
             <span>یک اپلیکیشن، برای تمام کانال‌های ارتباطی شما</span>
           </div>
 
           <h1 className="text-2xl sm:text-4xl lg:text-[40px] font-black text-[#212121] leading-[1.35] tracking-tight">
-            مدیریت، زمان‌بندی و انتشار <span className="text-[#21aa58]">یکپارچه</span> در{' '}
-            <span className="text-[#21aa58]">۵ پلتفرم</span> با سوشال من!
+            مدیریت، زمان‌بندی و انتشار <span className="text-[#3b96cc]">یکپارچه</span> در{' '}
+            <span className="text-[#3b96cc]">۵ پلتفرم</span> با سوشال من!
           </h1>
 
           <p className="text-sm sm:text-base text-[#616161] font-medium leading-relaxed max-w-xl">
@@ -33,7 +33,7 @@ export function SnappHero({ onOpenPublish, onOpenCalendar }: SnappHeroProps) {
             {/* Primary Green Button: Publish Post */}
             <button
               onClick={onOpenPublish}
-              className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl text-xs sm:text-sm font-black bg-[#21aa58] hover:bg-[#1e9b50] text-white shadow-lg shadow-[#21aa58]/30 transition-transform active:scale-95"
+              className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl text-xs sm:text-sm font-black bg-[#3b96cc] hover:bg-[#2c7ead] text-white shadow-lg shadow-[#3b96cc]/30 transition-transform active:scale-95"
             >
               <span>انتشار پست در ۵ پلتفرم 🚀</span>
               <ArrowLeft className="w-4 h-4 mr-1" />
@@ -44,7 +44,7 @@ export function SnappHero({ onOpenPublish, onOpenCalendar }: SnappHeroProps) {
               onClick={onOpenCalendar}
               className="flex items-center gap-2 px-5 py-3.5 rounded-2xl text-xs sm:text-sm font-black text-[#212121] bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors shadow-xs"
             >
-              <Calendar className="w-4 h-4 text-[#21aa58]" />
+              <Calendar className="w-4 h-4 text-[#3b96cc]" />
               <span>مشاهده تقویم محتوایی آذر</span>
             </button>
           </div>
@@ -52,15 +52,15 @@ export function SnappHero({ onOpenPublish, onOpenCalendar }: SnappHeroProps) {
           {/* Social Proof Badges */}
           <div className="flex items-center gap-5 pt-3 text-xs text-gray-500 font-bold">
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-[#21aa58]" />
+              <CheckCircle2 className="w-4 h-4 text-[#3b96cc]" />
               بدون نیاز به فیلترشکن
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-[#21aa58]" />
+              <CheckCircle2 className="w-4 h-4 text-[#3b96cc]" />
               پشتیبانی از زبان فارسی
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-[#21aa58]" />
+              <CheckCircle2 className="w-4 h-4 text-[#3b96cc]" />
               درگاه رسمی شاپرک
             </span>
           </div>
@@ -70,7 +70,7 @@ export function SnappHero({ onOpenPublish, onOpenCalendar }: SnappHeroProps) {
         <div className="lg:col-span-5 flex justify-center relative select-none">
           <div className="relative w-80 sm:w-[460px] h-80 sm:h-[460px] flex items-center justify-center group">
             {/* Ambient soft glow aura */}
-            <div className="absolute inset-8 rounded-full bg-gradient-to-tr from-[#21aa58]/15 via-emerald-100/30 to-transparent blur-3xl -z-10" />
+            <div className="absolute inset-8 rounded-full bg-gradient-to-tr from-[#3b96cc]/15 via-sky-100/30 to-transparent blur-3xl -z-10" />
 
             {/* 3D Hero Character (Transparent Isolated PNG) */}
             <img

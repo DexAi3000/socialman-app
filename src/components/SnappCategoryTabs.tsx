@@ -90,7 +90,7 @@ export function SnappCategoryTabs({ activeCategory, onSelectCategory }: SnappCat
               </div>
               <span
                 className={`text-xs font-black transition-colors ${
-                  isActive ? 'text-[#21aa58]' : 'text-gray-500 group-hover:text-gray-900'
+                  isActive ? 'text-[#3b96cc]' : 'text-gray-500 group-hover:text-gray-900'
                 }`}
               >
                 {tab.name}
@@ -98,7 +98,7 @@ export function SnappCategoryTabs({ activeCategory, onSelectCategory }: SnappCat
 
               {/* Green Snapp Underline for Active Tab */}
               {isActive && (
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#21aa58] rounded-full" />
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#3b96cc] rounded-full" />
               )}
             </button>
           );

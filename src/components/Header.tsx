@@ -113,7 +113,7 @@ export function Header({ activeTab, setActiveTab }: HeaderProps) {
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
             }`}
           >
-            <Users className="w-4 h-4 text-emerald-400" />
+            <Users className="w-4 h-4 text-sky-400" />
             پورتال کارفرما
           </button>
 

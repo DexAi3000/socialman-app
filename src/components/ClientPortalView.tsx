@@ -130,7 +130,7 @@ export function ClientPortalView() {
                   </div>
 
                   {post.hook && (
-                    <div className="text-xs p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950">
+                    <div className="text-xs p-3 rounded-2xl bg-sky-50 border border-sky-200 text-sky-950">
                       <strong className="text-[#00A852] ml-1">قلاب اولیه: </strong> {post.hook}
                     </div>
                   )}

@@ -164,8 +164,8 @@ export function AiStudioView({ initialPlatform = 'instagram' }: AiStudioViewProp
       <div className="p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <div className="p-2 rounded-xl bg-emerald-50 text-[#21aa58] border border-emerald-200">
-              <Sparkles className="w-5 h-5 fill-[#21aa58]" />
+            <div className="p-2 rounded-xl bg-sky-50 text-[#3b96cc] border border-sky-200">
+              <Sparkles className="w-5 h-5 fill-[#3b96cc]" />
             </div>
             <h1 className="text-base sm:text-lg font-black text-slate-900">
               استودیوی تولید محتوای هوشمند Gemini
@@ -207,7 +207,7 @@ export function AiStudioView({ initialPlatform = 'instagram' }: AiStudioViewProp
                       onClick={() => setPlatform(item.id)}
                       className={`flex flex-col items-center gap-1.5 p-2.5 rounded-2xl border text-[11px] font-bold transition-all ${
                         isSelected
-                          ? 'bg-emerald-50 border-[#00D166] text-[#00A852] shadow-xs scale-102'
+                          ? 'bg-sky-50 border-[#00D166] text-[#00A852] shadow-xs scale-102'
                           : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
                       }`}
                     >
@@ -301,7 +301,7 @@ export function AiStudioView({ initialPlatform = 'instagram' }: AiStudioViewProp
                 disabled={loading}
                 className={`w-full py-3.5 rounded-2xl font-black text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 transition-all disabled:opacity-50 active:scale-95 ${
                   currentPlan === 'agency'
-                    ? 'bg-[#21aa58] hover:bg-[#1e9b50] text-white shadow-[#21aa58]/20'
+                    ? 'bg-[#3b96cc] hover:bg-[#2c7ead] text-white shadow-[#3b96cc]/20'
                     : 'bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-amber-400/20'
                 }`}
               >
@@ -350,7 +350,7 @@ export function AiStudioView({ initialPlatform = 'instagram' }: AiStudioViewProp
             {result && (
               <div className="rounded-2xl bg-slate-50 border border-slate-200 p-4 shadow-xs space-y-3">
                 {/* Hook Box */}
-                <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200">
+                <div className="p-3 rounded-xl bg-sky-50/70 border border-sky-200">
                   <span className="text-[10px] font-black text-[#00A852] block mb-1">
                     قلاب توقف‌کننده (Hook):
                   </span>
@@ -370,7 +370,7 @@ export function AiStudioView({ initialPlatform = 'instagram' }: AiStudioViewProp
                 {/* Hashtags */}
                 <div className="flex flex-wrap gap-1 font-mono text-[10px]">
                   {result.hashtags.map((h, i) => (
-                    <span key={i} className="text-[#00A852] bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-md font-bold">
+                    <span key={i} className="text-[#00A852] bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md font-bold">
                       #{h}
                     </span>
                   ))}

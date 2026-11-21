@@ -159,8 +159,8 @@ export function MultiPublishView() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-100">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <div className="p-2 rounded-2xl bg-emerald-50 text-[#21aa58] border border-emerald-100 shadow-xs">
-              <Send className="w-5 h-5 fill-[#21aa58] rotate-45 -mr-0.5" />
+            <div className="p-2 rounded-2xl bg-sky-50 text-[#3b96cc] border border-sky-100 shadow-xs">
+              <Send className="w-5 h-5 fill-[#3b96cc] rotate-45 -mr-0.5" />
             </div>
             <h1 className="text-lg sm:text-xl font-black text-gray-900">
               مرکز انتشار و زمان‌بندی همزمان ۵ پلتفرم
@@ -216,12 +216,12 @@ export function MultiPublishView() {
                     onClick={() => togglePlatform(item.id)}
                     className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border transition-all text-center ${
                       isSelected
-                        ? 'bg-emerald-50/70 border-[#21aa58] shadow-xs'
+                        ? 'bg-sky-50/70 border-[#3b96cc] shadow-xs'
                         : 'bg-gray-50 border-gray-200 opacity-60 hover:opacity-100'
                     }`}
                   >
                     <IconComponent className="w-8 h-8" />
-                    <span className={`text-[11px] font-black ${isSelected ? 'text-[#21aa58]' : 'text-gray-600'}`}>
+                    <span className={`text-[11px] font-black ${isSelected ? 'text-[#3b96cc]' : 'text-gray-600'}`}>
                       {item.name}
                     </span>
                     <span className="text-[9px] font-bold text-gray-400">
@@ -243,7 +243,7 @@ export function MultiPublishView() {
               placeholder="مثال: ۵ راز مهم برای افزایش فروش پاییزی در شبکه‌های اجتماعی"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#21aa58] rounded-2xl px-4 py-3 text-xs sm:text-sm text-gray-900 font-medium outline-none transition-all"
+              className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl px-4 py-3 text-xs sm:text-sm text-gray-900 font-medium outline-none transition-all"
             />
           </div>
 
@@ -262,7 +262,7 @@ export function MultiPublishView() {
               placeholder="متن اصلی پست را اینجا بنویسید... (این متن همزمان برای تلگرام، واتساپ، بله، اینستاگرام و روبیکا ارسال خواهد شد)"
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#21aa58] rounded-2xl p-4 text-xs sm:text-sm text-gray-900 font-medium outline-none leading-relaxed transition-all resize-none"
+              className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl p-4 text-xs sm:text-sm text-gray-900 font-medium outline-none leading-relaxed transition-all resize-none"
             />
           </div>
 
@@ -277,7 +277,7 @@ export function MultiPublishView() {
                 placeholder="سوشال_من، رشد_کسب_و_کار، بازاریابی"
                 value={hashtags}
                 onChange={(e) => setHashtags(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#21aa58] rounded-2xl px-4 py-2.5 text-xs text-gray-800 font-medium outline-none pr-9"
+                className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl px-4 py-2.5 text-xs text-gray-800 font-medium outline-none pr-9"
               />
               <Hash className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
             </div>
@@ -309,9 +309,9 @@ export function MultiPublishView() {
             ) : (
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-gray-200 hover:border-emerald-300 rounded-2xl p-6 text-center cursor-pointer transition-colors bg-gray-50/50 hover:bg-emerald-50/30 flex flex-col items-center justify-center gap-2"
+                className="border-2 border-dashed border-gray-200 hover:border-sky-300 rounded-2xl p-6 text-center cursor-pointer transition-colors bg-gray-50/50 hover:bg-sky-50/30 flex flex-col items-center justify-center gap-2"
               >
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#21aa58] flex items-center justify-center shadow-xs">
+                <div className="w-10 h-10 rounded-xl bg-sky-50 text-[#3b96cc] flex items-center justify-center shadow-xs">
                   <ImageIcon className="w-5 h-5" />
                 </div>
                 <span className="text-xs font-black text-gray-700">کلیک برای انتخاب تصویر پست</span>
@@ -329,7 +329,7 @@ export function MultiPublishView() {
                   type="button"
                   onClick={() => setIsScheduledMode(false)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                    !isScheduledMode ? 'bg-[#21aa58] text-white shadow-xs' : 'text-gray-500 bg-white border border-gray-200'
+                    !isScheduledMode ? 'bg-[#3b96cc] text-white shadow-xs' : 'text-gray-500 bg-white border border-gray-200'
                   }`}
                 >
                   انتشار آنی 🚀
@@ -338,7 +338,7 @@ export function MultiPublishView() {
                   type="button"
                   onClick={() => setIsScheduledMode(true)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                    isScheduledMode ? 'bg-[#21aa58] text-white shadow-xs' : 'text-gray-500 bg-white border border-gray-200'
+                    isScheduledMode ? 'bg-[#3b96cc] text-white shadow-xs' : 'text-gray-500 bg-white border border-gray-200'
                   }`}
                 >
                   زمان‌بندی در تقویم 📅
@@ -377,7 +377,7 @@ export function MultiPublishView() {
                 type="button"
                 disabled={isPublishing || (!caption.trim() && !title.trim())}
                 onClick={handlePublishNow}
-                className="w-full py-4 rounded-2xl font-black text-xs sm:text-sm bg-[#21aa58] hover:bg-[#1e9b50] text-white shadow-lg shadow-[#21aa58]/30 flex items-center justify-center gap-2 transition-transform active:scale-95 disabled:opacity-50"
+                className="w-full py-4 rounded-2xl font-black text-xs sm:text-sm bg-[#3b96cc] hover:bg-[#2c7ead] text-white shadow-lg shadow-[#3b96cc]/30 flex items-center justify-center gap-2 transition-transform active:scale-95 disabled:opacity-50"
               >
                 {isPublishing ? (
                   <>
@@ -396,7 +396,7 @@ export function MultiPublishView() {
                 type="button"
                 onClick={handleSchedulePost}
                 disabled={!caption.trim() && !title.trim()}
-                className="w-full py-4 rounded-2xl font-black text-xs sm:text-sm bg-gradient-to-r from-[#21aa58] to-emerald-600 text-white shadow-lg shadow-[#21aa58]/30 flex items-center justify-center gap-2 transition-transform active:scale-95 disabled:opacity-50"
+                className="w-full py-4 rounded-2xl font-black text-xs sm:text-sm bg-gradient-to-r from-[#3b96cc] to-sky-600 text-white shadow-lg shadow-[#3b96cc]/30 flex items-center justify-center gap-2 transition-transform active:scale-95 disabled:opacity-50"
               >
                 <Calendar className="w-4 h-4" />
                 <span>ثبت زمان‌بندی در تقویم محتوایی آذر</span>
@@ -404,8 +404,8 @@ export function MultiPublishView() {
             )}
 
             {publishedSuccess && (
-              <div className="mt-3 p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-center gap-2 animate-bounce">
-                <CheckCircle2 className="w-4 h-4 text-[#21aa58]" />
+              <div className="mt-3 p-3 rounded-2xl bg-sky-50 border border-sky-200 text-sky-800 text-xs font-bold flex items-center justify-center gap-2 animate-bounce">
+                <CheckCircle2 className="w-4 h-4 text-[#3b96cc]" />
                 <span>عملیات با موفقیت انجام شد و در صف انتشار ثبت گردید!</span>
               </div>
             )}
@@ -417,7 +417,7 @@ export function MultiPublishView() {
           <div className="bg-white rounded-3xl border border-gray-100 p-5 shadow-xs space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-gray-100">
               <span className="text-xs font-black text-gray-800 flex items-center gap-1.5">
-                <Eye className="w-4 h-4 text-[#21aa58]" />
+                <Eye className="w-4 h-4 text-[#3b96cc]" />
                 پیش‌نمایش زنده در کانال‌های ارتباطی
               </span>
               <span className="text-[10px] text-gray-400 font-bold">شبیه‌ساز رسمی</span>
@@ -437,7 +437,7 @@ export function MultiPublishView() {
                   onClick={() => setActivePreviewTab(p.id)}
                   className={`flex-1 py-1.5 text-[11px] font-bold rounded-xl transition-all flex items-center justify-center gap-1 ${
                     activePreviewTab === p.id
-                      ? 'bg-white text-[#21aa58] shadow-xs font-black'
+                      ? 'bg-white text-[#3b96cc] shadow-xs font-black'
                       : 'text-gray-500 hover:text-gray-900'
                   }`}
                 >
@@ -452,7 +452,7 @@ export function MultiPublishView() {
               {/* Account header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#21aa58] to-emerald-400 flex items-center justify-center text-white text-xs font-black">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#3b96cc] to-sky-400 flex items-center justify-center text-white text-xs font-black">
                     {activeWorkspace.name.charAt(0)}
                   </div>
                   <div className="text-right">
@@ -500,7 +500,7 @@ export function MultiPublishView() {
               <button
                 type="button"
                 onClick={() => openConnectModal()}
-                className="text-[11px] font-black text-[#21aa58] hover:underline flex items-center gap-1 cursor-pointer"
+                className="text-[11px] font-black text-[#3b96cc] hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <Link2 className="w-3.5 h-3.5" />
                 <span>تنظیم و اتصال اکانت‌ها</span>
@@ -521,9 +521,9 @@ export function MultiPublishView() {
                   <div
                     key={c.id}
                     onClick={() => openConnectModal(c.id)}
-                    className={`flex items-center justify-between p-2.5 rounded-xl border cursor-pointer hover:border-[#21aa58] transition-colors ${
+                    className={`flex items-center justify-between p-2.5 rounded-xl border cursor-pointer hover:border-[#3b96cc] transition-colors ${
                       isSelected && isConnected
-                        ? 'bg-emerald-50/40 border-emerald-100'
+                        ? 'bg-sky-50/40 border-sky-100'
                         : 'bg-gray-50/60 border-gray-100 opacity-60'
                     }`}
                   >
@@ -542,7 +542,7 @@ export function MultiPublishView() {
                       <span
                         className={`text-[9px] px-1.5 py-0.5 rounded-md font-bold ${
                           isConnected
-                            ? 'bg-emerald-100 text-[#21aa58]'
+                            ? 'bg-sky-100 text-[#3b96cc]'
                             : 'bg-amber-100 text-amber-700'
                         }`}
                       >

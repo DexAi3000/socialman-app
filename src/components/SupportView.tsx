@@ -186,8 +186,8 @@ export function SupportView() {
         );
       case 'answered':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-[#21aa58] border border-emerald-200">
-            <CheckCircle2 className="w-3 h-3 text-[#21aa58]" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-sky-50 text-[#3b96cc] border border-sky-200">
+            <CheckCircle2 className="w-3 h-3 text-[#3b96cc]" />
             پاسخ داده شده
           </span>
         );
@@ -220,12 +220,12 @@ export function SupportView() {
       {/* 1. Header Banner */}
       <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3.5 text-right">
-          <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-[#21aa58] to-emerald-400 flex items-center justify-center text-white shadow-md shadow-[#21aa58]/30 shrink-0">
+          <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-[#3b96cc] to-sky-400 flex items-center justify-center text-white shadow-md shadow-[#3b96cc]/30 shrink-0">
             <Headphones className="w-7 h-7" />
           </div>
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-[#21aa58] text-[10px] font-black">
+              <span className="px-2.5 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-[#3b96cc] text-[10px] font-black">
                 مرکز پشتیبانی رسمی
               </span>
               <span className="text-[10px] text-gray-400 font-bold">پاسخ‌گویی ۲۴ ساعته</span>
@@ -245,7 +245,7 @@ export function SupportView() {
             onClick={() => setActiveSubTab('chatbot')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black transition-all ${
               activeSubTab === 'chatbot'
-                ? 'bg-[#21aa58] text-white shadow-xs'
+                ? 'bg-[#3b96cc] text-white shadow-xs'
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
@@ -257,7 +257,7 @@ export function SupportView() {
             onClick={() => setActiveSubTab('tickets')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black transition-all ${
               activeSubTab === 'tickets'
-                ? 'bg-[#21aa58] text-white shadow-xs'
+                ? 'bg-[#3b96cc] text-white shadow-xs'
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
@@ -281,16 +281,16 @@ export function SupportView() {
           <div className="p-4 px-6 border-b border-gray-100 bg-gray-50/70 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#21aa58] to-emerald-400 flex items-center justify-center text-white shadow-xs">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#3b96cc] to-sky-400 flex items-center justify-center text-white shadow-xs">
                   <Bot className="w-5 h-5" />
                 </div>
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white absolute -bottom-0.5 -right-0.5" />
+                <span className="w-2.5 h-2.5 rounded-full bg-sky-500 border-2 border-white absolute -bottom-0.5 -right-0.5" />
               </div>
               <div className="text-right">
                 <span className="text-xs font-black text-gray-900 block">
                   دستیار هوشمند پشتیبانی سوشال‌من
                 </span>
-                <span className="text-[10px] text-emerald-600 font-bold">
+                <span className="text-[10px] text-sky-600 font-bold">
                   آنلاین • آماده پاسخ به سوالات انتشار و اتصال
                 </span>
               </div>
@@ -314,7 +314,7 @@ export function SupportView() {
                   className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs shrink-0 ${
                     msg.sender === 'user'
                       ? 'bg-gray-100 text-gray-800'
-                      : 'bg-[#21aa58] text-white shadow-xs'
+                      : 'bg-[#3b96cc] text-white shadow-xs'
                   }`}
                 >
                   {msg.sender === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
@@ -323,7 +323,7 @@ export function SupportView() {
                 <div
                   className={`p-4 rounded-3xl text-xs leading-relaxed text-right space-y-1 ${
                     msg.sender === 'user'
-                      ? 'bg-[#21aa58] text-white rounded-tr-xs shadow-xs'
+                      ? 'bg-[#3b96cc] text-white rounded-tr-xs shadow-xs'
                       : 'bg-gray-50 border border-gray-100 text-gray-800 rounded-tl-xs whitespace-pre-line'
                   }`}
                 >
@@ -341,7 +341,7 @@ export function SupportView() {
 
             {isBotTyping && (
               <div className="flex gap-3 max-w-[85%] ml-auto">
-                <div className="w-8 h-8 rounded-xl bg-[#21aa58] text-white flex items-center justify-center text-xs shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-[#3b96cc] text-white flex items-center justify-center text-xs shrink-0">
                   <Bot className="w-4 h-4" />
                 </div>
                 <div className="p-3.5 px-5 rounded-2xl bg-gray-50 border border-gray-100 flex items-center gap-1.5 text-gray-400">
@@ -361,7 +361,7 @@ export function SupportView() {
               <button
                 key={idx}
                 onClick={() => handleSendChatMessage(prompt)}
-                className="text-[10px] bg-white hover:bg-emerald-50 hover:text-[#21aa58] border border-gray-200 hover:border-emerald-200 px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-bold text-gray-600 shrink-0"
+                className="text-[10px] bg-white hover:bg-sky-50 hover:text-[#3b96cc] border border-gray-200 hover:border-sky-200 px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-bold text-gray-600 shrink-0"
               >
                 {prompt}
               </button>
@@ -375,7 +375,7 @@ export function SupportView() {
                 e.preventDefault();
                 handleSendChatMessage();
               }}
-              className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-2xl p-1.5 pr-4 focus-within:border-[#21aa58] focus-within:bg-white transition-all"
+              className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-2xl p-1.5 pr-4 focus-within:border-[#3b96cc] focus-within:bg-white transition-all"
             >
               <input
                 type="text"
@@ -387,7 +387,7 @@ export function SupportView() {
               <button
                 type="submit"
                 disabled={!chatInput.trim()}
-                className="w-10 h-10 rounded-xl bg-[#21aa58] hover:bg-[#1e9b50] disabled:opacity-40 text-white flex items-center justify-center transition-transform active:scale-95 shrink-0 shadow-xs"
+                className="w-10 h-10 rounded-xl bg-[#3b96cc] hover:bg-[#2c7ead] disabled:opacity-40 text-white flex items-center justify-center transition-transform active:scale-95 shrink-0 shadow-xs"
               >
                 <Send className="w-4 h-4 fill-white rotate-45 -mr-0.5" />
               </button>
@@ -401,9 +401,9 @@ export function SupportView() {
         <div className="space-y-5">
           {/* Success Banner */}
           {ticketSuccessNotice && (
-            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-[#21aa58] flex items-center justify-between text-xs font-black animate-in fade-in">
+            <div className="p-4 rounded-2xl bg-sky-50 border border-sky-200 text-[#3b96cc] flex items-center justify-between text-xs font-black animate-in fade-in">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#21aa58]" />
+                <CheckCircle2 className="w-4 h-4 text-[#3b96cc]" />
                 <span>{ticketSuccessNotice}</span>
               </div>
             </div>
@@ -419,7 +419,7 @@ export function SupportView() {
                 setShowNewTicketForm(!showNewTicketForm);
                 setSelectedTicketId(null);
               }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-[#21aa58] hover:bg-[#1e9b50] text-white text-xs font-black shadow-md shadow-[#21aa58]/20 transition-transform active:scale-95"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-[#3b96cc] hover:bg-[#2c7ead] text-white text-xs font-black shadow-md shadow-[#3b96cc]/20 transition-transform active:scale-95"
             >
               <PlusCircle className="w-4 h-4" />
               <span>{showNewTicketForm ? 'بستن فرم' : 'ثبت تیکت جدید'}</span>
@@ -450,7 +450,7 @@ export function SupportView() {
                   placeholder="مثال: سوال درباره نحوه اتصال کانال روبیکا به سیستم"
                   value={ticketSubject}
                   onChange={(e) => setTicketSubject(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#21aa58] rounded-2xl px-4 py-3 text-xs text-gray-900 font-medium outline-none transition-colors"
+                  className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl px-4 py-3 text-xs text-gray-900 font-medium outline-none transition-colors"
                 />
               </div>
 
@@ -463,7 +463,7 @@ export function SupportView() {
                   <select
                     value={ticketDept}
                     onChange={(e) => setTicketDept(e.target.value as TicketDepartment)}
-                    className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#21aa58] rounded-2xl px-4 py-3 text-xs text-gray-900 font-medium outline-none transition-colors"
+                    className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl px-4 py-3 text-xs text-gray-900 font-medium outline-none transition-colors"
                   >
                     <option value="technical">پشتیبانی فنی و اتصال پلتفرم‌ها</option>
                     <option value="billing">امور مالی، ارتقای پلن و فاکتور</option>
@@ -479,7 +479,7 @@ export function SupportView() {
                   <select
                     value={ticketPriority}
                     onChange={(e) => setTicketPriority(e.target.value as TicketPriority)}
-                    className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#21aa58] rounded-2xl px-4 py-3 text-xs text-gray-900 font-medium outline-none transition-colors"
+                    className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl px-4 py-3 text-xs text-gray-900 font-medium outline-none transition-colors"
                   >
                     <option value="low">معمولی</option>
                     <option value="medium">متوسط</option>
@@ -500,7 +500,7 @@ export function SupportView() {
                   placeholder="مشکل، سوال یا درخواست خود را به همراه جزئیات کامل بنویسید..."
                   value={ticketMessage}
                   onChange={(e) => setTicketMessage(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#21aa58] rounded-2xl p-4 text-xs text-gray-900 font-medium outline-none transition-colors leading-relaxed"
+                  className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl p-4 text-xs text-gray-900 font-medium outline-none transition-colors leading-relaxed"
                 />
               </div>
 
@@ -515,7 +515,7 @@ export function SupportView() {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-[#21aa58] hover:bg-[#1e9b50] text-white text-xs font-black shadow-md shadow-[#21aa58]/20 transition-transform active:scale-95"
+                  className="px-6 py-2.5 rounded-xl bg-[#3b96cc] hover:bg-[#2c7ead] text-white text-xs font-black shadow-md shadow-[#3b96cc]/20 transition-transform active:scale-95"
                 >
                   ارسال تیکت به کارشناس
                 </button>
@@ -543,7 +543,7 @@ export function SupportView() {
                       }}
                       className={`p-4 rounded-2xl border transition-all cursor-pointer text-right ${
                         isSelected
-                          ? 'bg-emerald-50/60 border-[#21aa58] shadow-xs'
+                          ? 'bg-sky-50/60 border-[#3b96cc] shadow-xs'
                           : 'bg-white border-gray-100 hover:border-gray-200 hover:shadow-xs'
                       }`}
                     >
@@ -594,12 +594,12 @@ export function SupportView() {
                           key={m.id}
                           className={`p-3.5 rounded-2xl text-xs space-y-1 text-right ${
                             isSupport
-                              ? 'bg-emerald-50/80 border border-emerald-100 text-emerald-950 ml-4'
+                              ? 'bg-sky-50/80 border border-sky-100 text-sky-950 ml-4'
                               : 'bg-gray-50 border border-gray-100 text-gray-800 mr-4'
                           }`}
                         >
                           <div className="flex items-center justify-between text-[10px] font-bold">
-                            <span className={isSupport ? 'text-[#21aa58]' : 'text-gray-500'}>
+                            <span className={isSupport ? 'text-[#3b96cc]' : 'text-gray-500'}>
                               {m.senderName}
                             </span>
                             <span className="text-gray-400 font-mono">{m.timestamp}</span>
@@ -619,13 +619,13 @@ export function SupportView() {
                       placeholder="پاسخ خود به کارشناس را بنویسید..."
                       value={replyMessage}
                       onChange={(e) => setReplyMessage(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#21aa58] rounded-xl p-2.5 text-xs text-gray-900 outline-none text-right font-medium"
+                      className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-xl p-2.5 text-xs text-gray-900 outline-none text-right font-medium"
                     />
                     <div className="flex justify-end">
                       <button
                         type="submit"
                         disabled={!replyMessage.trim()}
-                        className="px-4 py-1.5 rounded-xl bg-[#21aa58] hover:bg-[#1e9b50] disabled:opacity-40 text-white text-xs font-black transition-colors"
+                        className="px-4 py-1.5 rounded-xl bg-[#3b96cc] hover:bg-[#2c7ead] disabled:opacity-40 text-white text-xs font-black transition-colors"
                       >
                         ارسال پاسخ
                       </button>

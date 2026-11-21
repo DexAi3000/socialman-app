@@ -31,7 +31,7 @@ export function SnappSplashScreen({ onFinish, duration = 1800 }: SnappSplashScre
 
   return (
     <div
-      className={`fixed inset-0 z-[100] bg-[#21aa58] flex flex-col items-center justify-between py-10 px-4 select-none transition-all duration-700 ease-in-out ${
+      className={`fixed inset-0 z-[100] bg-[#3b96cc] flex flex-col items-center justify-between py-10 px-4 select-none transition-all duration-700 ease-in-out ${
         fadeOut ? 'opacity-0 scale-105 pointer-events-none' : 'opacity-100 scale-100'
       }`}
     >
@@ -50,7 +50,7 @@ export function SnappSplashScreen({ onFinish, duration = 1800 }: SnappSplashScre
 
         <div className="flex items-center justify-center">
           <span className="text-5xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight font-sans drop-shadow-sm">
-            سوشال‌من<span className="text-white">!</span>
+            Social Man
           </span>
         </div>
 

@@ -201,7 +201,7 @@ export function AuthModal() {
           <Link
             href="/login"
             onClick={closeAuthModal}
-            className="flex items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-[#21aa58] transition-colors"
+            className="flex items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-[#3b96cc] transition-colors"
             title="باز کردن در صفحه تمام‌صفحه"
           >
             <span>صفحه کامل</span>
@@ -255,7 +255,7 @@ export function AuthModal() {
                   placeholder="09123456789"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
-                  className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#21aa58] focus:ring-4 focus:ring-emerald-500/10 rounded-2xl px-4 py-3.5 text-center font-mono font-black text-base text-gray-800 outline-none tracking-widest transition-all"
+                  className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-4 focus:ring-sky-500/10 rounded-2xl px-4 py-3.5 text-center font-mono font-black text-base text-gray-800 outline-none tracking-widest transition-all"
                 />
                 <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1 pl-2 border-l border-gray-200 text-gray-500 text-xs font-mono font-bold">
                   <span>🇮🇷</span>
@@ -268,7 +268,7 @@ export function AuthModal() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-2xl font-black text-xs sm:text-sm bg-[#21aa58] hover:bg-[#1e9b50] text-white shadow-md shadow-[#21aa58]/25 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="w-full py-3.5 rounded-2xl font-black text-xs sm:text-sm bg-[#3b96cc] hover:bg-[#2c7ead] text-white shadow-md shadow-[#3b96cc]/25 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -288,9 +288,9 @@ export function AuthModal() {
               <button
                 type="button"
                 onClick={handleQuickDemoLogin}
-                className="w-full py-2.5 rounded-2xl font-black text-xs bg-emerald-50 hover:bg-emerald-100 text-[#21aa58] border border-emerald-200/80 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                className="w-full py-2.5 rounded-2xl font-black text-xs bg-sky-50 hover:bg-sky-100 text-[#3b96cc] border border-sky-200/80 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
               >
-                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                <Sparkles className="w-3.5 h-3.5 text-sky-600" />
                 <span>ورود آزمایشی با پروفایل نیما آرین‌فر</span>
               </button>
             </div>
@@ -319,8 +319,8 @@ export function AuthModal() {
                     onKeyDown={(e) => handleOtpKeyDown(idx, e)}
                     className={`w-11 h-13 text-center text-xl font-mono font-black rounded-2xl border transition-all outline-none ${
                       val
-                        ? 'border-[#21aa58] bg-white text-[#21aa58] shadow-xs'
-                        : 'border-gray-200 bg-gray-50 focus:bg-white focus:border-[#21aa58] focus:ring-4 focus:ring-emerald-500/10'
+                        ? 'border-[#3b96cc] bg-white text-[#3b96cc] shadow-xs'
+                        : 'border-gray-200 bg-gray-50 focus:bg-white focus:border-[#3b96cc] focus:ring-4 focus:ring-sky-500/10'
                     }`}
                   />
                 ))}
@@ -347,7 +347,7 @@ export function AuthModal() {
                   <button
                     type="button"
                     onClick={() => handleSendOtp()}
-                    className="text-[#21aa58] font-bold flex items-center gap-1 hover:underline cursor-pointer"
+                    className="text-[#3b96cc] font-bold flex items-center gap-1 hover:underline cursor-pointer"
                   >
                     <RotateCcw className="w-3 h-3" />
                     ارسال مجدد پیامک
@@ -359,7 +359,7 @@ export function AuthModal() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-2xl font-black text-xs sm:text-sm bg-[#21aa58] hover:bg-[#1e9b50] text-white shadow-md shadow-[#21aa58]/25 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="w-full py-3.5 rounded-2xl font-black text-xs sm:text-sm bg-[#3b96cc] hover:bg-[#2c7ead] text-white shadow-md shadow-[#3b96cc]/25 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
                 <>

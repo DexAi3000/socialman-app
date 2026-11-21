@@ -22,7 +22,7 @@ export default function RootLayout({
           href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css"
         />
       </head>
-      <body className="min-h-screen bg-[#fcfcfd] text-[#212121] antialiased selection:bg-[#21aa58] selection:text-white">
+      <body className="min-h-screen bg-[#fcfcfd] text-[#212121] antialiased selection:bg-[#3b96cc] selection:text-white">
         <AppProvider>
           {children}
         </AppProvider>

@@ -91,9 +91,9 @@ export function ConnectAccountsModal() {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Modal Header */}
-        <div className="p-5 sm:p-6 border-b border-gray-100 flex items-center justify-between bg-gradient-to-l from-emerald-50/50 to-white">
+        <div className="p-5 sm:p-6 border-b border-gray-100 flex items-center justify-between bg-gradient-to-l from-sky-50/50 to-white">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-[#21aa58] flex items-center justify-center text-white shadow-md shadow-[#21aa58]/30">
+            <div className="w-11 h-11 rounded-2xl bg-[#3b96cc] flex items-center justify-center text-white shadow-md shadow-[#3b96cc]/30">
               <Link2 className="w-6 h-6" />
             </div>
             <div>
@@ -128,7 +128,7 @@ export function ConnectAccountsModal() {
                 }}
                 className={`flex items-center gap-2 px-3.5 py-2.5 rounded-t-2xl text-xs font-bold transition-all whitespace-nowrap border-b-2 ${
                   isSelected
-                    ? 'bg-white border-[#21aa58] text-[#21aa58] font-black shadow-xs'
+                    ? 'bg-white border-[#3b96cc] text-[#3b96cc] font-black shadow-xs'
                     : 'border-transparent text-gray-500 hover:text-gray-900'
                 }`}
               >
@@ -138,7 +138,7 @@ export function ConnectAccountsModal() {
                 <span>{p.name}</span>
                 <span
                   className={`w-2 h-2 rounded-full ${
-                    isConn ? 'bg-[#21aa58]' : 'bg-gray-300'
+                    isConn ? 'bg-[#3b96cc]' : 'bg-gray-300'
                   }`}
                 />
               </button>
@@ -152,13 +152,13 @@ export function ConnectAccountsModal() {
           <div
             className={`p-4 rounded-2xl border flex items-center justify-between gap-3 ${
               currentAccount?.isConnected
-                ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
+                ? 'bg-sky-50/70 border-sky-200 text-sky-950'
                 : 'bg-amber-50/70 border-amber-200 text-amber-950'
             }`}
           >
             <div className="flex items-center gap-3">
               {currentAccount?.isConnected ? (
-                <div className="w-9 h-9 rounded-xl bg-[#21aa58] text-white flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-[#3b96cc] text-white flex items-center justify-center">
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
               ) : (
@@ -185,7 +185,7 @@ export function ConnectAccountsModal() {
               className={`px-3 py-1.5 rounded-xl text-xs font-black transition-colors ${
                 currentAccount?.isConnected
                   ? 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200'
-                  : 'bg-[#21aa58] text-white hover:bg-[#1e9b50]'
+                  : 'bg-[#3b96cc] text-white hover:bg-[#2c7ead]'
               }`}
             >
               {currentAccount?.isConnected ? 'قطع اتصال' : 'اتصال اکانت'}
@@ -208,10 +208,10 @@ export function ConnectAccountsModal() {
               <div className="p-4 rounded-2xl bg-sky-50/80 border border-sky-200 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-sky-500 animate-pulse" />
                     <span className="text-xs font-black text-sky-950">بات رسمی تلگرام: SocialMan</span>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800">
                     Bot API فعال و تایید شده ✓
                   </span>
                 </div>
@@ -221,7 +221,7 @@ export function ConnectAccountsModal() {
                     onClick={() => handleCopyBotId('@SocialManPublishBot')}
                     className="text-sky-600 hover:text-sky-800 flex items-center gap-1 text-[11px]"
                   >
-                    {copiedBot ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedBot ? <Check className="w-3.5 h-3.5 text-sky-600" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>کپی آیدی بات</span>
                   </button>
                 </div>
@@ -233,7 +233,7 @@ export function ConnectAccountsModal() {
               {/* Step by Step */}
               <div className="space-y-2.5 text-xs">
                 <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3">
-                  <span className="w-5 h-5 rounded-full bg-[#21aa58] text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
+                  <span className="w-5 h-5 rounded-full bg-[#3b96cc] text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
                     ۱
                   </span>
                   <div>
@@ -242,21 +242,21 @@ export function ConnectAccountsModal() {
                       در تلگرام وارد بخش تنظیمات کانال خود شوید، به بخش <strong>Administrators</strong> بروید و ربات زیر را اضافه کنید:
                     </span>
                     <div className="mt-2 flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-gray-200 w-fit">
-                      <span className="font-mono text-emerald-700 font-black text-xs">
+                      <span className="font-mono text-sky-700 font-black text-xs">
                         @SocialManPublishBot
                       </span>
                       <button
                         onClick={() => handleCopyBotId('@SocialManPublishBot')}
                         className="text-gray-400 hover:text-gray-700"
                       >
-                        {copiedBot ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copiedBot ? <Check className="w-3.5 h-3.5 text-sky-600" /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
                     </div>
                   </div>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3">
-                  <span className="w-5 h-5 rounded-full bg-[#21aa58] text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
+                  <span className="w-5 h-5 rounded-full bg-[#3b96cc] text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
                     ۲
                   </span>
                   <div>
@@ -268,7 +268,7 @@ export function ConnectAccountsModal() {
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3">
-                  <span className="w-5 h-5 rounded-full bg-[#21aa58] text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
+                  <span className="w-5 h-5 rounded-full bg-[#3b96cc] text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
                     ۳
                   </span>
                   <div className="w-full">
@@ -279,7 +279,7 @@ export function ConnectAccountsModal() {
                         placeholder="@channel_id"
                         value={channelInput}
                         onChange={(e) => setChannelInput(e.target.value)}
-                        className="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-xs text-left font-mono outline-none focus:border-[#21aa58]"
+                        className="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-xs text-left font-mono outline-none focus:border-[#3b96cc]"
                       />
                       <button
                         onClick={() => {
@@ -287,7 +287,7 @@ export function ConnectAccountsModal() {
                             toggleAccountConnection('telegram', channelInput, 'کانال تلگرام اختصاصی');
                           }
                         }}
-                        className="px-4 py-1.5 rounded-xl bg-[#21aa58] text-white text-xs font-black hover:bg-[#1e9b50]"
+                        className="px-4 py-1.5 rounded-xl bg-[#3b96cc] text-white text-xs font-black hover:bg-[#2c7ead]"
                       >
                         تایید و اتصال
                       </button>
@@ -361,10 +361,10 @@ export function ConnectAccountsModal() {
               <div className="p-4 rounded-2xl bg-purple-50/80 border border-purple-200 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-sky-500 animate-pulse" />
                     <span className="text-xs font-black text-purple-950">بات فعال روبیکا: SocialMan</span>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800">
                     توکن فعال و متصل ✓
                   </span>
                 </div>
@@ -374,7 +374,7 @@ export function ConnectAccountsModal() {
                     onClick={() => handleCopyBotId('@SocialManPublishBot')}
                     className="text-purple-600 hover:text-purple-800 flex items-center gap-1 text-[11px]"
                   >
-                    {copiedBot ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedBot ? <Check className="w-3.5 h-3.5 text-sky-600" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>کپی آیدی بات</span>
                   </button>
                 </div>
@@ -523,7 +523,7 @@ export function ConnectAccountsModal() {
             <div className="pt-2 border-t border-gray-100">
               <div className="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <Radio className="w-4 h-4 text-[#21aa58] animate-pulse" />
+                  <Radio className="w-4 h-4 text-[#3b96cc] animate-pulse" />
                   <div>
                     <span className="text-xs font-black text-gray-800 block">تست ارسال آزمایشی</span>
                     <span className="text-[10px] text-gray-400">
@@ -539,17 +539,17 @@ export function ConnectAccountsModal() {
                 >
                   {testingConnection ? (
                     <>
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#21aa58]" />
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#3b96cc]" />
                       <span>در حال ارسال پیام تست...</span>
                     </>
                   ) : testSuccess ? (
                     <>
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
-                      <span className="text-emerald-700">ارسال تست موفق بود! ✅</span>
+                      <Check className="w-3.5 h-3.5 text-sky-600" />
+                      <span className="text-sky-700">ارسال تست موفق بود! ✅</span>
                     </>
                   ) : (
                     <>
-                      <Send className="w-3.5 h-3.5 text-[#21aa58]" />
+                      <Send className="w-3.5 h-3.5 text-[#3b96cc]" />
                       <span>ارسال پیام تستی</span>
                     </>
                   )}
@@ -562,12 +562,12 @@ export function ConnectAccountsModal() {
         {/* Modal Footer */}
         <div className="p-4 sm:p-5 border-t border-gray-100 bg-gray-50 flex items-center justify-between text-xs">
           <div className="flex items-center gap-1.5 text-gray-500 font-bold">
-            <ShieldCheck className="w-4 h-4 text-[#21aa58]" />
+            <ShieldCheck className="w-4 h-4 text-[#3b96cc]" />
             <span>پروتکل اتصال رمزنگاری‌شده SSL ۲۵۶ بیتی</span>
           </div>
           <button
             onClick={closeConnectModal}
-            className="px-5 py-2.5 rounded-xl bg-[#21aa58] text-white font-black hover:bg-[#1e9b50] transition-colors"
+            className="px-5 py-2.5 rounded-xl bg-[#3b96cc] text-white font-black hover:bg-[#2c7ead] transition-colors"
           >
             بستن و ذخیره تنظیمات
           </button>

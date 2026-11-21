@@ -95,13 +95,8 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
               />
             </div>
             <div className="flex flex-col -space-y-0.5">
-              <div className="flex items-center gap-1">
-                <span className="text-2xl font-black text-gray-900 tracking-tight">
-                  سوشال‌من<span className="text-[#21aa58]">!</span>
-                </span>
-              </div>
-              <span className="text-[10px] font-black text-[#21aa58] tracking-wider">
-                SocialMan SuperApp
+              <span className="text-2xl font-black text-gray-900 tracking-tight font-sans">
+                Social Man
               </span>
             </div>
           </div>
@@ -110,10 +105,10 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
           <div className="flex items-center">
             <button
               onClick={() => setIsHamburgerMenuOpen(true)}
-              className="flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-gray-50 hover:bg-emerald-50 text-gray-800 hover:text-[#21aa58] border border-gray-200 hover:border-emerald-200 transition-all font-bold text-xs shadow-2xs group cursor-pointer"
+              className="flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-gray-50 hover:bg-sky-50 text-gray-800 hover:text-[#3b96cc] border border-gray-200 hover:border-sky-200 transition-all font-bold text-xs shadow-2xs group cursor-pointer"
               title="باز کردن منوی همبرگری سوشال‌من"
             >
-              <div className="w-7 h-7 rounded-xl bg-white border border-gray-200/80 flex items-center justify-center text-gray-700 group-hover:text-[#21aa58] group-hover:border-emerald-200 shadow-2xs transition-colors">
+              <div className="w-7 h-7 rounded-xl bg-white border border-gray-200/80 flex items-center justify-center text-gray-700 group-hover:text-[#3b96cc] group-hover:border-sky-200 shadow-2xs transition-colors">
                 <Menu className="w-4 h-4" />
               </div>
               <span className="font-black text-xs">منو</span>
@@ -140,7 +135,7 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
                 className="flex items-center gap-2 p-1.5 pr-2.5 rounded-2xl bg-gray-50 hover:bg-gray-100 border border-gray-200 transition-colors group"
               >
                 <div className="text-right hidden sm:block">
-                  <span className="text-xs font-black text-gray-900 block group-hover:text-[#21aa58] transition-colors">
+                  <span className="text-xs font-black text-gray-900 block group-hover:text-[#3b96cc] transition-colors">
                     {currentUser.fullName}
                   </span>
                   <span className="text-[10px] text-gray-400 font-mono block">
@@ -170,7 +165,7 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
                   <div className="flex flex-col items-center text-center p-2 border-b border-gray-100">
                     <div
                       onClick={() => fileInputRef.current?.click()}
-                      className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-md border-2 border-[#21aa58] cursor-pointer group/avatar shrink-0 mb-2 bg-sky-100"
+                      className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-md border-2 border-[#3b96cc] cursor-pointer group/avatar shrink-0 mb-2 bg-sky-100"
                       title="برای تغییر عکس کلیک کنید"
                     >
                       {currentUser.avatarUrl ? (
@@ -196,7 +191,7 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
                   <div className="space-y-1.5">
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#21aa58] text-xs font-black transition-colors"
+                      className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-[#3b96cc] text-xs font-black transition-colors"
                     >
                       <Camera className="w-3.5 h-3.5" />
                       <span>{currentUser.avatarUrl ? 'تغییر عکس پروفایل' : 'آپلود عکس پروفایل جدید'}</span>
@@ -248,7 +243,7 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
               </Link>
               <button
                 onClick={openAuthModal}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black text-white bg-[#21aa58] hover:bg-[#1e9b50] shadow-sm transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black text-white bg-[#3b96cc] hover:bg-[#2c7ead] shadow-sm transition-colors cursor-pointer"
               >
                 <Smartphone className="w-3.5 h-3.5 text-white" />
                 <span>ورود / ثبت‌نام</span>

@@ -46,8 +46,8 @@ export function SnappServicesGrid({
       id: 'whatsapp' as SocialPlatform,
       name: 'واتساپ',
       icon: WhatsappIcon,
-      color: 'bg-gradient-to-tr from-[#25D366] to-emerald-700',
-      badgeColor: 'text-[#00A852] bg-emerald-50 border-emerald-200',
+      color: 'bg-gradient-to-tr from-[#25D366] to-sky-700',
+      badgeColor: 'text-[#00A852] bg-sky-50 border-sky-200',
       audience: '۵.۶K مخاطب',
       desc: 'کانال و برودکست پیام‌رسان',
     },
@@ -104,7 +104,7 @@ export function SnappServicesGrid({
               onClick={() => onSelectPlatform(p.id)}
               className={`p-3.5 rounded-3xl border transition-all cursor-pointer relative overflow-hidden group flex flex-col justify-between ${
                 isSelected
-                  ? 'bg-emerald-50/40 border-[#00D166] shadow-md shadow-[#00D166]/10 scale-[1.02]'
+                  ? 'bg-sky-50/40 border-[#00D166] shadow-md shadow-[#00D166]/10 scale-[1.02]'
                   : 'bg-white border-slate-200/80 hover:border-slate-300 hover:shadow-md'
               }`}
             >
