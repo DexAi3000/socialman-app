@@ -38,11 +38,40 @@ export function UpgradeModal() {
   }[targetPlan];
 
   const cardNumber = '6104331068945139';
-  const formattedCard = '۶۱۰۴ - ۳۳۱۰ - ۶۸۹۴ - ۵۱۳۹';
   const cardHolder = 'نیما آرین‌فر';
 
-  const handleCopyCard = () => {
-    navigator.clipboard.writeText(cardNumber);
+  const handleCopyCard = async () => {
+    let success = false;
+
+    // 1. Try modern Clipboard API if supported and in secure context
+    if (typeof navigator !== 'undefined' && navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(cardNumber);
+        success = true;
+      } catch (_) {}
+    }
+
+    // 2. Fallback via temporary textarea for non-secure HTTP and mobile WebViews
+    if (!success && typeof document !== 'undefined') {
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = cardNumber;
+        textArea.setAttribute('readonly', '');
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        textArea.style.left = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        textArea.setSelectionRange(0, 99999);
+        success = document.execCommand('copy');
+        document.body.removeChild(textArea);
+      } catch (err) {
+        console.error('Fallback copy failed:', err);
+      }
+    }
+
+    // Visual feedback
     setCopiedCard(true);
     setTimeout(() => setCopiedCard(false), 2500);
   };
@@ -90,30 +119,67 @@ export function UpgradeModal() {
           </div>
         </div>
 
-        {/* Bank Card Details Box */}
-        <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-white space-y-3 shadow-lg relative overflow-hidden">
+        {/* Bank Card Details Box (Bank Mellat Style Matching Image 2) */}
+        <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-[#ef5992] via-[#e63f7e] to-[#d6286a] text-gray-900 space-y-3.5 shadow-xl shadow-pink-500/20 relative overflow-hidden border border-pink-300/40">
+          {/* Card Top Row: 'کارت پیش فرض' Badge + 'بانک ملت' with Official Mellat Emblem */}
           <div className="flex items-center justify-between">
+            <span className="px-2.5 py-0.5 rounded-full bg-white/30 backdrop-blur-xs border border-white/40 text-white text-[10px] font-bold">
+              کارت پیش فرض
+            </span>
+
             <div className="flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-sky-400" />
-              <span className="text-xs font-bold text-gray-300">کارت بانکی شتاب</span>
+              <span className="text-xs sm:text-sm font-black text-gray-900">بانک ملت</span>
+              {/* Bank Mellat Emblem */}
+              <div className="w-6 h-6 rounded-lg bg-white/20 p-0.5 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-[#b91c1c]" viewBox="0 0 100 100" fill="none">
+                  <path
+                    d="M50 15 L78 31 L78 63 L50 79 L22 63 L22 31 Z"
+                    stroke="#a81c24"
+                    strokeWidth="8"
+                    fill="#c52229"
+                  />
+                  <circle cx="50" cy="47" r="13" fill="#eab308" stroke="#a81c24" strokeWidth="4" />
+                </svg>
+              </div>
             </div>
-            <span className="text-[11px] font-mono text-gray-400">بانک ملت</span>
           </div>
 
+          {/* Card Number Row: Left-to-Right LTR Display (۶۱۰۴ - ۳۳۱۰ - ۶۸۹۴ - ۵۱۳۹) */}
           <div className="py-1 text-center">
-            <div className="font-mono text-lg sm:text-xl font-black tracking-widest text-sky-300 dir-ltr select-all">
-              {formattedCard}
+            <div
+              dir="ltr"
+              style={{ direction: 'ltr', unicodeBidi: 'isolate' }}
+              className="flex items-center justify-center gap-2 sm:gap-3 text-lg sm:text-xl font-black font-mono tracking-wider text-gray-900 select-all"
+            >
+              <span className="tabular-nums">۶۱۰۴</span>
+              <span className="text-gray-700/60 font-sans">-</span>
+              <span className="tabular-nums">۳۳۱۰</span>
+              <span className="text-gray-700/60 font-sans">-</span>
+              <span className="tabular-nums">۶۸۹۴</span>
+              <span className="text-gray-700/60 font-sans">-</span>
+              <span className="tabular-nums">۵۱۳۹</span>
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-xs pt-2 border-t border-white/10">
-            <span className="text-gray-400">صاحب حساب: <strong className="text-white font-bold">{cardHolder}</strong></span>
+          {/* Card Footer Row: Account Holder + Copy Button */}
+          <div className="flex items-center justify-between text-xs pt-2.5 border-t border-black/10">
+            <span className="text-gray-800 text-[11px] font-medium">
+              صاحب حساب: <strong className="text-gray-900 font-black">{cardHolder}</strong>
+            </span>
             <button
               type="button"
               onClick={handleCopyCard}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold transition-all cursor-pointer"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-black transition-all cursor-pointer shadow-xs active:scale-95 ${
+                copiedCard
+                  ? 'bg-emerald-600 text-white shadow-emerald-500/30'
+                  : 'bg-white/85 hover:bg-white text-gray-900 border border-white/60'
+              }`}
             >
-              {copiedCard ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              {copiedCard ? (
+                <Check className="w-3.5 h-3.5 text-white" />
+              ) : (
+                <Copy className="w-3.5 h-3.5 text-gray-700" />
+              )}
               <span>{copiedCard ? 'کپی شد ✓' : 'کپی شماره کارت'}</span>
             </button>
           </div>
@@ -141,7 +207,6 @@ export function UpgradeModal() {
           >
             <MessageCircle className="w-4 h-4" />
             <span>ارسال رسید</span>
-            <ExternalLink className="w-3.5 h-3.5" />
           </a>
 
           <button
