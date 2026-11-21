@@ -68,7 +68,8 @@ export function MultiPublishView() {
   // Publishing simulation state
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishedSuccess, setPublishedSuccess] = useState(false);
-  const [publishProgress, setPublishProgress] = useState<{ [key in SocialPlatform]?: 'pending' | 'success' }>({});
+  const [publishErrorMessage, setPublishErrorMessage] = useState<string | null>(null);
+  const [publishProgress, setPublishProgress] = useState<{ [key in SocialPlatform]?: 'pending' | 'success' | 'error' }>({});
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -100,9 +101,10 @@ export function MultiPublishView() {
 
     setIsPublishing(true);
     setPublishedSuccess(false);
+    setPublishErrorMessage(null);
 
     // Progressive publishing simulation across selected platforms
-    const progressMap: { [key in SocialPlatform]?: 'pending' | 'success' } = {};
+    const progressMap: { [key in SocialPlatform]?: 'pending' | 'success' | 'error' } = {};
     for (const p of selectedPlatforms) {
       progressMap[p] = 'pending';
     }
@@ -110,10 +112,13 @@ export function MultiPublishView() {
 
     try {
       // Build accounts config from user's connected channels
-      const accountsConfig: Record<string, { channelId?: string }> = {};
+      const accountsConfig: Record<string, { channelId?: string; botToken?: string }> = {};
       for (const p of selectedPlatforms) {
         if (connectedAccounts[p]?.handle) {
-          accountsConfig[p] = { channelId: connectedAccounts[p].handle };
+          accountsConfig[p] = {
+            channelId: connectedAccounts[p].handle,
+            botToken: connectedAccounts[p].botToken,
+          };
         }
       }
 
@@ -131,37 +136,70 @@ export function MultiPublishView() {
           isImmediate: true,
           scheduledDateShamsi: 'امروز',
           scheduledTime: 'هم‌اکنون',
+          mediaUrl: imagePreview,
           accountsConfig,
         }),
       });
       const data = await res.json().catch(() => null);
       console.log('Publish API result:', data);
-    } catch (err) {
+
+      if (data?.publishResults) {
+        let hasFailure = false;
+        const failedMsgs: string[] = [];
+        for (const p of selectedPlatforms) {
+          const pRes = data.publishResults[p];
+          if (pRes && pRes.success === false) {
+            progressMap[p] = 'error';
+            hasFailure = true;
+            failedMsgs.push(`${p}: ${pRes.error || 'خطا در انتشار'}`);
+          } else {
+            progressMap[p] = 'success';
+          }
+        }
+        setPublishProgress({ ...progressMap });
+
+        if (hasFailure) {
+          setPublishErrorMessage(data.message || failedMsgs.join(' | '));
+        } else {
+          setPublishedSuccess(true);
+          setTimeout(() => setPublishedSuccess(false), 5000);
+        }
+      } else if (!res.ok) {
+        for (const p of selectedPlatforms) {
+          progressMap[p] = 'error';
+        }
+        setPublishProgress({ ...progressMap });
+        setPublishErrorMessage(data?.error || 'خطا در ارسال پست به پلتفرم‌های انتخابی');
+      } else {
+        for (const p of selectedPlatforms) {
+          progressMap[p] = 'success';
+        }
+        setPublishProgress({ ...progressMap });
+        setPublishedSuccess(true);
+        setTimeout(() => setPublishedSuccess(false), 5000);
+      }
+
+      // Save to local context
+      for (const p of selectedPlatforms) {
+        addPost({
+          workspaceId: activeWorkspace.id,
+          title: title || caption.slice(0, 30) || 'پست انتشار همزمان',
+          content: caption,
+          hook: title,
+          hashtags: hashtags.split(/[،, ]+/).filter(Boolean),
+          platform: p,
+          status: 'published',
+          scheduledDateShamsi: 'امروز',
+          scheduledTime: 'هم‌اکنون',
+          mediaUrl: imagePreview || undefined,
+        });
+      }
+    } catch (err: any) {
       console.error('Publish API error:', err);
+      setPublishErrorMessage(err.message || 'خطای شبکه در ارتباط با سرور انتشار');
+    } finally {
+      setIsPublishing(false);
     }
-
-    for (const p of selectedPlatforms) {
-      await new Promise((r) => setTimeout(r, 250));
-      progressMap[p] = 'success';
-      setPublishProgress({ ...progressMap });
-
-      // Save to posts context
-      addPost({
-        workspaceId: activeWorkspace.id,
-        title: title || caption.slice(0, 30) || 'پست انتشار همزمان',
-        content: caption,
-        hook: title,
-        hashtags: hashtags.split(/[،, ]+/).filter(Boolean),
-        platform: p,
-        status: 'published',
-        scheduledDateShamsi: 'امروز',
-        scheduledTime: 'هم‌اکنون',
-      });
-    }
-
-    setIsPublishing(false);
-    setPublishedSuccess(true);
-    setTimeout(() => setPublishedSuccess(false), 5000);
   };
 
   const handleSchedulePost = () => {
@@ -436,9 +474,16 @@ export function MultiPublishView() {
             )}
 
             {publishedSuccess && (
-              <div className="mt-3 p-3 rounded-2xl bg-sky-50 border border-sky-200 text-sky-800 text-xs font-bold flex items-center justify-center gap-2 animate-bounce">
-                <CheckCircle2 className="w-4 h-4 text-[#3b96cc]" />
-                <span>عملیات با موفقیت انجام شد و در صف انتشار ثبت گردید!</span>
+              <div className="mt-3 p-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-sky-900 text-xs font-black flex items-center justify-center gap-2 shadow-xs">
+                <CheckCircle2 className="w-5 h-5 text-[#3b96cc]" />
+                <span>پست با موفقیت در کانال‌های انتخابی منتشر گردید! 🚀</span>
+              </div>
+            )}
+
+            {publishErrorMessage && (
+              <div className="mt-3 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center justify-start gap-2 shadow-xs">
+                <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+                <span className="leading-relaxed">{publishErrorMessage}</span>
               </div>
             )}
           </div>

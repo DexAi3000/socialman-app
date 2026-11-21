@@ -34,6 +34,7 @@ import {
 } from './SnappIcons';
 import { SocialPlatform } from '@/types';
 import { toPersianDigits } from '@/lib/utils';
+import { normalizeTelegramChatId } from '@/lib/publishers/telegram';
 
 export function ConnectAccountsModal() {
   const {
@@ -52,6 +53,8 @@ export function ConnectAccountsModal() {
   const [channelInput, setChannelInput] = useState('');
   const [testingConnection, setTestingConnection] = useState(false);
   const [testSuccess, setTestSuccess] = useState(false);
+  const [testMessage, setTestMessage] = useState('');
+  const [testError, setTestError] = useState<string | null>(null);
 
   // Sync tab with external caller
   React.useEffect(() => {
@@ -60,9 +63,16 @@ export function ConnectAccountsModal() {
     }
   }, [targetPlatformForConnect]);
 
-  if (!isConnectModalOpen) return null;
-
   const currentAccount = connectedAccounts[activeTab];
+
+  // Pre-fill channel input with existing handle
+  React.useEffect(() => {
+    if (currentAccount?.handle && currentAccount.handle !== '@SocialManPublishBot') {
+      setChannelInput(currentAccount.handle);
+    }
+  }, [activeTab, currentAccount?.handle]);
+
+  if (!isConnectModalOpen) return null;
 
   const handleCopyBotId = (botId: string) => {
     navigator.clipboard.writeText(botId);
@@ -73,10 +83,34 @@ export function ConnectAccountsModal() {
   const handleTestConnection = async () => {
     setTestingConnection(true);
     setTestSuccess(false);
-    await new Promise((r) => setTimeout(r, 1200));
-    setTestingConnection(false);
-    setTestSuccess(true);
-    setTimeout(() => setTestSuccess(false), 4000);
+    setTestError(null);
+    setTestMessage('');
+
+    try {
+      const res = await fetch('/socialman/api/publish/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          platform: activeTab,
+          channelId: channelInput.trim() || currentAccount?.handle || '@novexalab',
+        }),
+      });
+      const data = await res.json().catch(() => null);
+
+      if (res.ok && data?.success) {
+        setTestSuccess(true);
+        setTestMessage(data.message || 'اتصال کانال با موفقیت تایید شد! ✅');
+        setTimeout(() => setTestSuccess(false), 6000);
+      } else {
+        setTestError(data?.error || 'خطا در ارتباط با کانال یا دسترسی ربات');
+        setTimeout(() => setTestError(null), 8000);
+      }
+    } catch (e: any) {
+      setTestError(e.message || 'خطای شبکه در تست اتصال');
+      setTimeout(() => setTestError(null), 8000);
+    } finally {
+      setTestingConnection(false);
+    }
   };
 
   const platformsList = [
@@ -284,7 +318,8 @@ export function ConnectAccountsModal() {
                       <button
                         onClick={() => {
                           if (channelInput.trim()) {
-                            toggleAccountConnection('telegram', channelInput, 'کانال تلگرام اختصاصی');
+                            const clean = normalizeTelegramChatId(channelInput);
+                            toggleAccountConnection('telegram', clean, 'کانال تلگرام اختصاصی', true);
                           }
                         }}
                         className="px-4 py-1.5 rounded-xl bg-[#3b96cc] text-white text-xs font-black hover:bg-[#2c7ead]"
@@ -520,14 +555,14 @@ export function ConnectAccountsModal() {
 
           {/* Test Dispatch Button */}
           {currentAccount?.isConnected && (
-            <div className="pt-2 border-t border-gray-100">
+            <div className="pt-2 border-t border-gray-100 space-y-2">
               <div className="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
                   <Radio className="w-4 h-4 text-[#3b96cc] animate-pulse" />
                   <div>
-                    <span className="text-xs font-black text-gray-800 block">تست ارسال آزمایشی</span>
+                    <span className="text-xs font-black text-gray-800 block">تست صحت اتصال و دسترسی ربات</span>
                     <span className="text-[10px] text-gray-400">
-                      یک پیام تست مخفی به {currentAccount.accountName} ارسال کنید تا صحت اتصال تایید شود.
+                      بررسی وضعیت دسترسی ربات SocialMan به کانال {currentAccount.handle}
                     </span>
                   </div>
                 </div>
@@ -540,21 +575,35 @@ export function ConnectAccountsModal() {
                   {testingConnection ? (
                     <>
                       <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#3b96cc]" />
-                      <span>در حال ارسال پیام تست...</span>
+                      <span>در حال بررسی اتصال...</span>
                     </>
                   ) : testSuccess ? (
                     <>
                       <Check className="w-3.5 h-3.5 text-sky-600" />
-                      <span className="text-sky-700">ارسال تست موفق بود! ✅</span>
+                      <span className="text-sky-700">اتصال تایید شد! ✅</span>
                     </>
                   ) : (
                     <>
                       <Send className="w-3.5 h-3.5 text-[#3b96cc]" />
-                      <span>ارسال پیام تستی</span>
+                      <span>تست اتصال به کانال</span>
                     </>
                   )}
                 </button>
               </div>
+
+              {testSuccess && testMessage && (
+                <div className="p-3 bg-sky-50 border border-sky-200 rounded-xl text-sky-900 text-xs font-bold flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-sky-600 shrink-0" />
+                  <span>{testMessage}</span>
+                </div>
+              )}
+
+              {testError && (
+                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs font-bold flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>{testError}</span>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -13,6 +13,7 @@ import {
   TicketPriority,
   TicketMessage,
 } from '@/types';
+import { normalizeTelegramChatId } from '@/lib/publishers/telegram';
 
 interface AppContextType {
   currentUser: UserProfile | null;
@@ -45,7 +46,12 @@ interface AppContextType {
   targetPlatformForConnect: SocialPlatform | null;
   openConnectModal: (platform?: SocialPlatform) => void;
   closeConnectModal: () => void;
-  toggleAccountConnection: (platform: SocialPlatform, handle?: string, name?: string) => void;
+  toggleAccountConnection: (
+    platform: SocialPlatform,
+    handle?: string,
+    name?: string,
+    forceState?: boolean
+  ) => void;
   isUpgradeModalOpen: boolean;
   selectedPlanForUpgrade: PlanType | null;
   setIsUpgradeModalOpen: (open: boolean) => void;
@@ -86,8 +92,8 @@ const INITIAL_CONNECTED_ACCOUNTS: Record<SocialPlatform, ConnectedAccountInfo> =
   telegram: {
     platform: 'telegram',
     isConnected: true,
-    accountName: 'ربات انتشار تلگرام SocialMan',
-    handle: '@SocialManPublishBot',
+    accountName: 'کانال تلگرام Novexa',
+    handle: '@novexalab',
     botUsername: '@SocialManPublishBot',
     botToken: '9115798954:AAHHygpdWUJlhI3k-FX7rtU2egGt7wwHwrg',
     connectedAt: 'متصل به Bot API تلگرام ✓',
@@ -292,6 +298,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (_) {}
 
+    // Restore cached connected channels from localStorage
+    try {
+      const cachedAccounts = localStorage.getItem('socialman_connected_accounts');
+      if (cachedAccounts) {
+        const parsed = JSON.parse(cachedAccounts);
+        if (parsed && typeof parsed === 'object') {
+          setConnectedAccounts((prev) => ({ ...prev, ...parsed }));
+        }
+      }
+    } catch (_) {}
+
     // Verify and refresh from real DB session
     refreshSession();
 
@@ -372,20 +389,37 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setTargetPlatformForConnect(null);
   };
 
-  const toggleAccountConnection = (platform: SocialPlatform, handle?: string, name?: string) => {
+  const toggleAccountConnection = (
+    platform: SocialPlatform,
+    handle?: string,
+    name?: string,
+    forceState?: boolean
+  ) => {
     setConnectedAccounts((prev) => {
       const current = prev[platform];
-      const nextState = !current.isConnected;
-      return {
+      const nextState = forceState !== undefined ? forceState : (handle ? true : !current.isConnected);
+      const cleanHandle = handle
+        ? platform === 'telegram'
+          ? normalizeTelegramChatId(handle)
+          : handle.trim()
+        : current.handle;
+
+      const updated = {
         ...prev,
         [platform]: {
           ...current,
           isConnected: nextState,
-          handle: handle || current.handle,
+          handle: cleanHandle || current.handle,
           accountName: name || current.accountName,
-          connectedAt: nextState ? 'امروز' : undefined,
+          connectedAt: nextState ? current.connectedAt || 'امروز' : undefined,
         },
       };
+
+      try {
+        localStorage.setItem('socialman_connected_accounts', JSON.stringify(updated));
+      } catch (_) {}
+
+      return updated;
     });
   };
 

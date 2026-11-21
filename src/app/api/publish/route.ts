@@ -40,7 +40,7 @@ export async function POST(request: Request) {
       });
     }
 
-    // 2. Persist post records in SQLite for each platform or grouped
+    // 2. Persist post records in SQLite for each platform
     const createdPosts = await Promise.all(
       platforms.map(async (platform: string) => {
         return prisma.post.create({
@@ -61,13 +61,43 @@ export async function POST(request: Request) {
       })
     );
 
+    // 3. Inspect publish results for errors
+    const failedPlatforms: string[] = [];
+    if (isImmediate && publishResults) {
+      for (const p of platforms) {
+        const res = publishResults[p];
+        if (res && res.success === false) {
+          failedPlatforms.push(`${p}: ${res.error || 'خطای ناشناخته'}`);
+        }
+      }
+    }
+
+    const allFailed = platforms.length > 0 && failedPlatforms.length === platforms.length;
+    const someFailed = failedPlatforms.length > 0;
+
+    if (allFailed) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `خطا در انتشار: ${failedPlatforms.join(' | ')}`,
+          publishResults,
+          posts: createdPosts,
+        },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
-      message: isImmediate
+      message: someFailed
+        ? `پست منتشر شد، اما در برخی پلتفرم‌ها با خطا مواجه شد: ${failedPlatforms.join(' | ')}`
+        : isImmediate
         ? 'پست با موفقیت در شبکه‌های اجتماعی منتشر شد 🚀'
         : 'پست با موفقیت در تقویم محتوایی زمان‌بندی شد 📅',
       posts: createdPosts,
       publishResults,
+      hasFailures: someFailed,
+      failedPlatforms,
     });
   } catch (error: any) {
     console.error('Publish error:', error);

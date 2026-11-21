@@ -73,6 +73,7 @@ export interface Post {
   scheduledDateShamsi: string; // e.g. "۱۴۰۳/۰۹/۰۵"
   scheduledTime: string; // e.g. "۱۸:۳۰"
   createdAt: string;
+  mediaUrl?: string | null;
   clientComment?: string;
 }
 
