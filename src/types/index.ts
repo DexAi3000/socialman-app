@@ -36,6 +36,7 @@ export interface UserProfile {
   phone: string;
   username?: string;
   role: string;
+  plan?: PlanType;
   isLoggedIn: boolean;
   verifiedVia?: string;
   avatarUrl?: string;

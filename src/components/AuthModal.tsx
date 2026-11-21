@@ -103,6 +103,7 @@ export function AuthModal() {
           phone: data.user.phone,
           username: data.user.username,
           role: data.user.role,
+          plan: data.user.plan,
           verifiedVia: 'Password',
         });
         closeAuthModal();
@@ -275,6 +276,7 @@ export function AuthModal() {
           phone: data.user.phone,
           username: data.user.username,
           role: data.user.role,
+          plan: data.user.plan,
           verifiedVia: otpPurpose === 'register' ? 'Register-SMS' : 'SMS.ir',
         });
         closeAuthModal();

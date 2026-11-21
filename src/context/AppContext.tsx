@@ -22,6 +22,7 @@ interface AppContextType {
   closeAuthModal: () => void;
   loginUser: (user: Omit<UserProfile, 'isLoggedIn'>) => void;
   logoutUser: () => void;
+  refreshSession: () => void;
   currentPlan: PlanType;
   aiUsageCount: number;
   maxAiUsage: number;
@@ -277,35 +278,64 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const [targetPlatformForConnect, setTargetPlatformForConnect] = useState<SocialPlatform | null>(null);
 
-  // Sync initial data from real database and check session on mount
-  useEffect(() => {
-    // 0. Check real authentication session
+  // Session refresh helper that syncs user & plan from database
+  const refreshSession = () => {
     fetch('/socialman/api/auth/me')
       .then((r) => r.json())
       .then((d) => {
         if (d.authenticated && d.user) {
-          setCurrentUser({
+          const profile: UserProfile = {
             id: d.user.id,
             fullName: d.user.fullName,
             phone: d.user.phone,
+            username: d.user.username,
             role: d.user.role,
+            plan: (d.user.plan || 'free') as PlanType,
             avatarUrl: d.user.avatarUrl,
             isLoggedIn: true,
-          });
+          };
+          setCurrentUser(profile);
           if (d.user.plan) {
             setCurrentPlan(d.user.plan as PlanType);
           }
-        } else {
-          setCurrentUser(null);
+          try {
+            localStorage.setItem('socialman_user', JSON.stringify(profile));
+          } catch (_) {}
         }
       })
       .catch((err) => {
         console.log('Auth session check error:', err);
-        setCurrentUser(null);
       })
       .finally(() => {
         setIsAuthChecked(true);
       });
+  };
+
+  // Sync initial data from real database and check session on mount
+  useEffect(() => {
+    // 0. Restore cached session immediately from localStorage for instant render
+    try {
+      const cached = localStorage.getItem('socialman_user');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed?.isLoggedIn) {
+          setCurrentUser(parsed);
+          if (parsed.plan) setCurrentPlan(parsed.plan as PlanType);
+        }
+      }
+    } catch (_) {}
+
+    // Verify and refresh from real DB session
+    refreshSession();
+
+    // Re-check session whenever tab comes into focus or visibility changes
+    window.addEventListener('focus', refreshSession);
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        refreshSession();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
 
     // 1. Fetch Workspaces from DB
     fetch('/socialman/api/workspaces')
@@ -376,10 +406,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const closeAuthModal = () => setIsAuthModalOpen(false);
 
   const loginUser = (userData: Omit<UserProfile, 'isLoggedIn'>) => {
-    setCurrentUser({
+    const fullUser: UserProfile = {
       ...userData,
       isLoggedIn: true,
-    });
+    };
+    setCurrentUser(fullUser);
+    if (userData.plan) {
+      setCurrentPlan(userData.plan as PlanType);
+    }
+    try {
+      localStorage.setItem('socialman_user', JSON.stringify(fullUser));
+    } catch (_) {}
     setIsAuthModalOpen(false);
   };
 
@@ -390,6 +427,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       console.error('Logout error:', e);
     }
     setCurrentUser(null);
+    setCurrentPlan('free');
+    try {
+      localStorage.removeItem('socialman_user');
+    } catch (_) {}
     window.location.href = '/socialman/login';
   };
 
@@ -604,6 +645,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         closeAuthModal,
         loginUser,
         logoutUser,
+        refreshSession,
         currentPlan,
         aiUsageCount,
         maxAiUsage,

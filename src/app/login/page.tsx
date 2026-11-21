@@ -104,6 +104,7 @@ export default function LoginPage() {
           phone: data.user.phone,
           username: data.user.username,
           role: data.user.role,
+          plan: data.user.plan,
           verifiedVia: 'Password',
         });
         setStep('success');
@@ -282,6 +283,7 @@ export default function LoginPage() {
           phone: data.user.phone,
           username: data.user.username,
           role: data.user.role,
+          plan: data.user.plan,
           verifiedVia: otpPurpose === 'register' ? 'Register-SMS' : 'SMS.ir',
         });
         setStep('success');
