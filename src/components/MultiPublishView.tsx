@@ -33,7 +33,7 @@ import {
   SnappBaleIcon,
 } from './SnappIcons';
 import { SocialPlatform } from '@/types';
-import { toPersianDigits } from '@/lib/utils';
+import { toPersianDigits, getShamsiToday } from '@/lib/utils';
 
 export function MultiPublishView() {
   const {
@@ -61,8 +61,8 @@ export function MultiPublishView() {
   const [activePreviewTab, setActivePreviewTab] = useState<SocialPlatform>('instagram');
 
   // Scheduling state
-  const [scheduleDate, setScheduleDate] = useState('۱۴۰۳/۰۹/۱۰');
-  const [scheduleTime, setScheduleTime] = useState('۱۸:۳۰');
+  const [scheduleDate, setScheduleDate] = useState(() => getShamsiToday().formatted);
+  const [scheduleTime, setScheduleTime] = useState(() => getShamsiToday().timeFormatted || '۱۹:۰۰');
   const [isScheduledMode, setIsScheduledMode] = useState(false);
 
   // Publishing simulation state

@@ -13,7 +13,7 @@ import {
   Menu,
 } from 'lucide-react';
 import { InstagramIcon, TelegramIcon } from '@/components/SocialIcons';
-import { toPersianDigits } from '@/lib/utils';
+import { toPersianDigits, getShamsiToday } from '@/lib/utils';
 
 interface TopBarProps {
   onOpenAiStudio: () => void;
@@ -27,7 +27,7 @@ export function TopBar({ onOpenAiStudio, onOpenMobileMenu, activeTab }: TopBarPr
   const tabTitles: Record<string, string> = {
     dashboard: 'داشبورد تحلیلی و مانیتورینگ',
     'ai-studio': 'استودیوی تولید محتوای هوش مصنوعی',
-    calendar: 'تقویم محتوایی شمسی (آذر ۱۴۰۳)',
+    calendar: `تقویم محتوایی شمسی (${getShamsiToday().fullTitle})`,
     'client-portal': 'پورتال اختصاصی تایید کارفرما',
     pricing: 'تعرفه‌ها و ارتقای اشتراک',
   };

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Send } from 'lucide-react';
+import { getShamsiToday } from '@/lib/utils';
 import {
   SnappInstagramIcon,
   SnappTelegramIcon,
@@ -46,7 +47,7 @@ export function SnappTilesGrid({ onSelectService }: SnappTilesGridProps) {
       title: 'زمان‌بندی تقویم شمسی',
       desc: 'ارسال خودکار در تاریخ و ساعت مشخص',
       icon: <SnappCalendarIcon className="w-16 h-16 sm:w-20 sm:h-20" />,
-      badge: 'آذر ۱۴۰۳ 📅',
+      badge: `${getShamsiToday().fullTitle} 📅`,
       badgeColor: 'bg-amber-50 text-amber-700 border-amber-200',
     },
     {

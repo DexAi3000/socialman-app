@@ -21,7 +21,7 @@ import {
   RubikaIcon,
 } from '@/components/SocialIcons';
 import { SocialPlatform, ContentTone, AiGenerationResponse } from '@/types';
-import { toPersianDigits } from '@/lib/utils';
+import { toPersianDigits, getShamsiToday } from '@/lib/utils';
 
 interface AiStudioViewProps {
   initialPlatform?: SocialPlatform;
@@ -118,8 +118,8 @@ export function AiStudioView({ initialPlatform = 'instagram' }: AiStudioViewProp
       hashtags: result.hashtags,
       platform,
       status: 'draft',
-      scheduledDateShamsi: '۱۴۰۳/۰۹/۱۰',
-      scheduledTime: '۱۹:۳۰',
+      scheduledDateShamsi: getShamsiToday().formatted,
+      scheduledTime: getShamsiToday().timeFormatted || '۱۹:۳۰',
     });
     setScheduledSuccess(true);
     setTimeout(() => setScheduledSuccess(false), 3000);

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '@/context/AppContext';
 import {
   Calendar as CalendarIcon,
@@ -22,24 +22,34 @@ import {
   BaleIcon,
   RubikaIcon,
 } from '@/components/SocialIcons';
-import { toPersianDigits, IRANIAN_EVENTS } from '@/lib/utils';
+import { toPersianDigits, IRANIAN_EVENTS, getShamsiToday } from '@/lib/utils';
 import { Post, SocialPlatform, PostStatus } from '@/types';
 
 export function CalendarView() {
   const { posts, activeWorkspace, updatePost, deletePost, addPost } = useApp();
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [today, setToday] = useState(() => getShamsiToday());
+  const [selectedDay, setSelectedDay] = useState<number>(() => getShamsiToday().day);
   const [platformFilter, setPlatformFilter] = useState<string>('all');
   const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
-  const [selectedDay, setSelectedDay] = useState<number>(14); // Default to today (14th)
   const [viewMode, setViewMode] = useState<'month' | 'agenda'>('month');
+
+  // Keep date strictly synced with real current clock on mount
+  useEffect(() => {
+    const cur = getShamsiToday();
+    setToday(cur);
+    setSelectedDay(cur.day);
+  }, []);
 
   const [newTitle, setNewTitle] = useState('');
   const [newContent, setNewContent] = useState('');
   const [newPlatform, setNewPlatform] = useState<SocialPlatform>('instagram');
-  const [newDay, setNewDay] = useState('۱۴');
-  const [newTime, setNewTime] = useState('۱۹:۰۰');
+  const [newDay, setNewDay] = useState(() => String(getShamsiToday().day));
+  const [newTime, setNewTime] = useState(() => getShamsiToday().timeFormatted || '۱۹:۰۰');
 
-  const daysInAzar = 30;
+  const daysInMonth = today.daysInMonth;
+  const startWeekdayIndex = today.startWeekdayIndex;
+
   const weekDays = [
     { short: 'ش', full: 'شنبه', isHoliday: false },
     { short: '۱ش', full: 'یکشنبه', isHoliday: false },
@@ -118,6 +128,10 @@ export function CalendarView() {
   const handleCreateManualPost = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle.trim()) return;
+
+    const mStr = String(today.month).padStart(2, '0');
+    const dStr = String(newDay).padStart(2, '0');
+
     addPost({
       workspaceId: activeWorkspace.id,
       title: newTitle,
@@ -125,7 +139,7 @@ export function CalendarView() {
       platform: newPlatform,
       status: 'draft',
       hashtags: ['مارکتینگ', 'تولید_محتوا'],
-      scheduledDateShamsi: `۱۴۰۳/۰۹/${newDay.padStart(2, '۰')}`,
+      scheduledDateShamsi: `${toPersianDigits(today.year)}/${toPersianDigits(mStr)}/${toPersianDigits(dStr)}`,
       scheduledTime: newTime,
     });
     setNewTitle('');
@@ -134,11 +148,19 @@ export function CalendarView() {
   };
 
   // Posts for the actively selected day
-  const selectedDayStr = String(selectedDay).padStart(2, '۰');
-  const selectedDayEvent = IRANIAN_EVENTS.find((e) => e.day === selectedDay && e.month === 'آذر');
+  const selectedDayStr = String(selectedDay).padStart(2, '0');
+  const selectedDayEvent = IRANIAN_EVENTS.find(
+    (e) => e.day === selectedDay && e.month === today.monthName
+  );
   const selectedDayPosts = workspacePosts.filter((p) => {
-    const postDay = p.scheduledDateShamsi?.split('/')[2];
-    return postDay === toPersianDigits(selectedDayStr) || postDay === selectedDayStr;
+    if (!p.scheduledDateShamsi) return false;
+    const postDay = p.scheduledDateShamsi.split('/')[2];
+    return (
+      postDay === toPersianDigits(selectedDayStr) ||
+      postDay === selectedDayStr ||
+      postDay === String(selectedDay) ||
+      postDay === toPersianDigits(selectedDay)
+    );
   });
 
   return (
@@ -153,14 +175,14 @@ export function CalendarView() {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
-                  تقویم محتوایی ۵ شبکه (آذر ۱۴۰۳)
+                  تقویم محتوایی ۵ شبکه ({today.fullTitle})
                 </h1>
                 <span className="text-[11px] bg-sky-50 text-[#3b96cc] border border-sky-200 px-2.5 py-0.5 rounded-full font-mono font-black">
                   {toPersianDigits(workspacePosts.length)} پست
                 </span>
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-500">
-                زمان‌بندی انتشار خودکار در اینستاگرام، تلگرام، واتساپ، روبیکا و بله
+              <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
+                امروز: <strong className="text-slate-800">{today.fullDateWithWeekday}</strong> • زمان‌بندی خودکار در اینستاگرام، تلگرام، واتساپ، روبیکا و بله
               </p>
             </div>
           </div>
@@ -217,7 +239,7 @@ export function CalendarView() {
         </div>
       </div>
 
-      {/* 2. Monthly Grid View (100% Mobile Responsive, ZERO Horizontal Overflow) */}
+      {/* 2. Monthly Grid View (Calculated with precise starting weekday offset) */}
       {viewMode === 'month' && (
         <div className="bg-white border border-slate-200/90 rounded-3xl p-2.5 sm:p-5 shadow-xs space-y-3">
           {/* Weekday 7-Column Headers */}
@@ -237,28 +259,46 @@ export function CalendarView() {
             ))}
           </div>
 
-          {/* 30 Days Grid (7 columns fit effortlessly on mobile without cutoffs) */}
+          {/* Days Grid with precise start-of-month padding */}
           <div className="grid grid-cols-7 gap-1 sm:gap-2 w-full">
-            {Array.from({ length: daysInAzar }).map((_, index) => {
+            {/* Empty slots for days before day 1 */}
+            {Array.from({ length: startWeekdayIndex }).map((_, i) => (
+              <div
+                key={`empty-${i}`}
+                className="p-1 sm:p-2.5 rounded-xl sm:rounded-2xl border border-transparent aspect-square sm:aspect-auto sm:min-h-[110px] opacity-10 pointer-events-none"
+              />
+            ))}
+
+            {Array.from({ length: daysInMonth }).map((_, index) => {
               const dayNum = index + 1;
-              const dayStr = String(dayNum).padStart(2, '۰');
-              const dayEvent = IRANIAN_EVENTS.find((e) => e.day === dayNum && e.month === 'آذر');
+              const dayStr = String(dayNum).padStart(2, '0');
+              const dayEvent = IRANIAN_EVENTS.find(
+                (e) => e.day === dayNum && e.month === today.monthName
+              );
 
               const dayPosts = workspacePosts.filter((p) => {
-                const postDay = p.scheduledDateShamsi?.split('/')[2];
-                return postDay === toPersianDigits(dayStr) || postDay === dayStr;
+                if (!p.scheduledDateShamsi) return false;
+                const postDay = p.scheduledDateShamsi.split('/')[2];
+                return (
+                  postDay === toPersianDigits(dayStr) ||
+                  postDay === dayStr ||
+                  postDay === String(dayNum) ||
+                  postDay === toPersianDigits(dayNum)
+                );
               });
 
               const isSelected = selectedDay === dayNum;
-              const isToday = dayNum === 14; // Azar 14th simulated today
+              const isToday = dayNum === today.day;
 
               return (
                 <div
                   key={dayNum}
                   onClick={() => setSelectedDay(dayNum)}
                   className={`relative p-1 sm:p-2.5 rounded-xl sm:rounded-2xl border transition-all cursor-pointer flex flex-col justify-between aspect-square sm:aspect-auto sm:min-h-[110px] active:scale-95 ${
-                    isSelected
-                      ? 'border-[#3b96cc] ring-2 ring-[#3b96cc]/30 bg-sky-50/50 shadow-xs'
+                    isToday
+                      ? 'border-[#3b96cc] ring-2 ring-[#3b96cc]/40 bg-sky-50/60 shadow-sm'
+                      : isSelected
+                      ? 'border-[#3b96cc] ring-1 ring-[#3b96cc]/30 bg-sky-50/30'
                       : dayEvent?.type === 'hot'
                       ? 'bg-rose-50/50 border-rose-200/80 hover:border-rose-300'
                       : 'bg-white border-slate-200/90 hover:border-sky-300 hover:bg-slate-50/50'
@@ -269,16 +309,22 @@ export function CalendarView() {
                     <span
                       className={`text-[11px] sm:text-xs font-black font-mono w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-lg ${
                         isToday
-                          ? 'bg-[#3b96cc] text-white shadow-xs font-bold'
+                          ? 'bg-[#3b96cc] text-white shadow-xs font-black'
                           : isSelected
-                          ? 'bg-[#3b96cc] text-white'
+                          ? 'bg-sky-200 text-[#3b96cc] font-black'
                           : 'text-slate-800 bg-slate-100/90'
                       }`}
                     >
                       {toPersianDigits(dayNum)}
                     </span>
 
-                    {dayEvent && (
+                    {isToday && (
+                      <span className="text-[8px] sm:text-[9px] font-black px-1.5 py-0.5 rounded-md bg-[#3b96cc] text-white">
+                        امروز
+                      </span>
+                    )}
+
+                    {dayEvent && !isToday && (
                       <span
                         title={dayEvent.title}
                         className="text-[9px] sm:text-[10px] flex items-center justify-center"
@@ -353,13 +399,22 @@ export function CalendarView() {
             })}
           </div>
 
-          {/* 3. Selected Day Schedule Drawer / Bottom Panel (Focused on Mobile) */}
+          {/* 3. Selected Day Schedule Drawer / Bottom Panel */}
           <div className="mt-4 pt-4 border-t border-slate-100 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#3b96cc]" />
-                <h3 className="text-xs sm:text-sm font-black text-slate-900">
-                  برنامه انتشار روز {toPersianDigits(selectedDay)} آذر
+                <h3 className="text-xs sm:text-sm font-black text-slate-900 flex items-center gap-2">
+                  <span>
+                    {selectedDay === today.day
+                      ? `برنامه انتشار امروز (${toPersianDigits(selectedDay)} ${today.monthName})`
+                      : `برنامه انتشار روز ${toPersianDigits(selectedDay)} ${today.monthName}`}
+                  </span>
+                  {selectedDay === today.day && (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] bg-sky-100 text-[#3b96cc] font-black">
+                      امروز
+                    </span>
+                  )}
                 </h3>
                 {selectedDayEvent && (
                   <span className="text-[10px] bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
@@ -418,7 +473,9 @@ export function CalendarView() {
             ) : (
               <div className="p-5 rounded-2xl bg-slate-50 border border-dashed border-slate-200 text-center space-y-2">
                 <p className="text-xs text-slate-500 font-medium">
-                  هنوز پستی برای روز {toPersianDigits(selectedDay)} آذر زمان‌بندی نشده است.
+                  {selectedDay === today.day
+                    ? `هنوز پستی برای امروز (${toPersianDigits(selectedDay)} ${today.monthName}) زمان‌بندی نشده است.`
+                    : `هنوز پستی برای روز ${toPersianDigits(selectedDay)} ${today.monthName} زمان‌بندی نشده است.`}
                 </p>
                 <button
                   onClick={() => {
@@ -436,7 +493,7 @@ export function CalendarView() {
         </div>
       )}
 
-      {/* 4. Agenda / Schedule List View (Chronological list of all month's posts) */}
+      {/* 4. Agenda / Schedule List View */}
       {viewMode === 'agenda' && (
         <div className="bg-white border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-xs space-y-3">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -457,16 +514,16 @@ export function CalendarView() {
               <div
                 key={post.id}
                 onClick={() => setSelectedPost(post)}
-                className="p-3 sm:p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100/90 border border-slate-200 transition-all flex items-center justify-between gap-3 cursor-pointer active:scale-[0.99]"
+                className="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100/70 border border-slate-200 transition-all flex items-center justify-between gap-3 cursor-pointer"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-2xs">
-                    {getPlatformIcon(post.platform, 'w-4 h-4')}
+                  <div className="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-xs">
+                    {getPlatformIcon(post.platform, 'w-5 h-5')}
                   </div>
                   <div className="min-w-0 text-right">
-                    <h4 className="text-xs sm:text-sm font-black text-slate-900 truncate">
+                    <span className="text-xs sm:text-sm font-black text-slate-900 block truncate">
                       {post.title}
-                    </h4>
+                    </span>
                     <div className="flex items-center gap-2 text-[10px] text-slate-500 font-mono mt-0.5">
                       <span>{post.scheduledDateShamsi}</span>
                       <span>ساعت {toPersianDigits(post.scheduledTime || '۱۹:۰۰')}</span>
@@ -558,7 +615,7 @@ export function CalendarView() {
           <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 w-full max-w-sm shadow-2xl space-y-3.5">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
               <h3 className="text-sm font-black text-slate-900">
-                زمان‌بندی پست برای روز {toPersianDigits(newDay)} آذر
+                زمان‌بندی پست برای روز {toPersianDigits(newDay)} {today.monthName}
               </h3>
               <button
                 type="button"
@@ -610,11 +667,13 @@ export function CalendarView() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-black text-slate-700 mb-1">روز آذر (۱ تا ۳۰):</label>
+                  <label className="block text-[11px] font-black text-slate-700 mb-1">
+                    روز {today.monthName} (۱ تا {toPersianDigits(today.daysInMonth)}):
+                  </label>
                   <input
                     type="number"
                     min="1"
-                    max="30"
+                    max={today.daysInMonth}
                     value={newDay}
                     onChange={(e) => setNewDay(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-xs text-slate-800 outline-none text-center font-mono font-bold"

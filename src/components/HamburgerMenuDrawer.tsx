@@ -24,7 +24,7 @@ import {
   Zap,
   Smartphone,
 } from 'lucide-react';
-import { toPersianDigits } from '@/lib/utils';
+import { toPersianDigits, getShamsiToday } from '@/lib/utils';
 import { SocialPlatform } from '@/types';
 
 interface HamburgerMenuDrawerProps {
@@ -84,7 +84,7 @@ export function HamburgerMenuDrawer({
       label: 'تقویم محتوایی شمسی',
       desc: 'زمان‌بندی و مدیریت هوشمند ماه آذر',
       icon: Calendar,
-      badge: 'آذر ۱۴۰۳',
+      badge: getShamsiToday().fullTitle,
       badgeColor: 'bg-amber-100 text-amber-800',
     },
     {
