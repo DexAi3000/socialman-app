@@ -28,6 +28,7 @@ export function AuthModal() {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const [loginMethod, setLoginMethod] = useState<'password' | 'otp'>('password');
   const [step, setStep] = useState<'form' | 'otp' | 'success'>('form');
+  const [otpPurpose, setOtpPurpose] = useState<'login' | 'register'>('login');
 
   // Login fields
   const [loginIdentifier, setLoginIdentifier] = useState('');
@@ -116,7 +117,7 @@ export function AuthModal() {
     }
   };
 
-  // 2. Register
+  // 2. Register Form Submit -> Send OTP
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
@@ -157,7 +158,7 @@ export function AuthModal() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'register',
+          action: 'register-send-otp',
           fullName: regFullName.trim(),
           username: cleanUsername,
           phone: cleanPhone,
@@ -166,16 +167,16 @@ export function AuthModal() {
       });
 
       const data = await res.json();
-      if (res.ok && data.user) {
-        loginUser({
-          id: data.user.id,
-          fullName: data.user.fullName,
-          phone: data.user.phone,
-          username: data.user.username,
-          role: data.user.role,
-          verifiedVia: 'Register',
-        });
-        closeAuthModal();
+      if (res.ok) {
+        setTestOtpHint(data.testCode || '12345');
+        setOtpPhone(cleanPhone);
+        setOtpPurpose('register');
+        setOtpValues(['', '', '', '', '']);
+        setStep('otp');
+        setCountdown(120);
+        setTimeout(() => {
+          otpInputRefs.current[0]?.focus();
+        }, 150);
       } else {
         setErrorMsg(data.error || 'خطایی در ثبت‌نام رخ داد.');
       }
@@ -213,6 +214,8 @@ export function AuthModal() {
       if (res.ok) {
         setTestOtpHint(data.testCode || '12345');
         setOtpPhone(cleanPhone);
+        setOtpPurpose('login');
+        setOtpValues(['', '', '', '', '']);
         setStep('otp');
         setCountdown(120);
         setTimeout(() => {
@@ -228,7 +231,7 @@ export function AuthModal() {
     }
   };
 
-  // 4. Verify OTP
+  // 4. Verify OTP (Works for both Register and Login)
   const handleVerifyOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setErrorMsg('');
@@ -241,15 +244,31 @@ export function AuthModal() {
 
     setLoading(true);
     try {
-      const res = await fetch('/socialman/api/auth/otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'verify-otp',
-          phone: otpPhone,
-          code: fullCode,
-        }),
-      });
+      let res: Response;
+      if (otpPurpose === 'register') {
+        res = await fetch('/socialman/api/auth/otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'register-verify',
+            fullName: regFullName.trim(),
+            username: regUsername.trim().toLowerCase(),
+            phone: otpPhone,
+            password: regPassword,
+            code: fullCode,
+          }),
+        });
+      } else {
+        res = await fetch('/socialman/api/auth/otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'verify-otp',
+            phone: otpPhone,
+            code: fullCode,
+          }),
+        });
+      }
 
       const data = await res.json();
       if (res.ok && data.user) {
@@ -259,7 +278,7 @@ export function AuthModal() {
           phone: data.user.phone,
           username: data.user.username,
           role: data.user.role,
-          verifiedVia: 'SMS.ir',
+          verifiedVia: otpPurpose === 'register' ? 'Register-SMS' : 'SMS.ir',
         });
         closeAuthModal();
       } else {
@@ -606,10 +625,10 @@ export function AuthModal() {
                   {loading ? (
                     <>
                       <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>در حال ساخت حساب...</span>
+                      <span>در حال ارسال کد تایید...</span>
                     </>
                   ) : (
-                    <span>ثبت‌نام و ورود</span>
+                    <span>تایید شماره و دریافت کد</span>
                   )}
                 </button>
               </form>
@@ -705,7 +724,7 @@ export function AuthModal() {
                   <span>در حال بررسی...</span>
                 </>
               ) : (
-                <span>تایید و ورود</span>
+                <span>{otpPurpose === 'register' ? 'تایید و ایجاد حساب کاربری' : 'تایید و ورود'}</span>
               )}
             </button>
           </form>

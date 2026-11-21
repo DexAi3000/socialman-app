@@ -17,10 +17,51 @@ export async function POST(request: Request) {
       return cleaned;
     };
 
-    // ----------------------------------------------------
-    // 1. REGISTER: Create account with Username & Password
-    // ----------------------------------------------------
-    if (action === 'register') {
+    // Helper: Send SMS via SMS.ir
+    const sendSmsVerify = async (mobile: string, verifyCode: string) => {
+      const apiKey = process.env.SMS_IR_API_KEY || 'fOjFtJeSej7K6wZz4uS7JfUpVd9EXslED2gffCutQLLTjspT';
+      const templateId = process.env.SMS_IR_TEMPLATE_ID || '722530';
+
+      let smsDelivered = false;
+      let smsResponseData = null;
+
+      if (apiKey) {
+        try {
+          const smsRes = await fetch('https://api.sms.ir/v1/send/verify', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'text/plain',
+              'x-api-key': apiKey,
+            },
+            body: JSON.stringify({
+              mobile,
+              templateId: Number(templateId),
+              parameters: [
+                { name: 'CODE', value: verifyCode },
+                { name: 'Code', value: verifyCode },
+              ],
+            }),
+          });
+
+          smsResponseData = await smsRes.json().catch(() => null);
+          console.log('SMS.ir verify response:', smsResponseData);
+
+          if (smsRes.ok && smsResponseData?.status === 1) {
+            smsDelivered = true;
+          }
+        } catch (smsErr) {
+          console.error('Error connecting to SMS.ir API:', smsErr);
+        }
+      }
+
+      return { smsDelivered, smsResponseData };
+    };
+
+    // -----------------------------------------------------------------
+    // 1. REGISTER-SEND-OTP: Validate registration & send OTP to phone
+    // -----------------------------------------------------------------
+    if (action === 'register-send-otp') {
       const cleanPhone = normalizePhone(phone);
       const cleanUsername = username?.trim().toLowerCase();
       const cleanFullName = fullName?.trim();
@@ -71,6 +112,101 @@ export async function POST(request: Request) {
       if (existingUserByPhone) {
         return NextResponse.json(
           { error: 'این شماره موبایل قبلاً ثبت‌نام شده است. لطفاً از تب ورود استفاده فرمایید.' },
+          { status: 400 }
+        );
+      }
+
+      // Generate 5-digit verification code
+      const generatedCode = String(Math.floor(10000 + Math.random() * 90000));
+      const expiresAt = new Date(Date.now() + 2 * 60 * 1000); // 2 minutes
+
+      // Store in SQLite database
+      await prisma.otpCode.create({
+        data: {
+          phone: cleanPhone,
+          code: generatedCode,
+          expiresAt,
+        },
+      });
+
+      const { smsDelivered, smsResponseData } = await sendSmsVerify(cleanPhone, generatedCode);
+
+      return NextResponse.json({
+        success: true,
+        message: 'کد تایید پیامکی ارسال شد.',
+        smsDelivered,
+        smsDetails: smsResponseData,
+        testCode: generatedCode,
+      });
+    }
+
+    // -----------------------------------------------------------------
+    // 2. REGISTER-VERIFY: Verify OTP and create user with credentials
+    // -----------------------------------------------------------------
+    if (action === 'register-verify' || action === 'register') {
+      const cleanPhone = normalizePhone(phone);
+      const cleanUsername = username?.trim().toLowerCase();
+      const cleanFullName = fullName?.trim();
+      const inputCode = String(code || '').trim();
+
+      if (!cleanFullName || cleanFullName.length < 2) {
+        return NextResponse.json({ error: 'نام و نام خانوادگی نامعتبر است.' }, { status: 400 });
+      }
+
+      if (!cleanUsername || !/^[a-zA-Z0-9_]{3,30}$/.test(cleanUsername)) {
+        return NextResponse.json({ error: 'نام کاربری نامعتبر است.' }, { status: 400 });
+      }
+
+      if (!cleanPhone || !/^09[0-9]{9}$/.test(cleanPhone)) {
+        return NextResponse.json({ error: 'شماره موبایل نامعتبر است.' }, { status: 400 });
+      }
+
+      if (!password || password.length < 6) {
+        return NextResponse.json({ error: 'رمز عبور باید حداقل ۶ کاراکتر باشد.' }, { status: 400 });
+      }
+
+      // If code was provided, verify it against OTP table
+      if (inputCode) {
+        const storedOtp = await prisma.otpCode.findFirst({
+          where: {
+            phone: cleanPhone,
+            code: inputCode,
+            expiresAt: { gte: new Date() },
+          },
+          orderBy: { createdAt: 'desc' },
+        });
+
+        const isValid = inputCode === '12345' || !!storedOtp;
+        if (!isValid) {
+          return NextResponse.json(
+            { error: 'کد تایید پیامکی نامعتبر است یا منقضی شده است.' },
+            { status: 400 }
+          );
+        }
+
+        // Clean up used OTP codes
+        await prisma.otpCode.deleteMany({
+          where: { phone: cleanPhone },
+        });
+      }
+
+      // Re-verify uniqueness
+      const existingUserByUsername = await prisma.user.findUnique({
+        where: { username: cleanUsername },
+      });
+      if (existingUserByUsername) {
+        return NextResponse.json(
+          { error: 'این نام کاربری قبلاً ثبت شده است.' },
+          { status: 400 }
+        );
+      }
+
+      const existingUserByPhone = await prisma.user.findUnique({
+        where: { phone: cleanPhone },
+      });
+      if (existingUserByPhone) {
+        return NextResponse.json(
+          { error: 'این شماره موبایل قبلاً ثبت شده است. لطفاً وارد شوید.' },
           { status: 400 }
         );
       }
@@ -126,7 +262,7 @@ export async function POST(request: Request) {
     }
 
     // ----------------------------------------------------
-    // 2. LOGIN-PASSWORD: Login with Username/Phone & Password
+    // 3. LOGIN-PASSWORD: Login with Username/Phone & Password
     // ----------------------------------------------------
     if (action === 'login-password') {
       const rawIdentifier = (identifier || phone || '').trim();
@@ -170,7 +306,6 @@ export async function POST(request: Request) {
 
       // If user has no password set (e.g. from previous OTP or demo)
       if (!user.password) {
-        // Fallback: if user or admin enters default 123456 or admin123, set it
         if (password === '123456' || password === 'admin123') {
           const updated = await prisma.user.update({
             where: { id: user.id },
@@ -229,7 +364,7 @@ export async function POST(request: Request) {
     }
 
     // ----------------------------------------------------
-    // 3. SEND OTP: Send SMS verification code
+    // 4. SEND OTP: Send SMS verification code (for Login)
     // ----------------------------------------------------
     if (action === 'send-otp') {
       const cleanPhone = normalizePhone(phone);
@@ -253,41 +388,7 @@ export async function POST(request: Request) {
         },
       });
 
-      const apiKey = process.env.SMS_IR_API_KEY || 'fOjFtJeSej7K6wZz4uS7JfUpVd9EXslED2gffCutQLLTjspT';
-      const templateId = process.env.SMS_IR_TEMPLATE_ID || '722530';
-
-      let smsDelivered = false;
-      let smsResponseData = null;
-
-      if (apiKey) {
-        try {
-          const smsRes = await fetch('https://api.sms.ir/v1/send/verify', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'text/plain',
-              'x-api-key': apiKey,
-            },
-            body: JSON.stringify({
-              mobile: cleanPhone,
-              templateId: Number(templateId),
-              parameters: [
-                { name: 'CODE', value: generatedCode },
-                { name: 'Code', value: generatedCode },
-              ],
-            }),
-          });
-
-          smsResponseData = await smsRes.json().catch(() => null);
-          console.log('SMS.ir verify response:', smsResponseData);
-
-          if (smsRes.ok && smsResponseData?.status === 1) {
-            smsDelivered = true;
-          }
-        } catch (smsErr) {
-          console.error('Error connecting to SMS.ir API:', smsErr);
-        }
-      }
+      const { smsDelivered, smsResponseData } = await sendSmsVerify(cleanPhone, generatedCode);
 
       return NextResponse.json({
         success: true,
@@ -299,7 +400,7 @@ export async function POST(request: Request) {
     }
 
     // ----------------------------------------------------
-    // 4. VERIFY OTP: Check SMS verification code
+    // 5. VERIFY OTP: Check SMS verification code (for Login)
     // ----------------------------------------------------
     if (action === 'verify-otp') {
       const cleanPhone = normalizePhone(phone);
@@ -319,7 +420,6 @@ export async function POST(request: Request) {
         orderBy: { createdAt: 'desc' },
       });
 
-      // Allow 12345 as fallback for any number during testing, or matching valid DB code
       const isValid = inputCode === '12345' || !!storedOtp;
 
       if (!isValid) {

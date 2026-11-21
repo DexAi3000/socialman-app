@@ -9,12 +9,8 @@ import {
   CheckCircle2,
   Clock,
   RotateCcw,
-  User,
-  Lock,
   Eye,
   EyeOff,
-  AtSign,
-  KeyRound,
   ShieldCheck,
 } from 'lucide-react';
 import { toPersianDigits } from '@/lib/utils';
@@ -27,6 +23,7 @@ export default function LoginPage() {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const [loginMethod, setLoginMethod] = useState<'password' | 'otp'>('password');
   const [step, setStep] = useState<'form' | 'otp' | 'success'>('form');
+  const [otpPurpose, setOtpPurpose] = useState<'login' | 'register'>('login');
 
   // Login form fields
   const [loginIdentifier, setLoginIdentifier] = useState('');
@@ -147,8 +144,8 @@ export default function LoginPage() {
     }
   };
 
-  // 2. Handle Register with FullName, Username, Phone, Password
-  const handleRegister = async (e: React.FormEvent) => {
+  // 2. Handle Register Form Submit -> Send OTP to phone
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
 
@@ -188,7 +185,7 @@ export default function LoginPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'register',
+          action: 'register-send-otp',
           fullName: regFullName.trim(),
           username: cleanUsername,
           phone: cleanPhone,
@@ -197,22 +194,18 @@ export default function LoginPage() {
       });
 
       const data = await res.json();
-      if (res.ok && data.user) {
-        setSuccessName(data.user.fullName || cleanUsername);
-        loginUser({
-          id: data.user.id,
-          fullName: data.user.fullName,
-          phone: data.user.phone,
-          username: data.user.username,
-          role: data.user.role,
-          verifiedVia: 'Register',
-        });
-        setStep('success');
+      if (res.ok) {
+        setTestOtpHint(data.testCode || '12345');
+        setOtpPhone(cleanPhone);
+        setOtpPurpose('register');
+        setOtpValues(['', '', '', '', '']);
+        setStep('otp');
+        setCountdown(120);
         setTimeout(() => {
-          router.push('/');
-        }, 1000);
+          otpInputRefs.current[0]?.focus();
+        }, 150);
       } else {
-        setErrorMsg(data.error || 'خطایی در ثبت‌نام رخ داد.');
+        setErrorMsg(data.error || 'خطایی در ارسال کد تایید رخ داد.');
       }
     } catch (err) {
       setErrorMsg('خطای شبکه در ارتباط با سرور.');
@@ -221,8 +214,8 @@ export default function LoginPage() {
     }
   };
 
-  // 3. Handle Send OTP
-  const handleSendOtp = async (e?: React.FormEvent) => {
+  // 3. Handle Send OTP for Login
+  const handleLoginSendOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setErrorMsg('');
 
@@ -248,6 +241,8 @@ export default function LoginPage() {
       if (res.ok) {
         setTestOtpHint(data.testCode || '12345');
         setOtpPhone(cleanPhone);
+        setOtpPurpose('login');
+        setOtpValues(['', '', '', '', '']);
         setStep('otp');
         setCountdown(120);
         setTimeout(() => {
@@ -263,7 +258,7 @@ export default function LoginPage() {
     }
   };
 
-  // 4. Handle Verify OTP
+  // 4. Handle Verify OTP (Works for both Register and Login)
   const handleVerifyOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setErrorMsg('');
@@ -276,26 +271,44 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const res = await fetch('/socialman/api/auth/otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'verify-otp',
-          phone: otpPhone,
-          code: fullCode,
-        }),
-      });
+      let res: Response;
+      if (otpPurpose === 'register') {
+        // Finalize registration
+        res = await fetch('/socialman/api/auth/otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'register-verify',
+            fullName: regFullName.trim(),
+            username: regUsername.trim().toLowerCase(),
+            phone: otpPhone,
+            password: regPassword,
+            code: fullCode,
+          }),
+        });
+      } else {
+        // Login via OTP
+        res = await fetch('/socialman/api/auth/otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'verify-otp',
+            phone: otpPhone,
+            code: fullCode,
+          }),
+        });
+      }
 
       const data = await res.json();
       if (res.ok && data.user) {
-        setSuccessName(data.user.fullName || 'کاربر گرامی');
+        setSuccessName(data.user.fullName || data.user.username || 'کاربر گرامی');
         loginUser({
           id: data.user.id,
           fullName: data.user.fullName,
           phone: data.user.phone,
           username: data.user.username,
           role: data.user.role,
-          verifiedVia: 'SMS.ir',
+          verifiedVia: otpPurpose === 'register' ? 'Register-SMS' : 'SMS.ir',
         });
         setStep('success');
         setTimeout(() => {
@@ -308,6 +321,40 @@ export default function LoginPage() {
       setErrorMsg('خطایی در بررسی کد تایید رخ داد.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Resend OTP handler
+  const handleResendOtp = async () => {
+    if (otpPurpose === 'register') {
+      const cleanUsername = regUsername.trim().toLowerCase();
+      setLoading(true);
+      try {
+        const res = await fetch('/socialman/api/auth/otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'register-send-otp',
+            fullName: regFullName.trim(),
+            username: cleanUsername,
+            phone: otpPhone,
+            password: regPassword,
+          }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setTestOtpHint(data.testCode || '12345');
+          setCountdown(120);
+        } else {
+          setErrorMsg(data.error || 'خطا در ارسال مجدد.');
+        }
+      } catch {
+        setErrorMsg('خطای شبکه.');
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      handleLoginSendOtp();
     }
   };
 
@@ -507,12 +554,11 @@ export default function LoginPage() {
                   </form>
                 ) : (
                   /* Mode B: OTP Login */
-                  <form onSubmit={handleSendOtp} className="space-y-3.5 pt-1">
+                  <form onSubmit={handleLoginSendOtp} className="space-y-3.5 pt-1">
                     <div>
                       <label className="block text-xs font-black text-gray-700 mb-1.5 text-right">
                         شماره تلفن همراه (کد یکبار مصرف):
                       </label>
-                      {/* Left-to-Right Phone Input Container */}
                       <div className="w-full" dir="ltr">
                         <div className="flex items-center bg-gray-50 border border-gray-200 focus-within:border-[#3b96cc] focus-within:bg-white focus-within:ring-3 focus-within:ring-sky-500/10 rounded-2xl px-3 py-1 transition-all overflow-hidden">
                           <div className="flex items-center gap-1.5 pr-2.5 pl-1 py-1.5 border-r border-gray-200 text-gray-600 shrink-0 select-none">
@@ -566,7 +612,7 @@ export default function LoginPage() {
 
             {/* TAB 2: REGISTER */}
             {activeTab === 'register' && (
-              <form onSubmit={handleRegister} className="space-y-3 pt-1">
+              <form onSubmit={handleRegisterSubmit} className="space-y-3 pt-1">
                 {/* Full Name */}
                 <div>
                   <label className="block text-xs font-black text-gray-700 mb-1 text-right">
@@ -664,7 +710,7 @@ export default function LoginPage() {
                   <span className="text-[10px] text-gray-400">حداقل ۶ کاراکتر</span>
                 </div>
 
-                {/* Submit Register */}
+                {/* Submit Register -> Go to OTP */}
                 <button
                   type="submit"
                   disabled={loading}
@@ -673,10 +719,10 @@ export default function LoginPage() {
                   {loading ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>در حال ساخت حساب کاربری...</span>
+                      <span>در حال ارسال کد تایید...</span>
                     </>
                   ) : (
-                    <span>ثبت‌نام و ورود به پنل</span>
+                    <span>تایید شماره و دریافت کد</span>
                   )}
                 </button>
               </form>
@@ -689,7 +735,9 @@ export default function LoginPage() {
         {step === 'otp' && (
           <form onSubmit={handleVerifyOtp} className="space-y-4 my-auto py-4">
             <div className="text-center space-y-1">
-              <h3 className="text-sm font-black text-gray-900">تایید شماره تلفن همراه</h3>
+              <h3 className="text-sm font-black text-gray-900">
+                {otpPurpose === 'register' ? 'تایید شماره تلفن و ثبت‌نام' : 'تایید شماره تلفن همراه'}
+              </h3>
               <p className="text-[11px] text-gray-500">
                 کد تایید پیامک‌شده به{' '}
                 <span className="font-mono font-bold text-gray-800" dir="ltr">{otpPhone}</span> را وارد کنید.
@@ -745,7 +793,7 @@ export default function LoginPage() {
                 onClick={() => setStep('form')}
                 className="text-gray-500 hover:text-[#3b96cc] font-bold hover:underline cursor-pointer text-[11px]"
               >
-                ویرایش شماره
+                ویرایش مشخصات
               </button>
 
               <div className="flex items-center gap-1 font-mono text-xs">
@@ -757,7 +805,7 @@ export default function LoginPage() {
                 ) : (
                   <button
                     type="button"
-                    onClick={() => handleSendOtp()}
+                    onClick={handleResendOtp}
                     className="text-[#3b96cc] font-black flex items-center gap-1 hover:underline cursor-pointer text-[11px]"
                   >
                     <RotateCcw className="w-3 h-3" />
@@ -778,7 +826,7 @@ export default function LoginPage() {
                   <span>در حال بررسی کد...</span>
                 </>
               ) : (
-                <span>تایید و ورود</span>
+                <span>{otpPurpose === 'register' ? 'تایید و ایجاد حساب کاربری' : 'تایید و ورود'}</span>
               )}
             </button>
           </form>
@@ -791,7 +839,9 @@ export default function LoginPage() {
               <CheckCircle2 className="w-8 h-8 stroke-[2.5]" />
             </div>
             <div className="space-y-0.5">
-              <h3 className="text-base font-black text-gray-900">ورود با موفقیت انجام شد</h3>
+              <h3 className="text-base font-black text-gray-900">
+                {otpPurpose === 'register' ? 'حساب کاربری با موفقیت ساخته شد' : 'ورود با موفقیت انجام شد'}
+              </h3>
               <p className="text-xs text-gray-500">
                 خوش آمدید <span className="font-bold text-gray-800">{successName}</span>
               </p>
