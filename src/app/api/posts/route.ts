@@ -1,14 +1,27 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getUserFromRequest } from '@/lib/session';
 
-// GET all posts
+// GET posts filtered by workspace or current user
 export async function GET(request: Request) {
   try {
+    const user = await getUserFromRequest(request);
     const { searchParams } = new URL(request.url);
     const workspaceId = searchParams.get('workspaceId');
 
+    let whereClause: any = {};
+
+    if (workspaceId) {
+      whereClause.workspaceId = workspaceId;
+    } else if (user) {
+      whereClause.workspace = { userId: user.id };
+    } else {
+      // Unauthenticated request without workspaceId gets empty list
+      return NextResponse.json({ success: true, posts: [] });
+    }
+
     const posts = await prisma.post.findMany({
-      where: workspaceId ? { workspaceId } : undefined,
+      where: whereClause,
       orderBy: { createdAt: 'desc' },
     });
 
@@ -28,6 +41,7 @@ export async function GET(request: Request) {
 // POST create new post
 export async function POST(request: Request) {
   try {
+    const user = await getUserFromRequest(request);
     const body = await request.json();
     const {
       workspaceId,
@@ -60,6 +74,7 @@ export async function POST(request: Request) {
         scheduledDateShamsi,
         scheduledTime,
         mediaUrl,
+        userId: user?.id,
       },
     });
 

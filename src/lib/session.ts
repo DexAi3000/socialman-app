@@ -91,3 +91,52 @@ export async function clearSessionCookie() {
     maxAge: 0,
   });
 }
+
+// Authenticate and return user from Cookie, Bearer token, or fallback headers
+export async function getUserFromRequest(request?: Request) {
+  try {
+    let session = await getSession();
+
+    if (!session && request) {
+      const authHeader = request.headers.get('authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7).trim();
+        if (token) {
+          session = verifySession(token);
+        }
+      }
+    }
+
+    const { default: prisma } = await import('@/lib/prisma');
+
+    if (session) {
+      const user = await prisma.user.findUnique({
+        where: { id: session.userId },
+        include: { workspaces: true },
+      });
+      if (user) return user;
+    }
+
+    if (request) {
+      const fallbackId = request.headers.get('x-user-id');
+      const fallbackPhone = request.headers.get('x-user-phone');
+      if (fallbackId || fallbackPhone) {
+        const user = await prisma.user.findFirst({
+          where: {
+            OR: [
+              fallbackId ? { id: fallbackId } : undefined,
+              fallbackPhone ? { phone: fallbackPhone } : undefined,
+            ].filter(Boolean) as any,
+          },
+          include: { workspaces: true },
+        });
+        if (user) return user;
+      }
+    }
+
+    return null;
+  } catch (err) {
+    console.error('getUserFromRequest error:', err);
+    return null;
+  }
+}

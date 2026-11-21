@@ -1,12 +1,33 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getUserFromRequest } from '@/lib/session';
 
-// GET all workspaces
-export async function GET() {
+// GET all workspaces for current user
+export async function GET(request: Request) {
   try {
-    const workspaces = await prisma.workspace.findMany({
+    const user = await getUserFromRequest(request);
+
+    if (!user) {
+      return NextResponse.json({ success: true, workspaces: [] });
+    }
+
+    let workspaces = await prisma.workspace.findMany({
+      where: { userId: user.id },
       orderBy: { createdAt: 'asc' },
     });
+
+    // Auto-create default personal workspace if user has none
+    if (workspaces.length === 0) {
+      const defaultWs = await prisma.workspace.create({
+        data: {
+          name: `فضای کاری ${user.fullName || 'اصلی'}`,
+          category: 'کسب‌وکار',
+          userId: user.id,
+          connectedPlatforms: JSON.stringify(['telegram', 'instagram', 'whatsapp', 'bale', 'rubika']),
+        },
+      });
+      workspaces = [defaultWs];
+    }
 
     const formatted = workspaces.map((ws) => ({
       ...ws,
@@ -26,6 +47,7 @@ export async function GET() {
 // POST create workspace
 export async function POST(request: Request) {
   try {
+    const user = await getUserFromRequest(request);
     const body = await request.json();
     const { name, category, connectedPlatforms } = body;
 
@@ -37,6 +59,7 @@ export async function POST(request: Request) {
       data: {
         name,
         category: category || 'عمومی',
+        userId: user ? user.id : undefined,
         connectedPlatforms: Array.isArray(connectedPlatforms)
           ? JSON.stringify(connectedPlatforms)
           : '[]',

@@ -71,93 +71,9 @@ const INITIAL_USER: UserProfile = {
   verifiedVia: 'SMS.ir',
 };
 
-const INITIAL_WORKSPACES: Workspace[] = [
-  {
-    id: 'ws-1',
-    name: 'آکادمی رشد و مارکتینگ',
-    category: 'آموزش و کسب‌وکار',
-    connectedPlatforms: ['instagram', 'telegram', 'whatsapp', 'bale', 'rubika'],
-  },
-  {
-    id: 'ws-2',
-    name: 'فروشگاه و برند چرم ماهان',
-    category: 'پوشاک و لایف‌استایل',
-    connectedPlatforms: ['instagram', 'rubika', 'bale'],
-  },
-];
+const INITIAL_WORKSPACES: Workspace[] = [];
 
-const INITIAL_POSTS: Post[] = [
-  {
-    id: 'post-1',
-    workspaceId: 'ws-1',
-    title: '۵ ترفند افزایش تعامل استوری‌ها در پاییز',
-    hook: 'چرا بازدید استوری‌هات زیر ۱۰ درصده؟ احتمالاً این ۲ تا اشتباه رو انجام میدی!',
-    content: 'در الگوریتم جدید اینستاگرام، پاسخ به استیکرهای تعاملی ۵ برابر بیشتر از صرفاً دیدن اسلاید ارزش دارد. هر روز از نظرسنجی دوراهی استفاده کنید.',
-    cta: 'تو کامنت‌ها بنویس میانگین ویو استوریت چقدره تا کمکت کنم!',
-    hashtags: ['الگوریتم_اینستاگرام', 'افزایش_تعامل', 'تولید_محتوا', 'سوشال_مدیا'],
-    platform: 'instagram',
-    status: 'approved',
-    scheduledDateShamsi: '۱۴۰۳/۰۹/۰۳',
-    scheduledTime: '۱۸:۳۰',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'post-2',
-    workspaceId: 'ws-1',
-    title: 'خلاصه اخبار هوش مصنوعی هفته در کانال تلگرام',
-    hook: '⚡ مهم‌ترین رویدادهای دنیای تکنولوژی و AI در هفته‌ای که گذشت:',
-    content: '۱. معرفی ابزارهای نوین ادیت ویدیو\n۲. بهبود سرعت مدل‌های پردازش زبان طبیعی\n۳. انتشار تمپلیت‌های رایگان طراحی محتوا',
-    cta: 'عضو کانال وی‌آی‌پی ما بشید 👆',
-    hashtags: ['هوش_مصنوعی', 'اخبار_فناوری', 'تلگرام'],
-    platform: 'telegram',
-    status: 'approved',
-    scheduledDateShamsi: '۱۴۰۳/۰۹/۰۵',
-    scheduledTime: '۲۱:۰۰',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'post-3',
-    workspaceId: 'ws-1',
-    title: 'اطلاعیه برودکست تخفیف ویژه مشتریان واتساپ',
-    hook: '📢 *پیشنهاد ویژه ۴۸ ساعته فقط برای همراهان واتساپ*',
-    content: 'همراهان عزیز، از امروز می‌توانید با ارسال کد تخفیف اختصاصی در چت، از ۳۰٪ تخفیف روی تمامی خدمات بهره‌مند شوید.',
-    cta: 'جهت فعال‌سازی کد تخفیف عدد ۱ را ریپلای کنید 💬',
-    hashtags: ['تخفیف', 'واتساپ', 'باشگاه_مشتریان'],
-    platform: 'whatsapp',
-    status: 'pending_approval',
-    scheduledDateShamsi: '۱۴۰۳/۰۹/۰۸',
-    scheduledTime: '۱۶:۰۰',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'post-4',
-    workspaceId: 'ws-1',
-    title: 'پست روبینو: چطور با گوشی عکس‌های فروشگاهی بگیریم؟',
-    hook: 'عکاسی حرفه‌ای با موبایل بدون تجهیزات گرون قیمت! 📸',
-    content: 'فقط کافیه نور طبیعی پنجره رو مهار کنی و لنز گوشیت رو قبل از عکاسی تمیز کنی! نتیجه باورنکردنی میشه.',
-    cta: 'لایک کن و برام بنویس مدل گوشیت چیه تا تنظیمات دوربینشو بهت بگم ❤️',
-    hashtags: ['عکاسی_با_موبایل', 'روبیکا', 'روبینو', 'ترفند'],
-    platform: 'rubika',
-    status: 'approved',
-    scheduledDateShamsi: '۱۴۰۳/۰۹/۱۰',
-    scheduledTime: '۲۰:۳۰',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'post-5',
-    workspaceId: 'ws-1',
-    title: 'اطلاعیه رسمی کانال بله: وبینار رایگان بازاریابی محتوا',
-    hook: '🌿 وبینار آموزشی رایگان با اعطای گواهی معتبر',
-    content: 'ثبت‌نام دوره ویژه تولید محتوا با هوش مصنوعی در پیام‌رسان بله آغاز شد. برای کسب اطلاعات بیشتر همراه ما باشید.',
-    cta: 'برای ثبت نام از طریق بات بله اقدام فرمایید ✉️',
-    hashtags: ['پیام_رسان_بله', 'آموزش_رایگان', 'وبینار'],
-    platform: 'bale',
-    status: 'draft',
-    scheduledDateShamsi: '۱۴۰۳/۰۹/۱۲',
-    scheduledTime: '۱۴:۰۰',
-    createdAt: new Date().toISOString(),
-  },
-];
+const INITIAL_POSTS: Post[] = [];
 
 const INITIAL_CONNECTED_ACCOUNTS: Record<SocialPlatform, ConnectedAccountInfo> = {
   instagram: {
@@ -267,9 +183,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const [currentPlan, setCurrentPlan] = useState<PlanType>('free');
   const [aiUsageCount, setAiUsageCount] = useState<number>(3);
-  const [workspaces, setWorkspaces] = useState<Workspace[]>(INITIAL_WORKSPACES);
-  const [activeWorkspaceId, setActiveWorkspaceId] = useState<string>('ws-1');
-  const [posts, setPosts] = useState<Post[]>(INITIAL_POSTS);
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [activeWorkspaceId, setActiveWorkspaceId] = useState<string>('');
+  const [posts, setPosts] = useState<Post[]>([]);
   const [tickets, setTickets] = useState<SupportTicket[]>(INITIAL_TICKETS);
   const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
 
@@ -315,6 +231,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           if (d.user.plan) {
             setCurrentPlan(d.user.plan as PlanType);
           }
+          if (d.workspaces && d.workspaces.length > 0) {
+            const formattedWs = d.workspaces.map((ws: any) => ({
+              ...ws,
+              connectedPlatforms:
+                typeof ws.connectedPlatforms === 'string'
+                  ? JSON.parse(ws.connectedPlatforms || '[]')
+                  : ws.connectedPlatforms,
+            }));
+            setWorkspaces(formattedWs);
+            setActiveWorkspaceId((prev) =>
+              prev && formattedWs.some((w: any) => w.id === prev) ? prev : formattedWs[0].id
+            );
+          }
           try {
             localStorage.setItem('socialman_user', JSON.stringify(profile));
             if (d.token) {
@@ -329,6 +258,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       .finally(() => {
         setIsAuthChecked(true);
       });
+  };
+
+  // Helper to get auth headers from local cache
+  const getAuthHeaders = (): Record<string, string> => {
+    const headers: Record<string, string> = {};
+    try {
+      const cached = localStorage.getItem('socialman_user');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed?.id) headers['x-user-id'] = parsed.id;
+        if (parsed?.phone) headers['x-user-phone'] = parsed.phone;
+      }
+      const token = localStorage.getItem('socialman_token');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+    } catch (_) {}
+    return headers;
   };
 
   // Sync initial data from real database and check session on mount
@@ -360,29 +307,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // Periodic live sync (every 6 seconds) so admin approval in Telegram instantly unlocks app
     const syncInterval = setInterval(refreshSession, 6000);
 
-    // 1. Fetch Workspaces from DB
-    fetch('/socialman/api/workspaces')
+    // 1. Fetch Workspaces from DB for current user
+    fetch('/socialman/api/workspaces', { headers: getAuthHeaders() })
       .then((r) => r.json())
       .then((d) => {
         if (d.success && d.workspaces?.length > 0) {
           setWorkspaces(d.workspaces);
-          setActiveWorkspaceId(d.workspaces[0].id);
+          setActiveWorkspaceId((prev) =>
+            prev && d.workspaces.some((w: any) => w.id === prev) ? prev : d.workspaces[0].id
+          );
         }
       })
       .catch((err) => console.log('Workspaces DB sync:', err));
 
-    // 2. Fetch Posts from DB
-    fetch('/socialman/api/posts')
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.success && d.posts?.length > 0) {
-          setPosts(d.posts);
-        }
-      })
-      .catch((err) => console.log('Posts DB sync:', err));
-
-    // 3. Fetch Tickets from DB
-    fetch('/socialman/api/tickets')
+    // 2. Fetch Tickets from DB
+    fetch('/socialman/api/tickets', { headers: getAuthHeaders() })
       .then((r) => r.json())
       .then((d) => {
         if (d.success && d.tickets?.length > 0) {
@@ -397,6 +336,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       clearInterval(syncInterval);
     };
   }, []);
+
+  // Fetch posts strictly scoped to the active workspace
+  useEffect(() => {
+    if (!activeWorkspaceId) {
+      setPosts([]);
+      return;
+    }
+
+    fetch(`/socialman/api/posts?workspaceId=${encodeURIComponent(activeWorkspaceId)}`, {
+      headers: getAuthHeaders(),
+      cache: 'no-store',
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && Array.isArray(d.posts)) {
+          setPosts(d.posts);
+        } else {
+          setPosts([]);
+        }
+      })
+      .catch((err) => {
+        console.log('Posts DB sync:', err);
+        setPosts([]);
+      });
+  }, [activeWorkspaceId]);
 
   const openConnectModal = (platform?: SocialPlatform) => {
     setTargetPlatformForConnect(platform || null);
@@ -429,7 +393,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [selectedPlanForUpgrade, setSelectedPlanForUpgrade] = useState<PlanType | null>(null);
 
   const maxAiUsage = currentPlan === 'free' ? 10 : Infinity;
-  const activeWorkspace = workspaces.find((w) => w.id === activeWorkspaceId) || workspaces[0];
+  const activeWorkspace: Workspace = workspaces.find((w) => w.id === activeWorkspaceId) || workspaces[0] || {
+    id: 'main',
+    name: currentUser?.fullName ? `فضای کاری ${currentUser.fullName}` : 'فضای کاری اصلی',
+    category: 'کسب‌وکار',
+    connectedPlatforms: ['telegram', 'instagram', 'whatsapp', 'bale', 'rubika'],
+  };
 
   const openAuthModal = () => setIsAuthModalOpen(true);
   const closeAuthModal = () => setIsAuthModalOpen(false);
@@ -469,10 +438,38 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const updateUserAvatar = (avatarUrl?: string) => {
     if (currentUser) {
-      setCurrentUser({
+      const updatedUser: UserProfile = {
         ...currentUser,
         avatarUrl,
-      });
+      };
+      setCurrentUser(updatedUser);
+      try {
+        localStorage.setItem('socialman_user', JSON.stringify(updatedUser));
+      } catch (_) {}
+
+      // Persist to database
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      try {
+        const token = localStorage.getItem('socialman_token');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        if (currentUser.id) headers['x-user-id'] = currentUser.id;
+        if (currentUser.phone) headers['x-user-phone'] = currentUser.phone;
+      } catch (_) {}
+
+      fetch('/socialman/api/user/avatar', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ avatarUrl: avatarUrl || null }),
+      })
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.success) {
+            console.log('Avatar persisted to database successfully');
+          }
+        })
+        .catch((err) => console.error('Error persisting avatar to DB:', err));
     }
   };
 
@@ -513,7 +510,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // Persist to real database
     fetch('/socialman/api/workspaces', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
       body: JSON.stringify({ name, category, connectedPlatforms: platforms }),
     })
       .then((r) => r.json())
@@ -550,7 +547,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // Persist to real database
     fetch('/socialman/api/posts', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
       body: JSON.stringify(postData),
     })
       .then((r) => r.json())
@@ -568,7 +565,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // Persist to real database
     fetch('/socialman/api/posts', {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
       body: JSON.stringify({ id, ...updates }),
     }).catch((err) => console.error('Error updating post in DB:', err));
   };
@@ -579,6 +576,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // Persist to real database
     fetch(`/socialman/api/posts?id=${id}`, {
       method: 'DELETE',
+      headers: getAuthHeaders(),
     }).catch((err) => console.error('Error deleting post in DB:', err));
   };
 

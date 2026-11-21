@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-// GET post by approval token
+// GET approval info by token (handles both single Post token/id and Workspace portal token/id)
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -11,7 +11,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'توکن نامعتبر است.' }, { status: 400 });
     }
 
-    // Try finding by clientToken or by ID
+    // 1. Try finding by Post clientToken or Post ID
     const post = await prisma.post.findFirst({
       where: {
         OR: [{ clientToken: token }, { id: token }],
@@ -21,36 +21,86 @@ export async function GET(request: Request) {
       },
     });
 
-    if (!post) {
-      return NextResponse.json(
-        { error: 'پستی با این مشخصات یافت نشد یا منقضی شده است.' },
-        { status: 404 }
-      );
+    if (post) {
+      let hashtags: string[] = [];
+      try {
+        hashtags = JSON.parse(post.hashtags || '[]');
+      } catch {
+        hashtags = [];
+      }
+
+      return NextResponse.json({
+        success: true,
+        mode: 'post',
+        post: {
+          id: post.id,
+          title: post.title,
+          hook: post.hook,
+          content: post.content,
+          cta: post.cta,
+          hashtags,
+          platform: post.platform,
+          status: post.status,
+          mediaUrl: post.mediaUrl,
+          scheduledDateShamsi: post.scheduledDateShamsi,
+          scheduledTime: post.scheduledTime,
+          clientFeedback: post.clientFeedback,
+          workspaceName: post.workspace.name,
+        },
+      });
     }
 
-    let hashtags: string[] = [];
-    try {
-      hashtags = JSON.parse(post.hashtags || '[]');
-    } catch {
-      hashtags = [];
-    }
-
-    return NextResponse.json({
-      success: true,
-      post: {
-        id: post.id,
-        title: post.title,
-        content: post.content,
-        hashtags,
-        platform: post.platform,
-        status: post.status,
-        mediaUrl: post.mediaUrl,
-        scheduledDateShamsi: post.scheduledDateShamsi,
-        scheduledTime: post.scheduledTime,
-        clientFeedback: post.clientFeedback,
-        workspaceName: post.workspace.name,
+    // 2. Try finding as a Workspace Client Portal
+    const workspace = await prisma.workspace.findUnique({
+      where: { id: token },
+      include: {
+        posts: {
+          orderBy: { createdAt: 'desc' },
+        },
       },
     });
+
+    if (workspace) {
+      const formattedPosts = workspace.posts.map((p) => {
+        let hashtags: string[] = [];
+        try {
+          hashtags = JSON.parse(p.hashtags || '[]');
+        } catch {
+          hashtags = [];
+        }
+        return {
+          id: p.id,
+          title: p.title,
+          hook: p.hook,
+          content: p.content,
+          cta: p.cta,
+          hashtags,
+          platform: p.platform,
+          status: p.status,
+          mediaUrl: p.mediaUrl,
+          scheduledDateShamsi: p.scheduledDateShamsi,
+          scheduledTime: p.scheduledTime,
+          clientFeedback: p.clientFeedback,
+          workspaceName: workspace.name,
+        };
+      });
+
+      return NextResponse.json({
+        success: true,
+        mode: 'workspace',
+        workspace: {
+          id: workspace.id,
+          name: workspace.name,
+          category: workspace.category,
+        },
+        posts: formattedPosts,
+      });
+    }
+
+    return NextResponse.json(
+      { error: 'پست یا پورتال کاری با این مشخصات یافت نشد یا منقضی شده است.' },
+      { status: 404 }
+    );
   } catch (error: any) {
     console.error('Approval fetch error:', error);
     return NextResponse.json({ error: 'خطایی رخ داد.' }, { status: 500 });
@@ -61,15 +111,16 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { token, action, feedback } = body;
+    const { token, postId, action, feedback } = body;
 
-    if (!token || !action) {
+    const targetIdentifier = postId || token;
+    if (!targetIdentifier || !action) {
       return NextResponse.json({ error: 'پارامترهای درخواست ناقص است.' }, { status: 400 });
     }
 
     const post = await prisma.post.findFirst({
       where: {
-        OR: [{ clientToken: token }, { id: token }],
+        OR: [{ clientToken: targetIdentifier }, { id: targetIdentifier }],
       },
     });
 
