@@ -7,14 +7,11 @@ import { useApp } from '@/context/AppContext';
 import {
   X,
   Smartphone,
-  ShieldCheck,
   ArrowRight,
-  ArrowLeft,
   CheckCircle2,
   Clock,
   RotateCcw,
   Sparkles,
-  Send,
   ExternalLink,
 } from 'lucide-react';
 import { toPersianDigits } from '@/lib/utils';
@@ -212,25 +209,11 @@ export function AuthModal() {
           </Link>
         </div>
 
-        {/* Brand App Mascot + SMS.ir Header */}
-        <div className="flex flex-col items-center text-center space-y-2.5 pt-1">
+        {/* Brand App Mascot */}
+        <div className="flex flex-col items-center text-center space-y-2 pt-1">
           {/* App Mascot Icon */}
           <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg border border-gray-100 shadow-rose-900/10 shrink-0">
             <img src="/app-icon.jpg" alt="لوگوی سوشال‌من" className="w-full h-full object-cover" />
-          </div>
-
-          {/* SMS.ir Emblem Badge */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-amber-50 border border-amber-200">
-            <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-amber-500 via-orange-500 to-yellow-400 flex items-center justify-center text-white shadow-xs">
-              <Send className="w-3.5 h-3.5 fill-white rotate-45 -mr-0.5" />
-            </div>
-            <div className="flex items-baseline gap-1 font-sans">
-              <span className="font-black text-sm text-gray-900 tracking-tight">SMS</span>
-              <span className="font-bold text-xs text-amber-600">.ir</span>
-            </div>
-            <span className="text-[10px] text-gray-500 font-bold border-r border-amber-200 pr-2 mr-1">
-              سامانه پیامکی امن
-            </span>
           </div>
 
           <h2 className="text-lg sm:text-xl font-black text-[#212121]">
@@ -284,7 +267,7 @@ export function AuthModal() {
               {loading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>در حال ارسال پیامک با SMS.ir...</span>
+                  <span>در حال ارسال پیامک...</span>
                 </>
               ) : (
                 <>
@@ -311,22 +294,6 @@ export function AuthModal() {
         {/* Step 2: 5-Digit Pin OTP Verification Form */}
         {step === 'otp' && (
           <form onSubmit={handleVerifyOtp} className="space-y-4">
-            {testOtpHint && (
-              <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between">
-                <div className="flex items-center gap-1.5 font-bold">
-                  <Sparkles className="w-4 h-4 text-[#21aa58]" />
-                  <span>کد تست دریافتی:</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleFillTestCode}
-                  className="font-mono font-black text-sm bg-white px-2.5 py-1 rounded-xl border border-emerald-300 text-[#21aa58] cursor-pointer hover:bg-emerald-100 shadow-2xs"
-                >
-                  {toPersianDigits(testOtpHint)} (درج خودکار)
-                </button>
-              </div>
-            )}
-
             <div>
               <label className="block text-xs font-black text-gray-700 mb-2 text-center">
                 کد تایید ۵ رقمی:
@@ -402,15 +369,6 @@ export function AuthModal() {
             </button>
           </form>
         )}
-
-        {/* Footer Security Badges */}
-        <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-400">
-          <div className="flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-[#21aa58]" />
-            <span>احراز هویت تحت وب‌سرویس SMS.ir</span>
-          </div>
-          <span>پروتکل امن SSL</span>
-        </div>
       </div>
     </div>
   );

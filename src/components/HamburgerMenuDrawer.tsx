@@ -382,9 +382,9 @@ export function HamburgerMenuDrawer({
                   openAuthModal();
                   setIsHamburgerMenuOpen(false);
                 }}
-                className="px-3 py-1.5 rounded-xl bg-[#21aa58] text-white font-black text-[11px] hover:bg-[#1e9b50] transition-colors cursor-pointer"
+                className="px-3.5 py-1.5 rounded-xl bg-[#21aa58] text-white font-black text-[11px] hover:bg-[#1e9b50] transition-colors cursor-pointer"
               >
-                ورود سریع SMS.ir
+                ورود / ثبت‌نام
               </button>
             </div>
           )}

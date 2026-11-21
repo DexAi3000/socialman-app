@@ -6,13 +6,11 @@ import { useRouter } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import {
   Smartphone,
-  ShieldCheck,
   ArrowRight,
   CheckCircle2,
   Clock,
   RotateCcw,
   Sparkles,
-  Send,
 } from 'lucide-react';
 import { toPersianDigits } from '@/lib/utils';
 
@@ -199,8 +197,8 @@ export default function LoginPage() {
       {/* Mobile Frame Container */}
       <div className="w-full max-w-[420px] bg-white min-h-screen sm:min-h-[640px] sm:rounded-[32px] sm:shadow-xl sm:border sm:border-gray-100 flex flex-col justify-between p-5 sm:p-6 relative">
         
-        {/* Top Header: Back Button + SMS.ir Badge */}
-        <div className="flex items-center justify-between pb-3">
+        {/* Top Header: Back Button */}
+        <div className="flex items-center justify-between pb-2">
           <Link
             href="/"
             className="flex items-center gap-1.5 text-xs font-black text-gray-600 hover:text-[#21aa58] transition-colors p-1"
@@ -208,14 +206,6 @@ export default function LoginPage() {
             <ArrowRight className="w-4 h-4" />
             <span>بازگشت</span>
           </Link>
-
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-bold">
-            <div className="w-4 h-4 rounded-md bg-gradient-to-tr from-amber-500 to-orange-400 flex items-center justify-center text-white">
-              <Send className="w-2.5 h-2.5 fill-white rotate-45 -mr-0.5" />
-            </div>
-            <span className="font-sans font-black text-gray-900">SMS.ir</span>
-            <span className="text-[9px] text-gray-400">| امن</span>
-          </div>
         </div>
 
         {/* Mascot & Mobile Titles */}
@@ -326,22 +316,6 @@ export default function LoginPage() {
         {/* Step 2: 5-Digit Pin OTP */}
         {step === 'otp' && (
           <form onSubmit={handleVerifyOtp} className="space-y-4 my-auto py-4">
-            {testOtpHint && (
-              <div className="p-2.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between">
-                <div className="flex items-center gap-1 font-bold text-[11px]">
-                  <Sparkles className="w-3.5 h-3.5 text-[#21aa58]" />
-                  <span>کد تست دریافتی:</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleFillTestCode}
-                  className="font-mono font-black text-xs bg-white px-2 py-0.5 rounded-lg border border-emerald-300 text-[#21aa58] cursor-pointer hover:bg-emerald-100"
-                >
-                  {toPersianDigits(testOtpHint)} (درج خودکار)
-                </button>
-              </div>
-            )}
-
             <div>
               <label className="block text-xs font-black text-gray-700 mb-2 text-center">
                 کد تایید ۵ رقمی را وارد کنید:
@@ -432,15 +406,6 @@ export default function LoginPage() {
             </div>
           </div>
         )}
-
-        {/* Mobile Footer */}
-        <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-[10px] text-gray-400">
-          <div className="flex items-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#21aa58]" />
-            <span>احراز هویت تحت وب‌سرویس SMS.ir</span>
-          </div>
-          <span>پروتکل امن SSL</span>
-        </div>
       </div>
     </div>
   );

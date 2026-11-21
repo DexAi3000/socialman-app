@@ -190,9 +190,6 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
 
                     <span className="font-black text-sm text-gray-900 block">{currentUser.fullName}</span>
                     <span className="text-[11px] text-gray-500 font-mono">{toPersianDigits(currentUser.phone)}</span>
-                    <span className="inline-flex items-center gap-1 mt-1 text-[10px] font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
-                      <span>احراز هویت SMS.ir ✓</span>
-                    </span>
                   </div>
 
                   {/* Upload Profile Picture Action Button */}
@@ -254,7 +251,7 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
                 className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black text-white bg-[#21aa58] hover:bg-[#1e9b50] shadow-sm transition-colors cursor-pointer"
               >
                 <Smartphone className="w-3.5 h-3.5 text-white" />
-                <span>ورود با SMS.ir</span>
+                <span>ورود / ثبت‌نام</span>
               </button>
             </div>
           )}
