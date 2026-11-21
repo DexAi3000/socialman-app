@@ -441,18 +441,14 @@ export default function LoginPage() {
                       <label className="block text-xs font-black text-gray-700 mb-1.5 text-right">
                         نام کاربری یا شماره موبایل:
                       </label>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          required
-                          dir="ltr"
-                          placeholder="nima_dev یا 09123456789"
-                          value={loginIdentifier}
-                          onChange={(e) => setLoginIdentifier(e.target.value)}
-                          className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-3 focus:ring-sky-500/10 rounded-2xl px-4 py-3 text-left font-mono font-bold text-sm text-gray-900 outline-none transition-all placeholder:text-right placeholder:font-sans placeholder:text-gray-400 placeholder:text-xs"
-                        />
-                        <AtSign className="w-4 h-4 text-gray-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
-                      </div>
+                      <input
+                        type="text"
+                        required
+                        dir="ltr"
+                        value={loginIdentifier}
+                        onChange={(e) => setLoginIdentifier(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-3 focus:ring-sky-500/10 rounded-2xl px-4 py-3 text-left font-mono font-bold text-sm text-gray-900 outline-none transition-all"
+                      />
                     </div>
 
                     {/* Password */}
@@ -465,10 +461,9 @@ export default function LoginPage() {
                           type={showLoginPassword ? 'text' : 'password'}
                           required
                           dir="ltr"
-                          placeholder="••••••••"
                           value={loginPassword}
                           onChange={(e) => setLoginPassword(e.target.value)}
-                          className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-3 focus:ring-sky-500/10 rounded-2xl px-4 py-3 text-left font-mono font-bold text-sm text-gray-900 outline-none transition-all"
+                          className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-3 focus:ring-sky-500/10 rounded-2xl px-4 pr-11 py-3 text-left font-mono font-bold text-sm text-gray-900 outline-none transition-all"
                         />
                         <button
                           type="button"
@@ -528,10 +523,9 @@ export default function LoginPage() {
                             type="tel"
                             dir="ltr"
                             required
-                            placeholder="9123456789"
                             value={otpPhone}
                             onChange={(e) => setOtpPhone(e.target.value.replace(/[^0-9]/g, ''))}
-                            className="w-full bg-transparent px-3 py-2.5 text-left font-mono font-black text-sm sm:text-base text-gray-900 outline-none tracking-wider placeholder:text-gray-400 placeholder:font-normal placeholder:tracking-normal"
+                            className="w-full bg-transparent px-3 py-2.5 text-left font-mono font-black text-sm sm:text-base text-gray-900 outline-none tracking-wider"
                           />
                           <Smartphone className="w-4 h-4 text-gray-400 shrink-0 mr-1" />
                         </div>
@@ -578,17 +572,13 @@ export default function LoginPage() {
                   <label className="block text-xs font-black text-gray-700 mb-1 text-right">
                     نام و نام خانوادگی:
                   </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      required
-                      placeholder="مثال: نیما آرین‌فر"
-                      value={regFullName}
-                      onChange={(e) => setRegFullName(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-3 focus:ring-sky-500/10 rounded-2xl px-4 py-2.5 text-right font-bold text-xs text-gray-900 outline-none transition-all placeholder:text-gray-400"
-                    />
-                    <User className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  </div>
+                  <input
+                    type="text"
+                    required
+                    value={regFullName}
+                    onChange={(e) => setRegFullName(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-3 focus:ring-sky-500/10 rounded-2xl px-4 py-2.5 text-right font-bold text-xs text-gray-900 outline-none transition-all"
+                  />
                 </div>
 
                 {/* Username (LTR) */}
@@ -596,18 +586,14 @@ export default function LoginPage() {
                   <label className="block text-xs font-black text-gray-700 mb-1 text-right">
                     نام کاربری (حروف انگلیسی):
                   </label>
-                  <div className="relative" dir="ltr">
-                    <input
-                      type="text"
-                      dir="ltr"
-                      required
-                      placeholder="nima_dev"
-                      value={regUsername}
-                      onChange={(e) => setRegUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-                      className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-3 focus:ring-sky-500/10 rounded-2xl px-4 py-2.5 text-left font-mono font-bold text-xs text-gray-900 outline-none transition-all placeholder:text-gray-400"
-                    />
-                    <AtSign className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
-                  </div>
+                  <input
+                    type="text"
+                    dir="ltr"
+                    required
+                    value={regUsername}
+                    onChange={(e) => setRegUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                    className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-3 focus:ring-sky-500/10 rounded-2xl px-4 py-2.5 text-left font-mono font-bold text-xs text-gray-900 outline-none transition-all"
+                  />
                 </div>
 
                 {/* Phone Number (Strict LTR) */}
@@ -625,10 +611,9 @@ export default function LoginPage() {
                         type="tel"
                         dir="ltr"
                         required
-                        placeholder="9123456789"
                         value={regPhone}
                         onChange={(e) => setRegPhone(e.target.value.replace(/[^0-9]/g, ''))}
-                        className="w-full bg-transparent px-3 py-2 text-left font-mono font-black text-xs sm:text-sm text-gray-900 outline-none tracking-wider placeholder:text-gray-400 placeholder:font-normal placeholder:tracking-normal"
+                        className="w-full bg-transparent px-3 py-2 text-left font-mono font-black text-xs sm:text-sm text-gray-900 outline-none tracking-wider"
                       />
                       <Smartphone className="w-4 h-4 text-gray-400 shrink-0 mr-1" />
                     </div>
@@ -641,34 +626,28 @@ export default function LoginPage() {
                     <label className="block text-xs font-black text-gray-700 mb-1 text-right">
                       رمز عبور:
                     </label>
-                    <div className="relative">
-                      <input
-                        type={showRegPassword ? 'text' : 'password'}
-                        required
-                        dir="ltr"
-                        placeholder="حداقل ۶ نویسه"
-                        value={regPassword}
-                        onChange={(e) => setRegPassword(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-3 focus:ring-sky-500/10 rounded-2xl px-3 py-2 text-left font-mono font-bold text-xs text-gray-900 outline-none transition-all placeholder:text-[10px]"
-                      />
-                    </div>
+                    <input
+                      type={showRegPassword ? 'text' : 'password'}
+                      required
+                      dir="ltr"
+                      value={regPassword}
+                      onChange={(e) => setRegPassword(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-3 focus:ring-sky-500/10 rounded-2xl px-3 py-2 text-left font-mono font-bold text-xs text-gray-900 outline-none transition-all"
+                    />
                   </div>
 
                   <div>
                     <label className="block text-xs font-black text-gray-700 mb-1 text-right">
                       تکرار رمز عبور:
                     </label>
-                    <div className="relative">
-                      <input
-                        type={showRegPassword ? 'text' : 'password'}
-                        required
-                        dir="ltr"
-                        placeholder="تکرار رمز"
-                        value={regConfirmPassword}
-                        onChange={(e) => setRegConfirmPassword(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-3 focus:ring-sky-500/10 rounded-2xl px-3 py-2 text-left font-mono font-bold text-xs text-gray-900 outline-none transition-all placeholder:text-[10px]"
-                      />
-                    </div>
+                    <input
+                      type={showRegPassword ? 'text' : 'password'}
+                      required
+                      dir="ltr"
+                      value={regConfirmPassword}
+                      onChange={(e) => setRegConfirmPassword(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-3 focus:ring-sky-500/10 rounded-2xl px-3 py-2 text-left font-mono font-bold text-xs text-gray-900 outline-none transition-all"
+                    />
                   </div>
                 </div>
 

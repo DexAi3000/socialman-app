@@ -398,18 +398,14 @@ export function AuthModal() {
                       <label className="block text-xs font-black text-gray-700 mb-1 text-right">
                         نام کاربری یا شماره موبایل:
                       </label>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          required
-                          dir="ltr"
-                          placeholder="nima_dev یا 09123456789"
-                          value={loginIdentifier}
-                          onChange={(e) => setLoginIdentifier(e.target.value)}
-                          className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-3 focus:ring-sky-500/10 rounded-2xl px-3 py-2 text-left font-mono font-bold text-xs text-gray-900 outline-none transition-all placeholder:text-right placeholder:font-sans placeholder:text-gray-400"
-                        />
-                        <AtSign className="w-3.5 h-3.5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
-                      </div>
+                      <input
+                        type="text"
+                        required
+                        dir="ltr"
+                        value={loginIdentifier}
+                        onChange={(e) => setLoginIdentifier(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-3 focus:ring-sky-500/10 rounded-2xl px-3 py-2 text-left font-mono font-bold text-xs text-gray-900 outline-none transition-all"
+                      />
                     </div>
 
                     <div>
@@ -421,10 +417,9 @@ export function AuthModal() {
                           type={showLoginPassword ? 'text' : 'password'}
                           required
                           dir="ltr"
-                          placeholder="••••••••"
                           value={loginPassword}
                           onChange={(e) => setLoginPassword(e.target.value)}
-                          className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-3 focus:ring-sky-500/10 rounded-2xl px-3 py-2 text-left font-mono font-bold text-xs text-gray-900 outline-none transition-all"
+                          className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-3 focus:ring-sky-500/10 rounded-2xl px-3 pr-9 py-2 text-left font-mono font-bold text-xs text-gray-900 outline-none transition-all"
                         />
                         <button
                           type="button"
@@ -480,10 +475,9 @@ export function AuthModal() {
                             type="tel"
                             dir="ltr"
                             required
-                            placeholder="9123456789"
                             value={otpPhone}
                             onChange={(e) => setOtpPhone(e.target.value.replace(/[^0-9]/g, ''))}
-                            className="w-full bg-transparent px-3 py-2 text-left font-mono font-black text-xs sm:text-sm text-gray-900 outline-none tracking-wider placeholder:text-gray-400 placeholder:font-normal placeholder:tracking-normal"
+                            className="w-full bg-transparent px-3 py-2 text-left font-mono font-black text-xs sm:text-sm text-gray-900 outline-none tracking-wider"
                           />
                           <Smartphone className="w-4 h-4 text-gray-400 shrink-0 mr-1" />
                         </div>
@@ -532,10 +526,9 @@ export function AuthModal() {
                   <input
                     type="text"
                     required
-                    placeholder="مثال: نیما آرین‌فر"
                     value={regFullName}
                     onChange={(e) => setRegFullName(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl px-3 py-2 text-right font-bold text-xs text-gray-900 outline-none transition-all placeholder:text-gray-400"
+                    className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl px-3 py-2 text-right font-bold text-xs text-gray-900 outline-none transition-all"
                   />
                 </div>
 
@@ -547,10 +540,9 @@ export function AuthModal() {
                     type="text"
                     dir="ltr"
                     required
-                    placeholder="nima_dev"
                     value={regUsername}
                     onChange={(e) => setRegUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-                    className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl px-3 py-2 text-left font-mono font-bold text-xs text-gray-900 outline-none transition-all placeholder:text-gray-400"
+                    className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl px-3 py-2 text-left font-mono font-bold text-xs text-gray-900 outline-none transition-all"
                   />
                 </div>
 
@@ -568,10 +560,9 @@ export function AuthModal() {
                         type="tel"
                         dir="ltr"
                         required
-                        placeholder="9123456789"
                         value={regPhone}
                         onChange={(e) => setRegPhone(e.target.value.replace(/[^0-9]/g, ''))}
-                        className="w-full bg-transparent px-2.5 py-1.5 text-left font-mono font-black text-xs text-gray-900 outline-none tracking-wider placeholder:text-gray-400 placeholder:font-normal placeholder:tracking-normal"
+                        className="w-full bg-transparent px-2.5 py-1.5 text-left font-mono font-black text-xs text-gray-900 outline-none tracking-wider"
                       />
                     </div>
                   </div>
@@ -586,7 +577,6 @@ export function AuthModal() {
                       type={showRegPassword ? 'text' : 'password'}
                       required
                       dir="ltr"
-                      placeholder="حداقل ۶ نویسه"
                       value={regPassword}
                       onChange={(e) => setRegPassword(e.target.value)}
                       className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl px-2.5 py-1.5 text-left font-mono font-bold text-[11px] text-gray-900 outline-none transition-all"
@@ -601,7 +591,6 @@ export function AuthModal() {
                       type={showRegPassword ? 'text' : 'password'}
                       required
                       dir="ltr"
-                      placeholder="تکرار"
                       value={regConfirmPassword}
                       onChange={(e) => setRegConfirmPassword(e.target.value)}
                       className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl px-2.5 py-1.5 text-left font-mono font-bold text-[11px] text-gray-900 outline-none transition-all"

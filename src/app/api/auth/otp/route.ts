@@ -253,8 +253,8 @@ export async function POST(request: Request) {
         },
       });
 
-      const apiKey = process.env.SMS_IR_API_KEY || 'wQXNOwaL75yUIMjRgdMBzYcQ1w3o8WRmuvhnhSwYAoBOweiC';
-      const templateId = process.env.SMS_IR_TEMPLATE_ID || '123456';
+      const apiKey = process.env.SMS_IR_API_KEY || 'fOjFtJeSej7K6wZz4uS7JfUpVd9EXslED2gffCutQLLTjspT';
+      const templateId = process.env.SMS_IR_TEMPLATE_ID || '722530';
 
       let smsDelivered = false;
       let smsResponseData = null;
@@ -271,7 +271,10 @@ export async function POST(request: Request) {
             body: JSON.stringify({
               mobile: cleanPhone,
               templateId: Number(templateId),
-              parameters: [{ name: 'Code', value: generatedCode }],
+              parameters: [
+                { name: 'CODE', value: generatedCode },
+                { name: 'Code', value: generatedCode },
+              ],
             }),
           });
 
