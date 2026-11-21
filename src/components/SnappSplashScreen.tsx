@@ -42,7 +42,7 @@ export function SnappSplashScreen({ onFinish, duration = 1800 }: SnappSplashScre
         {/* App Icon Mascot (Pomegranate Chat Bubble) */}
         <div className="w-24 h-24 rounded-3xl overflow-hidden shadow-2xl border-2 border-white/50 ring-4 ring-white/20 transform hover:scale-105 transition-transform shrink-0">
           <img
-            src="/app-icon.jpg"
+            src="/socialman/app-icon.jpg"
             alt="لوگوی سوشال‌من"
             className="w-full h-full object-cover"
           />

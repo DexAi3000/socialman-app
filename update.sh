@@ -29,7 +29,7 @@ if [ ! -f "prisma/dev.db" ] || [ $(sqlite3 prisma/dev.db "SELECT count(*) FROM P
   npx tsx prisma/seed.ts || true
 fi
 
-# 5. Build Next.js production build
+# 5. Build Next.js production build with basePath /socialman
 npm run build
 
 # 6. PM2 restart with ecosystem configuration
@@ -40,11 +40,53 @@ else
 fi
 
 # 7. Ensure Background Scheduler is in crontab
-CRON_JOB="* * * * * curl -s http://localhost:3000/api/cron/publish > /dev/null 2>&1"
+CRON_JOB="* * * * * curl -s http://localhost:3000/socialman/api/cron/publish > /dev/null 2>&1"
 (crontab -l 2>/dev/null | grep -F "$CRON_JOB") || (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
+
+# 8. Configure Nginx for nimaariyanfar.com/socialman and IP
+cat << 'EOF' > /etc/nginx/sites-available/socialman.conf
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name nimaariyanfar.com www.nimaariyanfar.com 194.117.64.88 _;
+
+    location /socialman {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location = / {
+        return 301 /socialman;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+EOF
+
+ln -sf /etc/nginx/sites-available/socialman.conf /etc/nginx/sites-enabled/socialman.conf
+nginx -t
+systemctl reload nginx
 
 echo "=========================================================="
 echo "✅ استقرار پروداکشن با موفقیت انجام شد!"
-echo "🌐 آدرس زنده وب‌اپلیکیشن: http://194.117.64.88"
+echo "🌐 آدرس رسمی جهت تایید SMS.ir: http://nimaariyanfar.com/socialman"
+echo "🌐 آدرس آی‌پی مستقیم: http://194.117.64.88/socialman"
 echo "⏰ سرویس زمان‌بندی خودکار پست‌ها فعال گردید."
 echo "=========================================================="

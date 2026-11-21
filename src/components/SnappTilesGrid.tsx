@@ -32,10 +32,10 @@ export function SnappTilesGrid({ onSelectService }: SnappTilesGridProps) {
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#3b96cc] to-sky-400 flex items-center justify-center text-white shadow-lg shadow-[#3b96cc]/35 z-10 group-hover:scale-105 transition-transform">
             <Send className="w-6 h-6 fill-white rotate-45 -mr-0.5" />
           </div>
-          <img src="/instagram-clean.png" alt="Instagram" className="w-5 h-5 absolute -top-1 -right-1 drop-shadow-md z-20 group-hover:-translate-y-0.5 transition-transform" />
-          <img src="/telegram-clean.png" alt="Telegram" className="w-5 h-5 absolute -top-1 -left-1 drop-shadow-md z-20 group-hover:-translate-y-0.5 transition-transform" />
-          <img src="/whatsapp-clean.png" alt="WhatsApp" className="w-5 h-5 absolute -bottom-1 -right-1 drop-shadow-md z-20 group-hover:translate-y-0.5 transition-transform" />
-          <img src="/rubika-icon.png" alt="Rubika" className="w-5 h-5 absolute -bottom-1 -left-1 drop-shadow-md z-20 group-hover:translate-y-0.5 transition-transform" />
+          <img src="/socialman/instagram-clean.png" alt="Instagram" className="w-5 h-5 absolute -top-1 -right-1 drop-shadow-md z-20 group-hover:-translate-y-0.5 transition-transform" />
+          <img src="/socialman/telegram-clean.png" alt="Telegram" className="w-5 h-5 absolute -top-1 -left-1 drop-shadow-md z-20 group-hover:-translate-y-0.5 transition-transform" />
+          <img src="/socialman/whatsapp-clean.png" alt="WhatsApp" className="w-5 h-5 absolute -bottom-1 -right-1 drop-shadow-md z-20 group-hover:translate-y-0.5 transition-transform" />
+          <img src="/socialman/rubika-icon.png" alt="Rubika" className="w-5 h-5 absolute -bottom-1 -left-1 drop-shadow-md z-20 group-hover:translate-y-0.5 transition-transform" />
         </div>
       ),
       badge: 'سرویس اصلی 🚀',

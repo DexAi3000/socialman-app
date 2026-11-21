@@ -21,9 +21,9 @@ export function AuthModal() {
   const { isAuthModalOpen, closeAuthModal, loginUser } = useApp();
 
   const [step, setStep] = useState<'phone' | 'otp' | 'success'>('phone');
-  const [phone, setPhone] = useState('09123456789');
+  const [phone, setPhone] = useState('');
   const [otpValues, setOtpValues] = useState(['', '', '', '', '']);
-  const [fullName, setFullName] = useState('نیما آرین فر');
+  const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [testOtpHint, setTestOtpHint] = useState<string | null>(null);
@@ -55,7 +55,7 @@ export function AuthModal() {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/otp', {
+      const res = await fetch('/socialman/api/auth/otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'send-otp', phone }),
@@ -77,20 +77,6 @@ export function AuthModal() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleQuickDemoLogin = () => {
-    setLoading(true);
-    setTimeout(() => {
-      loginUser({
-        id: 'usr-8192',
-        fullName: 'نیما آرین فر',
-        phone: '09123456789',
-        role: 'مدیر محتوا و ادمین',
-        verifiedVia: 'SMS.ir',
-      });
-      closeAuthModal();
-    }, 400);
   };
 
   const handleOtpChange = (index: number, value: string) => {
@@ -148,7 +134,7 @@ export function AuthModal() {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/otp', {
+      const res = await fetch('/socialman/api/auth/otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -213,7 +199,7 @@ export function AuthModal() {
         <div className="flex flex-col items-center text-center space-y-2 pt-1">
           {/* App Mascot Icon */}
           <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg border border-gray-100 shadow-rose-900/10 shrink-0">
-            <img src="/app-icon.jpg" alt="Social Man" className="w-full h-full object-cover" />
+            <img src="/socialman/app-icon.jpg" alt="Social Man" className="w-full h-full object-cover" />
           </div>
 
           <div>
@@ -282,18 +268,6 @@ export function AuthModal() {
                 </>
               )}
             </button>
-
-            {/* Quick 1-Click Demo Login */}
-            <div className="pt-1">
-              <button
-                type="button"
-                onClick={handleQuickDemoLogin}
-                className="w-full py-2.5 rounded-2xl font-black text-xs bg-sky-50 hover:bg-sky-100 text-[#3b96cc] border border-sky-200/80 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-sky-600" />
-                <span>ورود آزمایشی با پروفایل نیما آرین‌فر</span>
-              </button>
-            </div>
           </form>
         )}
 

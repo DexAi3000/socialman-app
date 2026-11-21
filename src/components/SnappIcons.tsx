@@ -10,7 +10,7 @@ export function SnappInstagramIcon({ className = 'w-14 h-14' }: { className?: st
   return (
     <div className={`${className} shrink-0 drop-shadow-[0_8px_16px_rgba(225,48,108,0.25)] transition-transform hover:scale-105 duration-300 flex items-center justify-center`}>
       <img
-        src="/instagram-clean.png"
+        src="/socialman/instagram-clean.png"
         alt="اینستاگرام"
         className="w-full h-full object-contain pointer-events-none select-none"
       />
@@ -23,7 +23,7 @@ export function SnappTelegramIcon({ className = 'w-14 h-14' }: { className?: str
   return (
     <div className={`${className} shrink-0 drop-shadow-[0_8px_16px_rgba(42,171,238,0.3)] transition-transform hover:scale-105 duration-300 flex items-center justify-center`}>
       <img
-        src="/telegram-clean.png"
+        src="/socialman/telegram-clean.png"
         alt="تلگرام"
         className="w-full h-full object-contain pointer-events-none select-none"
       />
@@ -36,7 +36,7 @@ export function SnappWhatsappIcon({ className = 'w-14 h-14' }: { className?: str
   return (
     <div className={`${className} shrink-0 drop-shadow-[0_8px_16px_rgba(37,211,102,0.3)] transition-transform hover:scale-105 duration-300 flex items-center justify-center`}>
       <img
-        src="/whatsapp-clean.png"
+        src="/socialman/whatsapp-clean.png"
         alt="واتساپ"
         className="w-full h-full object-contain pointer-events-none select-none"
       />

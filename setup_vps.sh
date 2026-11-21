@@ -74,12 +74,29 @@ PORT=3000 pm2 start npm --name "socialman" -- start
 pm2 save
 pm2 startup systemd -u root --hp /root || true
 
-# 8. Configure SEPARATE Nginx file ONLY for IP and subdomains (DOES NOT TOUCH nimaariyanfar.com)
-echo "🌐 پیکربندی کانفیگ اختصاصی Nginx برای آی‌پی و ساب‌دامین..."
+# 8. Configure Nginx for nimaariyanfar.com/socialman and IP
+echo "🌐 پیکربندی Nginx برای دامنه رسمی nimaariyanfar.com/socialman و آی‌پی..."
 cat << 'EOF' > /etc/nginx/sites-available/socialman.conf
 server {
-    listen 80;
-    server_name 194.117.64.88 app.nimaariyanfar.com social.nimaariyanfar.com;
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name nimaariyanfar.com www.nimaariyanfar.com 194.117.64.88 _;
+
+    location /socialman {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location = / {
+        return 301 /socialman;
+    }
 
     location / {
         proxy_pass http://127.0.0.1:3000;
@@ -102,6 +119,6 @@ systemctl reload nginx
 
 echo "=============================================="
 echo "🎉 تبریک! اپلیکیشن سوشال‌من با موفقیت لایو شد!"
-echo "🌐 آدرس آی‌پی مستقیم: http://194.117.64.88"
-echo "🔒 سایت nima-portfolio شما 100% دست‌نخورده و فعال باقی مانده است."
+echo "🌐 آدرس رسمی وب‌سایت جهت تایید SMS.ir: http://nimaariyanfar.com/socialman"
+echo "🌐 آدرس آی‌پی مستقیم: http://194.117.64.88/socialman"
 echo "=============================================="

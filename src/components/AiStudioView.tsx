@@ -81,7 +81,7 @@ export function AiStudioView({ initialPlatform = 'instagram' }: AiStudioViewProp
     setScheduledSuccess(false);
 
     try {
-      const res = await fetch('/api/ai/generate', {
+      const res = await fetch('/socialman/api/ai/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ topic, platform, tone, keywords }),

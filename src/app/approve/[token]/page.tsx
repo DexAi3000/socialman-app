@@ -28,7 +28,7 @@ function ClientApprovalContent() {
   useEffect(() => {
     if (!token) return;
 
-    fetch(`/api/posts/approve?token=${encodeURIComponent(token)}`)
+    fetch(`/socialman/api/posts/approve?token=${encodeURIComponent(token)}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.success && data.post) {
@@ -44,7 +44,7 @@ function ClientApprovalContent() {
   const handleApprove = async () => {
     setSubmitting(true);
     try {
-      const res = await fetch('/api/posts/approve', {
+      const res = await fetch('/socialman/api/posts/approve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, action: 'approve' }),
@@ -68,7 +68,7 @@ function ClientApprovalContent() {
     }
     setSubmitting(true);
     try {
-      const res = await fetch('/api/posts/approve', {
+      const res = await fetch('/socialman/api/posts/approve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, action: 'reject', feedback: feedbackText }),

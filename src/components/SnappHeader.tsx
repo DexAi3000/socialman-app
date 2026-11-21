@@ -99,7 +99,7 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
         >
           <div className="w-8 h-8 rounded-xl overflow-hidden shadow-xs border border-gray-100 shrink-0">
             <img
-              src="/app-icon.jpg"
+              src="/socialman/app-icon.jpg"
               alt="Social Man"
               className="w-full h-full object-cover"
             />

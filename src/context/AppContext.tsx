@@ -280,7 +280,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Sync initial data from real database and check session on mount
   useEffect(() => {
     // 0. Check real authentication session
-    fetch('/api/auth/me')
+    fetch('/socialman/api/auth/me')
       .then((r) => r.json())
       .then((d) => {
         if (d.authenticated && d.user) {
@@ -308,7 +308,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       });
 
     // 1. Fetch Workspaces from DB
-    fetch('/api/workspaces')
+    fetch('/socialman/api/workspaces')
       .then((r) => r.json())
       .then((d) => {
         if (d.success && d.workspaces?.length > 0) {
@@ -319,7 +319,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       .catch((err) => console.log('Workspaces DB sync:', err));
 
     // 2. Fetch Posts from DB
-    fetch('/api/posts')
+    fetch('/socialman/api/posts')
       .then((r) => r.json())
       .then((d) => {
         if (d.success && d.posts?.length > 0) {
@@ -329,7 +329,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       .catch((err) => console.log('Posts DB sync:', err));
 
     // 3. Fetch Tickets from DB
-    fetch('/api/tickets')
+    fetch('/socialman/api/tickets')
       .then((r) => r.json())
       .then((d) => {
         if (d.success && d.tickets?.length > 0) {
@@ -385,12 +385,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const logoutUser = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch('/socialman/api/auth/logout', { method: 'POST' });
     } catch (e) {
       console.error('Logout error:', e);
     }
     setCurrentUser(null);
-    window.location.href = '/login';
+    window.location.href = '/socialman/login';
   };
 
   const updateUserAvatar = (avatarUrl?: string) => {
@@ -437,7 +437,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setActiveWorkspaceId(tempId);
 
     // Persist to real database
-    fetch('/api/workspaces', {
+    fetch('/socialman/api/workspaces', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, category, connectedPlatforms: platforms }),
@@ -474,7 +474,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setPosts((prev) => [newPost, ...prev]);
 
     // Persist to real database
-    fetch('/api/posts', {
+    fetch('/socialman/api/posts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(postData),
@@ -492,7 +492,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
 
     // Persist to real database
-    fetch('/api/posts', {
+    fetch('/socialman/api/posts', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, ...updates }),
@@ -503,7 +503,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setPosts((prev) => prev.filter((p) => p.id !== id));
 
     // Persist to real database
-    fetch(`/api/posts?id=${id}`, {
+    fetch(`/socialman/api/posts?id=${id}`, {
       method: 'DELETE',
     }).catch((err) => console.error('Error deleting post in DB:', err));
   };
@@ -538,7 +538,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setTickets((prev) => [newTicket, ...prev]);
 
     // Persist to real database
-    fetch('/api/tickets', {
+    fetch('/socialman/api/tickets', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -582,7 +582,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     );
 
     // Persist reply to real database
-    fetch('/api/tickets', {
+    fetch('/socialman/api/tickets', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

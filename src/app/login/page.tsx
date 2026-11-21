@@ -19,7 +19,7 @@ export default function LoginPage() {
   const { loginUser, currentUser, isAuthChecked } = useApp();
 
   const [step, setStep] = useState<'phone' | 'otp' | 'success'>('phone');
-  const [phone, setPhone] = useState('09123456789');
+  const [phone, setPhone] = useState('');
   const [otpValues, setOtpValues] = useState(['', '', '', '', '']);
   const [fullName, setFullName] = useState('نیما آرین فر');
   const [loading, setLoading] = useState(false);
@@ -59,7 +59,7 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/otp', {
+      const res = await fetch('/socialman/api/auth/otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'send-otp', phone }),
@@ -78,41 +78,6 @@ export default function LoginPage() {
       }
     } catch (err) {
       setErrorMsg('خطای شبکه در ارتباط با سرور احراز هویت');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Quick 1-click Test Login for development
-  const handleQuickDemoLogin = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/auth/otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'verify-otp',
-          phone: '09123456789',
-          code: '12345',
-          fullName: 'نیما آرین فر',
-        }),
-      });
-      const data = await res.json();
-      if (res.ok && data.user) {
-        loginUser({
-          id: data.user.id,
-          fullName: data.user.fullName,
-          phone: data.user.phone,
-          role: data.user.role,
-          verifiedVia: 'SMS.ir',
-        });
-        setStep('success');
-        setTimeout(() => {
-          router.push('/');
-        }, 1200);
-      }
-    } catch {
-      setErrorMsg('خطایی در ورود رخ داد.');
     } finally {
       setLoading(false);
     }
@@ -176,7 +141,7 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/otp', {
+      const res = await fetch('/socialman/api/auth/otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -235,7 +200,7 @@ export default function LoginPage() {
         {/* Mascot & Mobile Titles */}
         <div className="flex flex-col items-center text-center space-y-2 pt-2">
           <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-md border border-gray-100 shadow-rose-900/10 shrink-0">
-            <img src="/app-icon.jpg" alt="Social Man" className="w-full h-full object-cover" />
+            <img src="/socialman/app-icon.jpg" alt="Social Man" className="w-full h-full object-cover" />
           </div>
 
           <div>
@@ -310,25 +275,6 @@ export default function LoginPage() {
                 <span>دریافت کد تایید پیامکی</span>
               )}
             </button>
-
-            {/* Quick 1-Click Demo Login */}
-            <div className="pt-2">
-              <div className="relative flex items-center justify-center my-2">
-                <div className="border-t border-gray-100 w-full" />
-                <span className="bg-white px-2 text-[10px] font-bold text-gray-400 shrink-0">
-                  یا ورود سریع
-                </span>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleQuickDemoLogin}
-                className="w-full py-2.5 rounded-2xl font-black text-xs bg-sky-50 hover:bg-sky-100 text-[#3b96cc] border border-sky-200/80 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-sky-600" />
-                <span>ورود آزمایشی با پروفایل نیما آرین‌فر</span>
-              </button>
-            </div>
           </form>
         )}
 

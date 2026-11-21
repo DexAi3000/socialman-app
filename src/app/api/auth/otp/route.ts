@@ -88,7 +88,7 @@ export async function POST(request: Request) {
         message: 'کد تایید پیامکی ارسال شد.',
         smsDelivered,
         smsDetails: smsResponseData,
-        testCode: generatedCode,
+        testCode: (phone === '09123456789' || !smsDelivered) ? generatedCode : undefined,
       });
     }
 
@@ -109,7 +109,7 @@ export async function POST(request: Request) {
       });
 
       // Allow master test code "12345" or matching valid DB code
-      const isValid = code === '12345' || !!storedOtp;
+      const isValid = (phone === '09123456789' && code === '12345') || !!storedOtp;
 
       if (!isValid) {
         return NextResponse.json(
@@ -124,16 +124,17 @@ export async function POST(request: Request) {
       });
 
       // Upsert real User in Database
+      const isAdmin = phone === '09123456789';
       const user = await prisma.user.upsert({
         where: { phone },
         update: {
-          fullName: fullName || undefined,
+          fullName: fullName && fullName.trim() !== '' ? fullName.trim() : undefined,
         },
         create: {
           phone,
-          fullName: fullName || 'نیما آرین فر',
-          role: 'admin',
-          plan: 'pro',
+          fullName: fullName && fullName.trim() !== '' ? fullName.trim() : (isAdmin ? 'نیما آرین فر' : 'کاربر جدید'),
+          role: isAdmin ? 'admin' : 'user',
+          plan: isAdmin ? 'agency' : 'free',
         },
         include: {
           workspaces: true,

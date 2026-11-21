@@ -70,7 +70,7 @@ export function SnappHero({ onOpenPublish, onOpenCalendar }: SnappHeroProps) {
 
             {/* 3D Hero Character (Transparent Isolated PNG) */}
             <img
-              src="/hero-character.png"
+              src="/socialman/hero-character.png"
               alt="سوشال‌من دستیار هوشمند محتوا"
               className="w-full h-full object-contain filter drop-shadow-[0_15px_30px_rgba(33,170,88,0.18)] group-hover:scale-105 transition-transform duration-500 pointer-events-none"
             />

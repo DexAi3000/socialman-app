@@ -4,7 +4,7 @@ import React from 'react';
 export function InstagramIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
     <img
-      src="/instagram-clean.png"
+      src="/socialman/instagram-clean.png"
       alt="اینستاگرام"
       className={`${className} object-contain inline-block shrink-0`}
     />
@@ -15,7 +15,7 @@ export function InstagramIcon({ className = 'w-4 h-4' }: { className?: string })
 export function TelegramIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
     <img
-      src="/telegram-clean.png"
+      src="/socialman/telegram-clean.png"
       alt="تلگرام"
       className={`${className} object-contain inline-block shrink-0`}
     />
@@ -26,7 +26,7 @@ export function TelegramIcon({ className = 'w-4 h-4' }: { className?: string }) 
 export function WhatsappIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
     <img
-      src="/whatsapp-clean.png"
+      src="/socialman/whatsapp-clean.png"
       alt="واتساپ"
       className={`${className} object-contain inline-block shrink-0`}
     />

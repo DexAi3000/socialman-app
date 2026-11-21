@@ -110,7 +110,7 @@ export function MultiPublishView() {
 
     try {
       // Call real publisher API
-      const res = await fetch('/api/publish', {
+      const res = await fetch('/socialman/api/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
