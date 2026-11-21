@@ -4,18 +4,11 @@ import React, { useState, useRef } from 'react';
 import { useApp } from '@/context/AppContext';
 import {
   ChevronDown,
-  Sparkles,
-  Zap,
-  CheckCircle2,
   LogOut,
   Smartphone,
   Camera,
-  Upload,
   Trash2,
-  Share2,
-  Crown,
   Menu,
-  Headphones,
 } from 'lucide-react';
 import { toPersianDigits } from '@/lib/utils';
 
@@ -60,12 +53,6 @@ interface SnappHeaderProps {
 
 export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
   const {
-    activeWorkspace,
-    workspaces,
-    setActiveWorkspaceId,
-    currentPlan,
-    aiUsageCount,
-    openUpgradeModal,
     currentUser,
     openAuthModal,
     logoutUser,
@@ -73,7 +60,6 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
     setIsHamburgerMenuOpen,
   } = useApp();
 
-  const [isWsDropdownOpen, setIsWsDropdownOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -119,12 +105,11 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
             </div>
           </div>
 
-          {/* Header Actions: Hamburger Menu + Support + Workspace */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* 1. Hamburger Menu Trigger Button */}
+          {/* Header Actions: Hamburger Menu */}
+          <div className="flex items-center">
             <button
               onClick={() => setIsHamburgerMenuOpen(true)}
-              className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-gray-50 hover:bg-emerald-50 text-gray-800 hover:text-[#21aa58] border border-gray-200 hover:border-emerald-200 transition-all font-bold text-xs shadow-2xs group cursor-pointer"
+              className="flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-gray-50 hover:bg-emerald-50 text-gray-800 hover:text-[#21aa58] border border-gray-200 hover:border-emerald-200 transition-all font-bold text-xs shadow-2xs group cursor-pointer"
               title="باز کردن منوی همبرگری سوشال‌من"
             >
               <div className="w-7 h-7 rounded-xl bg-white border border-gray-200/80 flex items-center justify-center text-gray-700 group-hover:text-[#21aa58] group-hover:border-emerald-200 shadow-2xs transition-colors">
@@ -132,93 +117,11 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
               </div>
               <span className="font-black text-xs">منو</span>
             </button>
-
-            {/* 2. Support Hub (Tickets & AI Chatbot) */}
-            <button
-              onClick={() => setActiveTab('support')}
-              className={`flex items-center gap-1.5 sm:gap-2 px-3 py-2 rounded-2xl transition-all text-xs font-bold border cursor-pointer ${
-                activeTab === 'support'
-                  ? 'bg-[#21aa58] text-white border-[#21aa58] shadow-sm font-black'
-                  : 'bg-emerald-50/70 text-emerald-800 hover:bg-emerald-100 border-emerald-100'
-              }`}
-              title="پشتیبانی ۲۴ ساعته: چت‌بات هوشمند و ثبت تیکت"
-            >
-              <Headphones className="w-4 h-4" />
-              <span className="hidden sm:inline">پشتیبانی</span>
-              <span
-                className={`text-[10px] px-2 py-0.5 rounded-full font-black ${
-                  activeTab === 'support'
-                    ? 'bg-white/20 text-white'
-                    : 'bg-emerald-600 text-white'
-                }`}
-              >
-                تیکت و چت‌بات
-              </span>
-            </button>
-
-            {/* 3. Workspace / Brand Dropdown */}
-            <div className="relative hidden md:block">
-              <button
-                onClick={() => setIsWsDropdownOpen(!isWsDropdownOpen)}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-xs font-black text-gray-800 hover:text-[#21aa58] transition-colors"
-              >
-                <span className="text-gray-400 font-normal">پیج:</span>
-                <span className="text-[#21aa58]">{activeWorkspace.name}</span>
-                <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
-              </button>
-
-              {isWsDropdownOpen && (
-                <div className="absolute top-full right-0 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl p-2 z-50 space-y-1">
-                  <span className="text-[10px] text-gray-400 font-bold px-2 py-1 block">
-                    انتخاب برند / پیج کاری:
-                  </span>
-                  {workspaces.map((ws) => (
-                    <button
-                      key={ws.id}
-                      onClick={() => {
-                        setActiveWorkspaceId(ws.id);
-                        setIsWsDropdownOpen(false);
-                      }}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs text-right transition-colors ${
-                        ws.id === activeWorkspace.id
-                          ? 'bg-emerald-50 text-[#21aa58] font-black'
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      <span>{ws.name}</span>
-                      {ws.id === activeWorkspace.id && (
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#21aa58]" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         </div>
 
-        {/* Left side: User Auth (SMS.ir) + Wallet + CTA */}
+        {/* Left side: User Auth (SMS.ir) */}
         <div className="flex items-center gap-3">
-          {/* Plan Status Chip */}
-          <button
-            onClick={() => openUpgradeModal('agency')}
-            className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black text-gray-700 border border-gray-200 hover:bg-gray-50 transition-all"
-          >
-            {currentPlan === 'agency' ? (
-              <Crown className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-            ) : (
-              <Zap className="w-3.5 h-3.5 text-[#21aa58] fill-[#21aa58]" />
-            )}
-            <span className="text-gray-500 font-bold hidden md:inline">پلن:</span>
-            <span className="font-bold text-[#21aa58]">
-              {currentPlan === 'agency'
-                ? 'طلایی (آژانس + AI)'
-                : currentPlan === 'pro'
-                ? 'نقره‌ای (۵ پلتفرم)'
-                : 'برنز (رایگان)'}
-            </span>
-          </button>
-
           {/* User Auth Profile / Login Button via SMS.ir */}
           {currentUser?.isLoggedIn ? (
             <div className="relative">
