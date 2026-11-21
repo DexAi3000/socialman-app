@@ -483,12 +483,12 @@ export function MultiPublishView() {
                 {isPublishing ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>در حال مخابره به ۵ پلتفرم...</span>
+                    <span>در حال انتشار...</span>
                   </>
                 ) : (
                   <>
                     <Send className="w-4 h-4 fill-white rotate-45 -mr-0.5" />
-                    <span>انتشار آنی در {toPersianDigits(selectedPlatforms.length)} شبکه اجتماعی</span>
+                    <span>انتشار</span>
                   </>
                 )}
               </button>
