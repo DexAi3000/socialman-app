@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-
-// Temporary in-memory store for verification codes (in production, use Redis or Database)
-const verificationCodes: Record<string, { code: string; expiresAt: number }> = {};
+import prisma from '@/lib/prisma';
 
 export async function POST(request: Request) {
   try {
@@ -19,10 +17,16 @@ export async function POST(request: Request) {
 
       // Generate a 5-digit verification code
       const generatedCode = String(Math.floor(10000 + Math.random() * 90000));
-      verificationCodes[phone] = {
-        code: generatedCode,
-        expiresAt: Date.now() + 2 * 60 * 1000, // 2 minutes expiry
-      };
+      const expiresAt = new Date(Date.now() + 2 * 60 * 1000); // 2 minutes
+
+      // Store in SQLite database
+      await prisma.otpCode.create({
+        data: {
+          phone,
+          code: generatedCode,
+          expiresAt,
+        },
+      });
 
       const apiKey = process.env.SMS_IR_API_KEY;
       const templateId = process.env.SMS_IR_TEMPLATE_ID;
@@ -43,9 +47,7 @@ export async function POST(request: Request) {
             body: JSON.stringify({
               mobile: phone,
               templateId: Number(templateId),
-              parameters: [
-                { name: 'CODE', value: generatedCode },
-              ],
+              parameters: [{ name: 'CODE', value: generatedCode }],
             }),
           });
 
@@ -55,7 +57,6 @@ export async function POST(request: Request) {
           if (smsRes.ok && smsResponseData?.status === 1) {
             smsDelivered = true;
           } else if (smsResponseData?.status === 113 && templateId !== '123456') {
-            console.log('Template 492717 pending approval in SMS.ir, using sandbox fallback...');
             try {
               const fbRes = await fetch('https://api.sms.ir/v1/send/verify', {
                 method: 'POST',
@@ -72,12 +73,9 @@ export async function POST(request: Request) {
               });
               const fbData = await fbRes.json().catch(() => null);
               if (fbRes.ok && fbData?.status === 1) {
-                // Keep delivered as false so user knows it's pending review, but allow test code
                 console.log('Sandbox fallback OK');
               }
             } catch (fbErr) {}
-          } else {
-            console.warn('SMS.ir response not OK:', smsResponseData);
           }
         } catch (smsErr) {
           console.error('Error connecting to SMS.ir API:', smsErr);
@@ -86,12 +84,9 @@ export async function POST(request: Request) {
 
       return NextResponse.json({
         success: true,
-        message: smsDelivered
-          ? 'کد تایید پیامکی از طریق سامانه رسمی SMS.ir به شماره شما ارسال شد.'
-          : 'کد تایید پیامکی از طریق سامانه SMS.ir ارسال شد.',
+        message: 'کد تایید پیامکی ارسال شد.',
         smsDelivered,
         smsDetails: smsResponseData,
-        // For development/testing convenience, return the test code
         testCode: generatedCode,
       });
     }
@@ -102,10 +97,18 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'شماره موبایل و کد تایید الزامی است.' }, { status: 400 });
       }
 
-      const stored = verificationCodes[phone];
+      // Check database for active OTP
+      const storedOtp = await prisma.otpCode.findFirst({
+        where: {
+          phone,
+          code,
+          expiresAt: { gte: new Date() },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
 
-      // Allow master test code "12345" or matching generated code
-      const isValid = code === '12345' || (stored && stored.code === code && Date.now() <= stored.expiresAt);
+      // Allow master test code "12345" or matching valid DB code
+      const isValid = code === '12345' || !!storedOtp;
 
       if (!isValid) {
         return NextResponse.json(
@@ -114,19 +117,35 @@ export async function POST(request: Request) {
         );
       }
 
-      // Clean up used code
-      delete verificationCodes[phone];
+      // Clean up used OTP codes for this phone
+      await prisma.otpCode.deleteMany({
+        where: { phone },
+      });
 
-      // Return logged-in user profile
+      // Upsert real User in Database
+      const user = await prisma.user.upsert({
+        where: { phone },
+        update: {
+          fullName: fullName || undefined,
+        },
+        create: {
+          phone,
+          fullName: fullName || 'نیما آرین فر',
+          role: 'admin',
+          plan: 'pro',
+        },
+      });
+
+      // Return logged-in user profile from DB
       return NextResponse.json({
         success: true,
         user: {
-          id: `usr-${phone.slice(-4)}`,
-          fullName: fullName || 'نیما آرین فر',
-          phone,
-          role: 'مدیر محتوا و ادمین',
-          plan: 'pro',
-          verifiedVia: 'SMS.ir',
+          id: user.id,
+          fullName: user.fullName,
+          phone: user.phone,
+          role: user.role,
+          plan: user.plan,
+          avatarUrl: user.avatarUrl,
         },
       });
     }

@@ -275,6 +275,40 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const [targetPlatformForConnect, setTargetPlatformForConnect] = useState<SocialPlatform | null>(null);
 
+  // Sync initial data from real database on mount
+  useEffect(() => {
+    // 1. Fetch Workspaces from DB
+    fetch('/api/workspaces')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.workspaces?.length > 0) {
+          setWorkspaces(d.workspaces);
+          setActiveWorkspaceId(d.workspaces[0].id);
+        }
+      })
+      .catch((err) => console.log('Workspaces DB sync:', err));
+
+    // 2. Fetch Posts from DB
+    fetch('/api/posts')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.posts?.length > 0) {
+          setPosts(d.posts);
+        }
+      })
+      .catch((err) => console.log('Posts DB sync:', err));
+
+    // 3. Fetch Tickets from DB
+    fetch('/api/tickets')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.tickets?.length > 0) {
+          setTickets(d.tickets);
+        }
+      })
+      .catch((err) => console.log('Tickets DB sync:', err));
+  }, []);
+
   const openConnectModal = (platform?: SocialPlatform) => {
     setTargetPlatformForConnect(platform || null);
     setIsConnectModalOpen(true);
@@ -356,14 +390,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       openUpgradeModal(currentPlan === 'free' ? 'pro' : 'agency');
       return false;
     }
+    const tempId = `ws-${Date.now()}`;
     const newWs: Workspace = {
-      id: `ws-${Date.now()}`,
+      id: tempId,
       name,
       category,
       connectedPlatforms: platforms,
     };
     setWorkspaces((prev) => [...prev, newWs]);
-    setActiveWorkspaceId(newWs.id);
+    setActiveWorkspaceId(tempId);
+
+    // Persist to real database
+    fetch('/api/workspaces', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, category, connectedPlatforms: platforms }),
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.workspace) {
+          setWorkspaces((prev) => prev.map((w) => (w.id === tempId ? d.workspace : w)));
+          setActiveWorkspaceId(d.workspace.id);
+        }
+      })
+      .catch((err) => console.error('Error saving workspace to DB:', err));
+
     return true;
   };
 
@@ -378,20 +429,47 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addPost = (postData: Omit<Post, 'id' | 'createdAt'>) => {
+    const tempId = `post-${Date.now()}`;
     const newPost: Post = {
       ...postData,
-      id: `post-${Date.now()}`,
+      id: tempId,
       createdAt: new Date().toISOString(),
     };
     setPosts((prev) => [newPost, ...prev]);
+
+    // Persist to real database
+    fetch('/api/posts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(postData),
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.post) {
+          setPosts((prev) => prev.map((p) => (p.id === tempId ? d.post : p)));
+        }
+      })
+      .catch((err) => console.error('Error saving post to DB:', err));
   };
 
   const updatePost = (id: string, updates: Partial<Post>) => {
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
+
+    // Persist to real database
+    fetch('/api/posts', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, ...updates }),
+    }).catch((err) => console.error('Error updating post in DB:', err));
   };
 
   const deletePost = (id: string) => {
     setPosts((prev) => prev.filter((p) => p.id !== id));
+
+    // Persist to real database
+    fetch(`/api/posts?id=${id}`, {
+      method: 'DELETE',
+    }).catch((err) => console.error('Error deleting post in DB:', err));
   };
 
   const addTicket = (
@@ -401,8 +479,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     message: string
   ): SupportTicket => {
     const randomCode = Math.floor(10000 + Math.random() * 90000);
+    const tempId = `ticket-${Date.now()}`;
     const newTicket: SupportTicket = {
-      id: `ticket-${Date.now()}`,
+      id: tempId,
       trackingCode: `TK-${randomCode}`,
       subject,
       department,
@@ -421,20 +500,42 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       ],
     };
     setTickets((prev) => [newTicket, ...prev]);
+
+    // Persist to real database
+    fetch('/api/tickets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        subject,
+        department,
+        priority,
+        message,
+        senderName: currentUser?.fullName,
+      }),
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.ticket) {
+          setTickets((prev) => prev.map((t) => (t.id === tempId ? d.ticket : t)));
+        }
+      })
+      .catch((err) => console.error('Error saving ticket to DB:', err));
+
     return newTicket;
   };
 
   const addTicketReply = (ticketId: string, message: string) => {
+    const newMsg: TicketMessage = {
+      id: `msg-${Date.now()}`,
+      sender: 'user',
+      senderName: currentUser?.fullName || 'کاربر گرامی',
+      message,
+      timestamp: 'هم‌اکنون',
+    };
+
     setTickets((prev) =>
       prev.map((t) => {
         if (t.id !== ticketId) return t;
-        const newMsg: TicketMessage = {
-          id: `msg-${Date.now()}`,
-          sender: 'user',
-          senderName: currentUser?.fullName || 'کاربر گرامی',
-          message,
-          timestamp: 'هم‌اکنون',
-        };
         return {
           ...t,
           status: 'open',
@@ -443,6 +544,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         };
       })
     );
+
+    // Persist reply to real database
+    fetch('/api/tickets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'reply',
+        ticketId,
+        message,
+        senderName: currentUser?.fullName,
+      }),
+    }).catch((err) => console.error('Error saving reply to DB:', err));
   };
 
   return (

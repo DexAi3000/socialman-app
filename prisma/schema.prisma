@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id          String         @id @default(cuid())
+  phone       String         @unique
+  fullName    String         @default("کاربر جدید")
+  role        String         @default("admin") // admin, creator, client
+  plan        String         @default("free") // free, pro, agency
+  avatarUrl   String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  workspaces  Workspace[]
+  posts       Post[]
+  tickets     Ticket[]
+}
+
+model OtpCode {
+  id        String   @id @default(cuid())
+  phone     String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Workspace {
+  id                 String    @id @default(cuid())
+  name               String
+  category           String    @default("عمومی")
+  connectedPlatforms String    @default("[\"telegram\",\"instagram\"]") // JSON string array
+  userId             String?
+  user               User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  posts              Post[]
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model Post {
+  id                  String     @id @default(cuid())
+  workspaceId         String
+  workspace           Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  title               String
+  hook                String?
+  content             String
+  cta                 String?
+  hashtags            String     @default("[]") // JSON string array
+  platform            String     @default("instagram") // instagram, telegram, bale, rubika, whatsapp
+  status              String     @default("draft") // draft, pending_approval, approved, published, rejected
+  scheduledDateShamsi String?
+  scheduledTime       String?
+  mediaUrl            String?
+  clientToken         String?
+  clientFeedback      String?
+  userId              String?
+  user                User?      @relation(fields: [userId], references: [id])
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+}
+
+model SocialAccount {
+  id          String   @id @default(cuid())
+  platform    String   @unique // telegram, rubika, bale, instagram, whatsapp
+  accountName String?
+  handle      String?
+  botToken    String?
+  chatId      String?
+  isConnected Boolean  @default(false)
+  connectedAt String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Ticket {
+  id              String          @id @default(cuid())
+  trackingCode    String          @unique
+  subject         String
+  department      String          @default("technical") // technical, billing, sales, ai
+  priority        String          @default("medium") // low, medium, high, urgent
+  status          String          @default("open") // open, in_progress, resolved, closed
+  createdAtShamsi String
+  userId          String?
+  user            User?           @relation(fields: [userId], references: [id])
+  messages        TicketMessage[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model TicketMessage {
+  id         String   @id @default(cuid())
+  ticketId   String
+  ticket     Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  sender     String   // user, support, bot
+  senderName String
+  message    String
+  timestamp  String
+  createdAt  DateTime @default(now())
+}
