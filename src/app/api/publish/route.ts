@@ -40,12 +40,36 @@ export async function POST(request: Request) {
       });
     }
 
-    // 2. Persist post records in SQLite for each platform
+    // 2. Resolve a guaranteed valid workspaceId to avoid Foreign Key errors
+    let targetWorkspaceId = workspaceId;
+    let validWorkspace = targetWorkspaceId
+      ? await prisma.workspace.findUnique({ where: { id: targetWorkspaceId } })
+      : null;
+
+    if (!validWorkspace) {
+      const firstWs = await prisma.workspace.findFirst();
+      if (firstWs) {
+        targetWorkspaceId = firstWs.id;
+      } else {
+        const firstUser = await prisma.user.findFirst();
+        const createdWs = await prisma.workspace.create({
+          data: {
+            name: 'فضای کاری اصلی',
+            category: 'عمومی',
+            connectedPlatforms: JSON.stringify(['telegram', 'instagram', 'whatsapp', 'bale', 'rubika']),
+            userId: firstUser?.id,
+          },
+        });
+        targetWorkspaceId = createdWs.id;
+      }
+    }
+
+    // 3. Persist post records in SQLite for each platform
     const createdPosts = await Promise.all(
       platforms.map(async (platform: string) => {
         return prisma.post.create({
           data: {
-            workspaceId: workspaceId || 'ws-1',
+            workspaceId: targetWorkspaceId,
             title: title || content.slice(0, 40) || 'پست جدید',
             hook: hook || null,
             content,
@@ -61,7 +85,7 @@ export async function POST(request: Request) {
       })
     );
 
-    // 3. Inspect publish results for errors
+    // 4. Inspect publish results for errors
     const failedPlatforms: string[] = [];
     if (isImmediate && publishResults) {
       for (const p of platforms) {
