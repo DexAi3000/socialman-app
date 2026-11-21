@@ -211,17 +211,12 @@ export default function LoginPage() {
         {/* Mascot & Mobile Titles */}
         <div className="flex flex-col items-center text-center space-y-2 pt-2">
           <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-md border border-gray-100 shadow-rose-900/10 shrink-0">
-            <img src="/app-icon.jpg" alt="سوشال‌من" className="w-full h-full object-cover" />
+            <img src="/app-icon.jpg" alt="Social Man" className="w-full h-full object-cover" />
           </div>
 
-          <div className="space-y-0.5">
-            <div className="flex items-center justify-center gap-1">
-              <span className="text-lg font-black text-gray-900">
-                سوشال‌من<span className="text-[#21aa58]">!</span>
-              </span>
-            </div>
-            <span className="text-[10px] font-bold text-[#21aa58] font-mono tracking-wider block">
-              SocialMan SuperApp
+          <div>
+            <span className="text-xl font-black text-gray-900 font-sans tracking-tight">
+              Social Man
             </span>
           </div>
 
@@ -239,7 +234,7 @@ export default function LoginPage() {
                   <span className="font-mono font-bold text-gray-800">{toPersianDigits(phone)}</span> را وارد کنید.
                 </span>
               )}
-              {step === 'success' && 'در حال هدایت به اپلیکیشن سوشال‌من...'}
+              {step === 'success' && 'در حال هدایت به اپلیکیشن Social Man...'}
             </p>
           </div>
         </div>

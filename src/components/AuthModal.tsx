@@ -213,11 +213,17 @@ export function AuthModal() {
         <div className="flex flex-col items-center text-center space-y-2 pt-1">
           {/* App Mascot Icon */}
           <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg border border-gray-100 shadow-rose-900/10 shrink-0">
-            <img src="/app-icon.jpg" alt="لوگوی سوشال‌من" className="w-full h-full object-cover" />
+            <img src="/app-icon.jpg" alt="Social Man" className="w-full h-full object-cover" />
           </div>
 
-          <h2 className="text-lg sm:text-xl font-black text-[#212121]">
-            {step === 'phone' ? 'ورود یا ثبت‌نام در سوشال من' : 'تایید شماره موبایل'}
+          <div>
+            <span className="text-xl font-black text-gray-900 font-sans tracking-tight">
+              Social Man
+            </span>
+          </div>
+
+          <h2 className="text-base font-black text-gray-900">
+            {step === 'phone' ? 'ورود یا ثبت‌نام' : 'تایید شماره موبایل'}
           </h2>
           <p className="text-xs text-gray-500 max-w-xs leading-relaxed">
             {step === 'phone'
