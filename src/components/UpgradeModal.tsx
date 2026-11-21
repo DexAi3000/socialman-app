@@ -37,8 +37,8 @@ export function UpgradeModal() {
     agency: { name: 'طلایی (آژانس و تیم)', price: '۵۸۰٬۰۰۰ تومان', priceNum: 580000, desc: 'برندهای نامحدود، هوش مصنوعی پیشرفته GPT-4o و اعضای تیم' },
   }[targetPlan];
 
-  const cardNumber = '6037997583214560';
-  const formattedCard = '۶۰۳۷ - ۹۹۷۵ - ۸۳۲۱ - ۴۵۶۰';
+  const cardNumber = '6104331068945139';
+  const formattedCard = '۶۱۰۴ - ۳۳۱۰ - ۶۸۹۴ - ۵۱۳۹';
   const cardHolder = 'نیما آرین‌فر';
 
   const handleCopyCard = () => {
@@ -97,7 +97,7 @@ export function UpgradeModal() {
               <CreditCard className="w-5 h-5 text-sky-400" />
               <span className="text-xs font-bold text-gray-300">کارت بانکی شتاب</span>
             </div>
-            <span className="text-[11px] font-mono text-gray-400">بانک ملی ایران</span>
+            <span className="text-[11px] font-mono text-gray-400">بانک ملت</span>
           </div>
 
           <div className="py-1 text-center">
@@ -123,10 +123,11 @@ export function UpgradeModal() {
         <div className="space-y-2 text-right">
           <span className="text-xs font-black text-gray-800 block">مراحل فعال‌سازی خودکار:</span>
           <div className="text-[11px] text-gray-600 space-y-1.5 leading-relaxed bg-sky-50/70 p-3.5 rounded-2xl border border-sky-100">
-            <p>۱. مبلغ <strong>{planInfo.price}</strong> را به شماره کارت بالا واریز کنید.</p>
-            <p>۲. روی دکمه زیر کلیک کنید تا وارد ربات تلگرام <strong>Nana AI</strong> شوید.</p>
-            <p>۳. گزینه <strong>«ارسال رسید اشتراک»</strong> را بزنید و عکس رسید را بفرستید.</p>
-            <p>۴. ادمین با زدن دکمه تایید، اشتراک شما را در کمتر از چند دقیقه به صورت <strong>اتوماتیک</strong> فعال می‌کند.</p>
+            <p>۱. مبلغ <strong>{planInfo.price}</strong> به شماره کارت بالا به نام نیما آرین فر واریز کنید.</p>
+            <p>۲. بعد از طریق دکمه آبی رنگ ارسال رسید وارد روبات شوید.</p>
+            <p>۳. روی گزینه اشتراکتون بزنید.</p>
+            <p>۴. نام کاربری یا شماره تلفن ثبت نامی خودتون رو ارسال کنید.</p>
+            <p>۵. سپس رسید خودتون رو ارسال کنید و بعد از چند دقیقه اشتراک برای شما فعال میشه.</p>
           </div>
         </div>
 
@@ -139,7 +140,7 @@ export function UpgradeModal() {
             className="w-full py-3.5 rounded-2xl text-xs sm:text-sm font-black bg-[#3b96cc] hover:bg-[#2c7ead] text-white shadow-md shadow-[#3b96cc]/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
           >
             <MessageCircle className="w-4 h-4" />
-            <span>ارسال رسید در ربات تلگرام (فعال‌سازی آنی)</span>
+            <span>ارسال رسید</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
 
