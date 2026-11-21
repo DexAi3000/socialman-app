@@ -22,7 +22,8 @@ git reset --hard origin/master
 
 # 3. Install dependencies and push Prisma schema
 npm install --production=false
-npx prisma db push
+npx prisma db push --accept-data-loss
+npx prisma generate
 
 # 4. Seed database if empty
 if [ ! -f "prisma/dev.db" ] || [ $(sqlite3 prisma/dev.db "SELECT count(*) FROM Post;" 2>/dev/null || echo 0) -eq 0 ]; then

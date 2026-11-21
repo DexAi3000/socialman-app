@@ -10,6 +10,8 @@ datasource db {
 model User {
   id          String         @id @default(cuid())
   phone       String         @unique
+  username    String?        @unique
+  password    String?
   fullName    String         @default("کاربر جدید")
   role        String         @default("admin") // admin, creator, client
   plan        String         @default("free") // free, pro, agency

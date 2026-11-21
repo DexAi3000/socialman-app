@@ -34,6 +34,7 @@ export interface UserProfile {
   id: string;
   fullName: string;
   phone: string;
+  username?: string;
   role: string;
   isLoggedIn: boolean;
   verifiedVia?: string;

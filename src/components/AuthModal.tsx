@@ -7,11 +7,15 @@ import { useApp } from '@/context/AppContext';
 import {
   X,
   Smartphone,
-  ArrowRight,
   CheckCircle2,
   Clock,
   RotateCcw,
-  Sparkles,
+  User,
+  Lock,
+  Eye,
+  EyeOff,
+  AtSign,
+  ShieldCheck,
   ExternalLink,
 } from 'lucide-react';
 import { toPersianDigits } from '@/lib/utils';
@@ -20,14 +24,33 @@ export function AuthModal() {
   const router = useRouter();
   const { isAuthModalOpen, closeAuthModal, loginUser } = useApp();
 
-  const [step, setStep] = useState<'phone' | 'otp' | 'success'>('phone');
-  const [phone, setPhone] = useState('');
+  // Mode states
+  const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+  const [loginMethod, setLoginMethod] = useState<'password' | 'otp'>('password');
+  const [step, setStep] = useState<'form' | 'otp' | 'success'>('form');
+
+  // Login fields
+  const [loginIdentifier, setLoginIdentifier] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+
+  // Register fields
+  const [regFullName, setRegFullName] = useState('');
+  const [regUsername, setRegUsername] = useState('');
+  const [regPhone, setRegPhone] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+  const [regConfirmPassword, setRegConfirmPassword] = useState('');
+  const [showRegPassword, setShowRegPassword] = useState(false);
+
+  // OTP fields
+  const [otpPhone, setOtpPhone] = useState('');
   const [otpValues, setOtpValues] = useState(['', '', '', '', '']);
-  const [fullName, setFullName] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
   const [testOtpHint, setTestOtpHint] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(120);
+
+  // Common UI states
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -44,12 +67,19 @@ export function AuthModal() {
 
   if (!isAuthModalOpen) return null;
 
-  const handleSendOtp = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  // 1. Login with Password
+  const handleLoginWithPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
     setErrorMsg('');
 
-    if (!phone || !/^09[0-9]{9}$/.test(phone)) {
-      setErrorMsg('لطفاً شماره موبایل ۱۱ رقمی معتبر وارد کنید (مثال: ۰۹۱۲۳۴۵۶۷۸۹)');
+    const cleanIdentifier = loginIdentifier.trim();
+    if (!cleanIdentifier) {
+      setErrorMsg('لطفاً نام کاربری یا شماره موبایل خود را وارد کنید.');
+      return;
+    }
+
+    if (!loginPassword) {
+      setErrorMsg('لطفاً رمز عبور خود را وارد کنید.');
       return;
     }
 
@@ -58,12 +88,131 @@ export function AuthModal() {
       const res = await fetch('/socialman/api/auth/otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'send-otp', phone }),
+        body: JSON.stringify({
+          action: 'login-password',
+          identifier: cleanIdentifier,
+          password: loginPassword,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.user) {
+        loginUser({
+          id: data.user.id,
+          fullName: data.user.fullName,
+          phone: data.user.phone,
+          username: data.user.username,
+          role: data.user.role,
+          verifiedVia: 'Password',
+        });
+        closeAuthModal();
+      } else {
+        setErrorMsg(data.error || 'اطلاعات ورود اشتباه است.');
+      }
+    } catch (err) {
+      setErrorMsg('خطای شبکه در ارتباط با سرور.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 2. Register
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg('');
+
+    if (!regFullName.trim() || regFullName.trim().length < 2) {
+      setErrorMsg('لطفاً نام و نام خانوادگی خود را کامل وارد کنید.');
+      return;
+    }
+
+    const cleanUsername = regUsername.trim().toLowerCase();
+    if (!cleanUsername || !/^[a-zA-Z0-9_]{3,30}$/.test(cleanUsername)) {
+      setErrorMsg('نام کاربری باید شامل حروف انگلیسی و حداقل ۳ کاراکتر باشد.');
+      return;
+    }
+
+    let cleanPhone = regPhone.trim().replace(/[^0-9]/g, '');
+    if (cleanPhone.length === 10 && cleanPhone.startsWith('9')) {
+      cleanPhone = '0' + cleanPhone;
+    }
+    if (!cleanPhone || !/^09[0-9]{9}$/.test(cleanPhone)) {
+      setErrorMsg('شماره موبایل ۱۱ رقمی معتبر وارد کنید (مثال: ۰۹۱۲۳۴۵۶۷۸۹).');
+      return;
+    }
+
+    if (!regPassword || regPassword.length < 6) {
+      setErrorMsg('رمز عبور باید حداقل ۶ کاراکتر باشد.');
+      return;
+    }
+
+    if (regPassword !== regConfirmPassword) {
+      setErrorMsg('تکرار رمز عبور با رمز عبور اصلی مطابقت ندارد.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch('/socialman/api/auth/otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'register',
+          fullName: regFullName.trim(),
+          username: cleanUsername,
+          phone: cleanPhone,
+          password: regPassword,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.user) {
+        loginUser({
+          id: data.user.id,
+          fullName: data.user.fullName,
+          phone: data.user.phone,
+          username: data.user.username,
+          role: data.user.role,
+          verifiedVia: 'Register',
+        });
+        closeAuthModal();
+      } else {
+        setErrorMsg(data.error || 'خطایی در ثبت‌نام رخ داد.');
+      }
+    } catch (err) {
+      setErrorMsg('خطای شبکه در ارتباط با سرور.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 3. Send OTP
+  const handleSendOtp = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setErrorMsg('');
+
+    let cleanPhone = otpPhone.trim().replace(/[^0-9]/g, '');
+    if (cleanPhone.length === 10 && cleanPhone.startsWith('9')) {
+      cleanPhone = '0' + cleanPhone;
+    }
+
+    if (!cleanPhone || !/^09[0-9]{9}$/.test(cleanPhone)) {
+      setErrorMsg('شماره موبایل ۱۱ رقمی معتبر وارد کنید (مثال: ۰۹۱۲۳۴۵۶۷۸۹)');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch('/socialman/api/auth/otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'send-otp', phone: cleanPhone }),
       });
 
       const data = await res.json();
       if (res.ok) {
         setTestOtpHint(data.testCode || '12345');
+        setOtpPhone(cleanPhone);
         setStep('otp');
         setCountdown(120);
         setTimeout(() => {
@@ -74,6 +223,50 @@ export function AuthModal() {
       }
     } catch (err) {
       setErrorMsg('خطای شبکه در ارتباط با سرور احراز هویت');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 4. Verify OTP
+  const handleVerifyOtp = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setErrorMsg('');
+
+    const fullCode = otpValues.join('');
+    if (fullCode.length < 5) {
+      setErrorMsg('کد تایید ۵ رقمی را به طور کامل وارد کنید.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch('/socialman/api/auth/otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'verify-otp',
+          phone: otpPhone,
+          code: fullCode,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.user) {
+        loginUser({
+          id: data.user.id,
+          fullName: data.user.fullName,
+          phone: data.user.phone,
+          username: data.user.username,
+          role: data.user.role,
+          verifiedVia: 'SMS.ir',
+        });
+        closeAuthModal();
+      } else {
+        setErrorMsg(data.error || 'کد تایید اشتباه است یا منقضی شده است.');
+      }
+    } catch (err) {
+      setErrorMsg('خطایی در بررسی کد تایید رخ داد.');
     } finally {
       setLoading(false);
     }
@@ -115,56 +308,6 @@ export function AuthModal() {
     }
   };
 
-  const handleFillTestCode = () => {
-    const code = testOtpHint || '12345';
-    const digits = code.split('').slice(0, 5);
-    setOtpValues(digits);
-    otpInputRefs.current[4]?.focus();
-  };
-
-  const handleVerifyOtp = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    setErrorMsg('');
-
-    const fullCode = otpValues.join('');
-    if (fullCode.length < 5) {
-      setErrorMsg('لطفاً کد تایید ۵ رقمی را به طور کامل وارد کنید.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const res = await fetch('/socialman/api/auth/otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'verify-otp',
-          phone,
-          code: fullCode,
-          fullName,
-        }),
-      });
-
-      const data = await res.json();
-      if (res.ok && data.user) {
-        loginUser({
-          id: data.user.id,
-          fullName: data.user.fullName,
-          phone: data.user.phone,
-          role: data.user.role,
-          verifiedVia: 'SMS.ir',
-        });
-        closeAuthModal();
-      } else {
-        setErrorMsg(data.error || 'کد تایید اشتباه است.');
-      }
-    } catch (err) {
-      setErrorMsg('خطایی در بررسی کد تایید رخ داد.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const formatTimer = (sec: number) => {
     const mins = Math.floor(sec / 60);
     const secs = sec % 60;
@@ -173,13 +316,14 @@ export function AuthModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 select-none animate-in fade-in duration-200">
-      <div className="relative bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-2xl border border-gray-100 space-y-5 animate-in zoom-in-95 duration-200">
-        {/* Top Controls: Close & Fullscreen Page Link */}
-        <div className="flex items-center justify-between">
+      <div className="relative bg-white rounded-3xl p-5 sm:p-6 w-full max-w-sm shadow-2xl border border-gray-100 space-y-4 animate-in zoom-in-95 duration-200 max-h-[95vh] overflow-y-auto">
+        
+        {/* Top Controls */}
+        <div className="flex items-center justify-between pb-1 border-b border-gray-100">
           <button
             onClick={closeAuthModal}
-            className="p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
-            title="بستن پنجره"
+            className="p-1.5 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+            title="بستن"
           >
             <X className="w-5 h-5" />
           </button>
@@ -188,143 +332,374 @@ export function AuthModal() {
             href="/login"
             onClick={closeAuthModal}
             className="flex items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-[#3b96cc] transition-colors"
-            title="باز کردن در صفحه تمام‌صفحه"
           >
-            <span>صفحه کامل</span>
+            <span>صفحه ورود</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        {/* Brand App Mascot */}
-        <div className="flex flex-col items-center text-center space-y-2 pt-1">
-          {/* App Mascot Icon */}
-          <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg border border-gray-100 shadow-rose-900/10 shrink-0">
+        {/* Mascot */}
+        <div className="flex flex-col items-center text-center space-y-1.5">
+          <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-md border border-gray-100 shrink-0">
             <img src="/socialman/app-icon.jpg" alt="Social Man" className="w-full h-full object-cover" />
           </div>
-
-          <div>
-            <span className="text-xl font-black text-gray-900 font-sans tracking-tight">
-              Social Man
-            </span>
-          </div>
-
-          <h2 className="text-base font-black text-gray-900">
-            {step === 'phone' ? 'ورود یا ثبت‌نام' : 'تایید شماره موبایل'}
-          </h2>
-          <p className="text-xs text-gray-500 max-w-xs leading-relaxed">
-            {step === 'phone'
-              ? 'شماره موبایل خود را وارد کنید تا کد تایید یکبار مصرف ارسال شود.'
-              : `کد تایید ۵ رقمی پیامک شده به شماره ${toPersianDigits(phone)} را وارد کنید.`}
-          </p>
+          <span className="text-base font-black text-gray-900 tracking-tight">Social Man</span>
         </div>
 
         {/* Error Alert */}
         {errorMsg && (
-          <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2 animate-in fade-in">
+          <div className="p-2.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2">
             <span>⚠️</span>
-            <span>{errorMsg}</span>
+            <span className="leading-relaxed">{errorMsg}</span>
           </div>
         )}
 
-        {/* Step 1: Phone Input Form */}
-        {step === 'phone' && (
-          <form onSubmit={handleSendOtp} className="space-y-4">
-            <div>
-              <label className="block text-xs font-black text-gray-700 mb-1.5 text-right">
-                شماره تلفن همراه:
-              </label>
-              <div className="relative">
-                <input
-                  type="tel"
-                  dir="ltr"
-                  required
-                  placeholder="09123456789"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
-                  className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-4 focus:ring-sky-500/10 rounded-2xl px-4 py-3.5 text-center font-mono font-black text-base text-gray-800 outline-none tracking-widest transition-all"
-                />
-                <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1 pl-2 border-l border-gray-200 text-gray-500 text-xs font-mono font-bold">
-                  <span>🇮🇷</span>
-                  <span>+۹۸</span>
-                </div>
-                <Smartphone className="w-5 h-5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3.5 rounded-2xl font-black text-xs sm:text-sm bg-[#3b96cc] hover:bg-[#2c7ead] text-white shadow-md shadow-[#3b96cc]/25 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
-            >
-              {loading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>در حال ارسال پیامک...</span>
-                </>
-              ) : (
-                <>
-                  <span>دریافت کد تایید پیامکی</span>
-                  <ArrowRight className="w-4 h-4 mr-1" />
-                </>
-              )}
-            </button>
-          </form>
-        )}
-
-        {/* Step 2: 5-Digit Pin OTP Verification Form */}
-        {step === 'otp' && (
-          <form onSubmit={handleVerifyOtp} className="space-y-4">
-            <div>
-              <label className="block text-xs font-black text-gray-700 mb-2 text-center">
-                کد تایید ۵ رقمی:
-              </label>
-              <div className="flex items-center justify-center gap-2" dir="ltr">
-                {otpValues.map((val, idx) => (
-                  <input
-                    key={idx}
-                    ref={(el) => {
-                      otpInputRefs.current[idx] = el;
-                    }}
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={1}
-                    value={val}
-                    onChange={(e) => handleOtpChange(idx, e.target.value)}
-                    onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                    className={`w-11 h-13 text-center text-xl font-mono font-black rounded-2xl border transition-all outline-none ${
-                      val
-                        ? 'border-[#3b96cc] bg-white text-[#3b96cc] shadow-xs'
-                        : 'border-gray-200 bg-gray-50 focus:bg-white focus:border-[#3b96cc] focus:ring-4 focus:ring-sky-500/10'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Timer & Edit Number */}
-            <div className="flex items-center justify-between text-xs text-gray-500 pt-1">
+        {/* Step: FORM */}
+        {step === 'form' && (
+          <div className="space-y-3.5">
+            {/* Tabs */}
+            <div className="flex items-center bg-gray-100 p-1 rounded-2xl w-full">
               <button
                 type="button"
-                onClick={() => setStep('phone')}
-                className="text-gray-500 hover:text-gray-800 font-bold hover:underline cursor-pointer"
+                onClick={() => {
+                  setActiveTab('login');
+                  setErrorMsg('');
+                }}
+                className={`flex-1 py-1.5 rounded-xl font-black text-xs transition-all cursor-pointer ${
+                  activeTab === 'login'
+                    ? 'bg-white text-[#3b96cc] shadow-xs'
+                    : 'text-gray-500 hover:text-gray-900'
+                }`}
               >
-                ویرایش شماره موبایل
+                ورود به حساب
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('register');
+                  setErrorMsg('');
+                }}
+                className={`flex-1 py-1.5 rounded-xl font-black text-xs transition-all cursor-pointer ${
+                  activeTab === 'register'
+                    ? 'bg-white text-[#3b96cc] shadow-xs'
+                    : 'text-gray-500 hover:text-gray-900'
+                }`}
+              >
+                ثبت‌نام جدید
+              </button>
+            </div>
+
+            {/* TAB: LOGIN */}
+            {activeTab === 'login' && (
+              <div>
+                {loginMethod === 'password' ? (
+                  <form onSubmit={handleLoginWithPassword} className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-black text-gray-700 mb-1 text-right">
+                        نام کاربری یا شماره موبایل:
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          required
+                          dir="ltr"
+                          placeholder="nima_dev یا 09123456789"
+                          value={loginIdentifier}
+                          onChange={(e) => setLoginIdentifier(e.target.value)}
+                          className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-3 focus:ring-sky-500/10 rounded-2xl px-3 py-2 text-left font-mono font-bold text-xs text-gray-900 outline-none transition-all placeholder:text-right placeholder:font-sans placeholder:text-gray-400"
+                        />
+                        <AtSign className="w-3.5 h-3.5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-gray-700 mb-1 text-right">
+                        رمز عبور:
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showLoginPassword ? 'text' : 'password'}
+                          required
+                          dir="ltr"
+                          placeholder="••••••••"
+                          value={loginPassword}
+                          onChange={(e) => setLoginPassword(e.target.value)}
+                          className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] focus:ring-3 focus:ring-sky-500/10 rounded-2xl px-3 py-2 text-left font-mono font-bold text-xs text-gray-900 outline-none transition-all"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowLoginPassword(!showLoginPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                        >
+                          {showLoginPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full py-2.5 rounded-2xl font-black text-xs bg-[#3b96cc] hover:bg-[#2c7ead] text-white shadow-md shadow-[#3b96cc]/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+                    >
+                      {loading ? (
+                        <>
+                          <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span>در حال بررسی...</span>
+                        </>
+                      ) : (
+                        <span>ورود به حساب</span>
+                      )}
+                    </button>
+
+                    <div className="pt-1 text-center">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLoginMethod('otp');
+                          setErrorMsg('');
+                        }}
+                        className="text-[11px] font-bold text-[#3b96cc] hover:underline cursor-pointer"
+                      >
+                        ورود سریع با پیامک (OTP) ←
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <form onSubmit={handleSendOtp} className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-black text-gray-700 mb-1 text-right">
+                        شماره تلفن همراه:
+                      </label>
+                      <div className="w-full" dir="ltr">
+                        <div className="flex items-center bg-gray-50 border border-gray-200 focus-within:border-[#3b96cc] focus-within:bg-white focus-within:ring-3 focus-within:ring-sky-500/10 rounded-2xl px-3 py-0.5 transition-all overflow-hidden">
+                          <div className="flex items-center gap-1.5 pr-2.5 pl-1 py-1.5 border-r border-gray-200 text-gray-600 shrink-0 select-none">
+                            <span className="text-sm">🇮🇷</span>
+                            <span className="font-mono font-bold text-xs">+98</span>
+                          </div>
+                          <input
+                            type="tel"
+                            dir="ltr"
+                            required
+                            placeholder="9123456789"
+                            value={otpPhone}
+                            onChange={(e) => setOtpPhone(e.target.value.replace(/[^0-9]/g, ''))}
+                            className="w-full bg-transparent px-3 py-2 text-left font-mono font-black text-xs sm:text-sm text-gray-900 outline-none tracking-wider placeholder:text-gray-400 placeholder:font-normal placeholder:tracking-normal"
+                          />
+                          <Smartphone className="w-4 h-4 text-gray-400 shrink-0 mr-1" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full py-2.5 rounded-2xl font-black text-xs bg-[#3b96cc] hover:bg-[#2c7ead] text-white shadow-md shadow-[#3b96cc]/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+                    >
+                      {loading ? (
+                        <>
+                          <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span>در حال ارسال پیامک...</span>
+                        </>
+                      ) : (
+                        <span>دریافت کد تایید پیامکی</span>
+                      )}
+                    </button>
+
+                    <div className="pt-1 text-center">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLoginMethod('password');
+                          setErrorMsg('');
+                        }}
+                        className="text-[11px] font-bold text-gray-600 hover:text-[#3b96cc] hover:underline cursor-pointer"
+                      >
+                        ورود با رمز عبور →
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            )}
+
+            {/* TAB: REGISTER */}
+            {activeTab === 'register' && (
+              <form onSubmit={handleRegister} className="space-y-2.5">
+                <div>
+                  <label className="block text-[11px] font-black text-gray-700 mb-0.5 text-right">
+                    نام و نام خانوادگی:
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="مثال: نیما آرین‌فر"
+                    value={regFullName}
+                    onChange={(e) => setRegFullName(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl px-3 py-2 text-right font-bold text-xs text-gray-900 outline-none transition-all placeholder:text-gray-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-black text-gray-700 mb-0.5 text-right">
+                    نام کاربری (انگلیسی):
+                  </label>
+                  <input
+                    type="text"
+                    dir="ltr"
+                    required
+                    placeholder="nima_dev"
+                    value={regUsername}
+                    onChange={(e) => setRegUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                    className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl px-3 py-2 text-left font-mono font-bold text-xs text-gray-900 outline-none transition-all placeholder:text-gray-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-black text-gray-700 mb-0.5 text-right">
+                    شماره موبایل:
+                  </label>
+                  <div className="w-full" dir="ltr">
+                    <div className="flex items-center bg-gray-50 border border-gray-200 focus-within:border-[#3b96cc] focus-within:bg-white rounded-2xl px-2.5 py-0.5 transition-all overflow-hidden">
+                      <div className="flex items-center gap-1 pr-2 pl-1 py-1 border-r border-gray-200 text-gray-600 shrink-0 select-none">
+                        <span className="text-xs">🇮🇷</span>
+                        <span className="font-mono font-bold text-[11px]">+98</span>
+                      </div>
+                      <input
+                        type="tel"
+                        dir="ltr"
+                        required
+                        placeholder="9123456789"
+                        value={regPhone}
+                        onChange={(e) => setRegPhone(e.target.value.replace(/[^0-9]/g, ''))}
+                        className="w-full bg-transparent px-2.5 py-1.5 text-left font-mono font-black text-xs text-gray-900 outline-none tracking-wider placeholder:text-gray-400 placeholder:font-normal placeholder:tracking-normal"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[11px] font-black text-gray-700 mb-0.5 text-right">
+                      رمز عبور:
+                    </label>
+                    <input
+                      type={showRegPassword ? 'text' : 'password'}
+                      required
+                      dir="ltr"
+                      placeholder="حداقل ۶ نویسه"
+                      value={regPassword}
+                      onChange={(e) => setRegPassword(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl px-2.5 py-1.5 text-left font-mono font-bold text-[11px] text-gray-900 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-black text-gray-700 mb-0.5 text-right">
+                      تکرار رمز:
+                    </label>
+                    <input
+                      type={showRegPassword ? 'text' : 'password'}
+                      required
+                      dir="ltr"
+                      placeholder="تکرار"
+                      value={regConfirmPassword}
+                      onChange={(e) => setRegConfirmPassword(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl px-2.5 py-1.5 text-left font-mono font-bold text-[11px] text-gray-900 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-2.5 rounded-2xl font-black text-xs bg-[#3b96cc] hover:bg-[#2c7ead] text-white shadow-md shadow-[#3b96cc]/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer mt-1"
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>در حال ساخت حساب...</span>
+                    </>
+                  ) : (
+                    <span>ثبت‌نام و ورود</span>
+                  )}
+                </button>
+              </form>
+            )}
+          </div>
+        )}
+
+        {/* Step: OTP */}
+        {step === 'otp' && (
+          <form onSubmit={handleVerifyOtp} className="space-y-3.5 py-1">
+            <div className="text-center space-y-1">
+              <h3 className="text-xs font-black text-gray-900">تایید شماره تلفن همراه</h3>
+              <p className="text-[11px] text-gray-500">
+                کد ۵ رقمی پیامک‌شده به <span className="font-mono font-bold text-gray-800" dir="ltr">{otpPhone}</span>
+              </p>
+            </div>
+
+            <div className="flex items-center justify-center gap-2" dir="ltr">
+              {otpValues.map((val, idx) => (
+                <input
+                  key={idx}
+                  ref={(el) => {
+                    otpInputRefs.current[idx] = el;
+                  }}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
+                  value={val}
+                  onChange={(e) => handleOtpChange(idx, e.target.value)}
+                  onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+                  className={`w-10 h-12 text-center text-lg font-mono font-black rounded-2xl border transition-all outline-none ${
+                    val
+                      ? 'border-[#3b96cc] bg-white text-[#3b96cc]'
+                      : 'border-gray-200 bg-gray-50 focus:bg-white focus:border-[#3b96cc]'
+                  }`}
+                />
+              ))}
+            </div>
+
+            {testOtpHint && (
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const digits = (testOtpHint || '12345').split('').slice(0, 5);
+                    setOtpValues(digits);
+                    otpInputRefs.current[4]?.focus();
+                  }}
+                  className="inline-flex items-center gap-1 text-[10px] font-bold text-sky-700 bg-sky-50 px-2.5 py-1 rounded-xl border border-sky-200 cursor-pointer"
+                >
+                  <ShieldCheck className="w-3 h-3" />
+                  <span>کد تست تایید: {testOtpHint}</span>
+                </button>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between text-[11px] text-gray-500 pt-0.5">
+              <button
+                type="button"
+                onClick={() => setStep('form')}
+                className="text-gray-500 hover:text-[#3b96cc] font-bold hover:underline cursor-pointer"
+              >
+                ویرایش شماره
               </button>
 
-              <div className="flex items-center gap-1 font-mono">
+              <div className="flex items-center gap-1 font-mono text-[11px]">
                 {countdown > 0 ? (
                   <>
-                    <Clock className="w-3.5 h-3.5 text-gray-400" />
+                    <Clock className="w-3 h-3 text-gray-400" />
                     <span>{formatTimer(countdown)}</span>
                   </>
                 ) : (
                   <button
                     type="button"
                     onClick={() => handleSendOtp()}
-                    className="text-[#3b96cc] font-bold flex items-center gap-1 hover:underline cursor-pointer"
+                    className="text-[#3b96cc] font-black flex items-center gap-1 hover:underline cursor-pointer"
                   >
                     <RotateCcw className="w-3 h-3" />
-                    ارسال مجدد پیامک
+                    ارسال مجدد
                   </button>
                 )}
               </div>
@@ -333,22 +708,20 @@ export function AuthModal() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-2xl font-black text-xs sm:text-sm bg-[#3b96cc] hover:bg-[#2c7ead] text-white shadow-md shadow-[#3b96cc]/25 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="w-full py-2.5 rounded-2xl font-black text-xs bg-[#3b96cc] hover:bg-[#2c7ead] text-white shadow-md shadow-[#3b96cc]/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>در حال بررسی کد...</span>
+                  <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>در حال بررسی...</span>
                 </>
               ) : (
-                <>
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>تایید و ورود به برنامه</span>
-                </>
+                <span>تایید و ورود</span>
               )}
             </button>
           </form>
         )}
+
       </div>
     </div>
   );

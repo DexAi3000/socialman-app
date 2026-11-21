@@ -28,6 +28,7 @@ export async function GET() {
         id: user.id,
         fullName: user.fullName,
         phone: user.phone,
+        username: user.username,
         role: user.role,
         plan: user.plan || 'free',
         avatarUrl: user.avatarUrl,
