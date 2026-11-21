@@ -25,7 +25,7 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-    private static final String APP_URL = "http://nimaariyanfar.com/socialman";
+    private static final String APP_URL = "http://194.117.64.88/socialman";
     private static final int FILE_CHOOSER_REQUEST_CODE = 1001;
 
     private WebView mWebView;
