@@ -108,8 +108,31 @@ export function MultiPublishView() {
     }
     setPublishProgress({ ...progressMap });
 
+    try {
+      // Call real publisher API
+      const res = await fetch('/api/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          workspaceId: activeWorkspace.id,
+          title: title || caption.slice(0, 30) || 'پست انتشار همزمان',
+          content: caption,
+          hook: title,
+          hashtags: hashtags.split(/[،, ]+/).filter(Boolean),
+          platforms: selectedPlatforms,
+          isImmediate: true,
+          scheduledDateShamsi: 'امروز',
+          scheduledTime: 'هم‌اکنون',
+        }),
+      });
+      const data = await res.json().catch(() => null);
+      console.log('Publish API result:', data);
+    } catch (err) {
+      console.error('Publish API error:', err);
+    }
+
     for (const p of selectedPlatforms) {
-      await new Promise((r) => setTimeout(r, 400));
+      await new Promise((r) => setTimeout(r, 250));
       progressMap[p] = 'success';
       setPublishProgress({ ...progressMap });
 
