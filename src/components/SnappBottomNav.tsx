@@ -4,9 +4,7 @@ import React from 'react';
 import {
   Home,
   Calendar,
-  Send,
   Users,
-  Crown,
   Share2,
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
@@ -23,7 +21,7 @@ export function SnappBottomNav({ activeTab, setActiveTab }: SnappBottomNavProps)
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-t border-gray-100 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] px-3 py-2 pb-safe">
-      <div className="max-w-md mx-auto flex items-center justify-between relative">
+      <div className="max-w-md mx-auto grid grid-cols-4 items-center">
         {/* Tab 1: Dashboard / Home */}
         <button
           onClick={() => setActiveTab('dashboard')}
@@ -52,20 +50,7 @@ export function SnappBottomNav({ activeTab, setActiveTab }: SnappBottomNavProps)
           )}
         </button>
 
-        {/* Center: Snapp-Style Elevated Floating Action Button (Publish Post) */}
-        <div className="flex-1 flex justify-center -mt-6">
-          <button
-            onClick={() => setActiveTab('publish')}
-            className={`w-14 h-14 rounded-full flex flex-col items-center justify-center transition-all shadow-xl active:scale-90 border-4 border-white ${
-              activeTab === 'publish'
-                ? 'bg-[#3b96cc] text-white shadow-[#3b96cc]/40 scale-105 ring-2 ring-[#3b96cc]/20'
-                : 'bg-gradient-to-tr from-[#3b96cc] to-sky-400 text-white shadow-[#3b96cc]/35 hover:scale-105'
-            }`}
-          >
-            <Send className="w-6 h-6 fill-white rotate-45 -mr-0.5" />
-            <span className="text-[9px] font-black -mt-0.5 tracking-tight">انتشار پست</span>
-          </button>
-        </div>
+
 
         {/* Tab 4: Calendar */}
         <button
