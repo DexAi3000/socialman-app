@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import {
   Smartphone,
-  ArrowRight,
   CheckCircle2,
   Clock,
   RotateCcw,
@@ -68,28 +67,6 @@ export default function LoginPage() {
     }
     return () => clearInterval(timer);
   }, [step, countdown]);
-
-  // Smart Back Button Handler
-  const handleBack = () => {
-    setErrorMsg('');
-    if (step === 'otp') {
-      setStep('form');
-      return;
-    }
-    if (loginMethod === 'otp') {
-      setLoginMethod('password');
-      return;
-    }
-    if (activeTab === 'register') {
-      setActiveTab('login');
-      return;
-    }
-    if (typeof window !== 'undefined' && window.history.length > 1) {
-      router.back();
-    } else {
-      router.push('/');
-    }
-  };
 
   // 1. Handle Login with Password (Username or Phone)
   const handleLoginWithPassword = async (e: React.FormEvent) => {
@@ -406,19 +383,6 @@ export default function LoginPage() {
       {/* Mobile Frame Container */}
       <div className="w-full max-w-[420px] bg-white min-h-screen sm:min-h-[640px] sm:rounded-[32px] sm:shadow-xl sm:border sm:border-gray-100 flex flex-col justify-between p-5 sm:p-6 relative">
         
-        {/* Top Header: Smart Back Button */}
-        <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-          <button
-            type="button"
-            onClick={handleBack}
-            className="flex items-center gap-1.5 text-xs font-black text-gray-600 hover:text-[#3b96cc] transition-colors p-1.5 rounded-xl hover:bg-gray-50 cursor-pointer active:scale-95"
-          >
-            <ArrowRight className="w-4 h-4 text-gray-700" />
-            <span>بازگشت</span>
-          </button>
-          <span className="text-[11px] font-bold text-gray-400">Social Man</span>
-        </div>
-
         {/* Mascot & Brand Header */}
         <div className="flex flex-col items-center text-center space-y-2 pt-2">
           <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-md border border-gray-100 shrink-0">
