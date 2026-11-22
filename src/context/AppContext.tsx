@@ -50,7 +50,8 @@ interface AppContextType {
     platform: SocialPlatform,
     handle?: string,
     name?: string,
-    forceState?: boolean
+    forceState?: boolean,
+    botToken?: string
   ) => void;
   isUpgradeModalOpen: boolean;
   selectedPlanForUpgrade: PlanType | null;
@@ -410,7 +411,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     platform: SocialPlatform,
     handle?: string,
     name?: string,
-    forceState?: boolean
+    forceState?: boolean,
+    botToken?: string
   ) => {
     setConnectedAccounts((prev) => {
       const current = prev[platform];
@@ -429,6 +431,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           handle: nextState ? (cleanHandle || current.handle) : '',
           accountName: nextState ? (name || current.accountName) : current.accountName,
           connectedAt: nextState ? current.connectedAt || 'امروز' : undefined,
+          botToken: nextState ? (botToken || current.botToken) : undefined,
         },
       };
 

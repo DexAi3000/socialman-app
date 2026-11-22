@@ -51,6 +51,7 @@ export function ConnectAccountsModal() {
 
   const [copiedBot, setCopiedBot] = useState(false);
   const [channelInput, setChannelInput] = useState('');
+  const [baleTokenInput, setBaleTokenInput] = useState('');
   const [testingConnection, setTestingConnection] = useState(false);
   const [testSuccess, setTestSuccess] = useState(false);
   const [testMessage, setTestMessage] = useState('');
@@ -65,12 +66,15 @@ export function ConnectAccountsModal() {
 
   const currentAccount = connectedAccounts[activeTab];
 
-  // Pre-fill channel input with existing handle
+  // Pre-fill channel input with existing handle and bot token
   React.useEffect(() => {
     if (currentAccount?.handle && currentAccount.handle !== '@SocialManPublishBot') {
       setChannelInput(currentAccount.handle);
     }
-  }, [activeTab, currentAccount?.handle]);
+    if (activeTab === 'bale' && currentAccount?.botToken) {
+      setBaleTokenInput(currentAccount.botToken);
+    }
+  }, [activeTab, currentAccount?.handle, currentAccount?.botToken]);
 
   if (!isConnectModalOpen) return null;
 
@@ -93,13 +97,14 @@ export function ConnectAccountsModal() {
         body: JSON.stringify({
           platform: activeTab,
           channelId: channelInput.trim() || currentAccount?.handle || '@novexalab',
+          botToken: activeTab === 'bale' ? (baleTokenInput.trim() || currentAccount?.botToken) : undefined,
         }),
       });
       const data = await res.json().catch(() => null);
 
       if (res.ok && data?.success) {
         setTestSuccess(true);
-        setTestMessage(data.message || 'اتصال کانال با موفقیت تایید شد! ✅');
+        setTestMessage(data.message || 'اتصال با موفقیت تایید شد! ✅');
         setTimeout(() => setTestSuccess(false), 6000);
       } else {
         setTestError(data?.error || 'خطا در ارتباط با کانال یا دسترسی ربات');
@@ -402,10 +407,10 @@ export function ConnectAccountsModal() {
             <div className="space-y-4">
               <div className="space-y-1">
                 <h3 className="text-sm font-black text-gray-900">
-                  اتصال خودکار روبیکا از طریق پلتفرم بات روبیکا
+                  اتصال خودکار روبیکا از طریق پلتفرم رسمی (Rubika Bot API v3)
                 </h3>
                 <p className="text-xs text-gray-500">
-                  ربات اختصاصی ساخته شده در «مدیریت بات‌های روبیکا» با موفقیت به اپلیکیشن متصل گردید:
+                  ربات رسمی SocialMan در روبیکا با موفقیت به سیستم متصل گردید:
                 </p>
               </div>
 
@@ -413,11 +418,11 @@ export function ConnectAccountsModal() {
               <div className="p-4 rounded-2xl bg-purple-50/80 border border-purple-200 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-sky-500 animate-pulse" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                     <span className="text-xs font-black text-purple-950">بات فعال روبیکا: SocialMan</span>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800">
-                    توکن فعال و متصل ✓
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                    رسمی و متصل ✓
                   </span>
                 </div>
                 <div className="text-xs text-purple-900 flex items-center justify-between">
@@ -426,36 +431,33 @@ export function ConnectAccountsModal() {
                     onClick={() => handleCopyBotId('@SocialManPublishBot')}
                     className="text-purple-600 hover:text-purple-800 flex items-center gap-1 text-[11px]"
                   >
-                    {copiedBot ? <Check className="w-3.5 h-3.5 text-sky-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedBot ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>کپی آیدی بات</span>
                   </button>
-                </div>
-                <div className="text-[10px] text-gray-500 font-mono bg-white p-2 rounded-xl border border-purple-100 truncate">
-                  توکن روبیکا: CJIJEG0ICJPDQSHEUWTHRWIDFFITRQUHWBZFEAQAYUJHCUZUGSYBGUQXCUZHERIR
                 </div>
               </div>
 
               <div className="space-y-2.5 text-xs">
-                <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3">
-                  <span className="w-5 h-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
-                    ۱
+                <div className="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200 flex items-start gap-3">
+                  <span className="w-5 h-5 rounded-full bg-amber-600 text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
+                    !
                   </span>
                   <div>
-                    <span className="font-bold text-gray-800 block">عضو کردن ربات در کانال روبیکا:</span>
-                    <span className="text-gray-500 text-[11px] leading-relaxed">
-                      در روبیکا وارد کانال خود شوید، به بخش «مدیران» بروید و ربات <strong>@SocialManPublishBot</strong> را با دسترسی «ارسال پیام» اضافه فرمایید.
+                    <span className="font-bold text-amber-900 block">نکته حیاتی جهت فعال‌سازی روبیکا:</span>
+                    <span className="text-amber-800 text-[11px] leading-relaxed">
+                      در اپلیکیشن روبیکا وارد کانال خود شوید، به بخش <strong>«مدیران کانال»</strong> (نه اعضای عادی) بروید و ربات <strong>@SocialManPublishBot</strong> را با دسترسی <strong>«ارسال پیام»</strong> مدیر (Admin) نمایید.
                     </span>
                   </div>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3">
                   <span className="w-5 h-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
-                    ۲
+                    ۱
                   </span>
                   <div className="w-full">
                     <span className="font-bold text-gray-800 block mb-1">ثبت شناسه کانال روبیکا:</span>
                     <span className="text-gray-500 text-[11px] leading-relaxed block mb-2">
-                      آیدی کانال خود را وارد کرده و دکمه اتصال را بزنید:
+                      آیدی کانال خود (یا شناسه چت روبیکا) را وارد فرمایید:
                     </span>
                     <div className="flex gap-2">
                       <input
@@ -467,13 +469,13 @@ export function ConnectAccountsModal() {
                       />
                       <button
                         onClick={() => {
-                          if (channelInput.trim()) {
-                            const clean = channelInput.trim().startsWith('@') ? channelInput.trim() : `@${channelInput.trim()}`;
-                            toggleAccountConnection('rubika', clean, `کانال روبیکا ${clean}`, true);
-                            setTestSuccess(true);
-                            setTestMessage(`کانال روبیکا ${clean} متصل گردید! ✅`);
-                            setTimeout(() => setTestSuccess(false), 4000);
-                          }
+                          const clean = channelInput.trim()
+                            ? (channelInput.trim().startsWith('@') ? channelInput.trim() : `@${channelInput.trim()}`)
+                            : '@SocialManPublishBot';
+                          toggleAccountConnection('rubika', clean, `کانال روبیکا ${clean}`, true);
+                          setTestSuccess(true);
+                          setTestMessage(`کانال روبیکا با موفقیت متصل گردید! ✅`);
+                          setTimeout(() => setTestSuccess(false), 4000);
                         }}
                         className="px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-black hover:bg-purple-700 cursor-pointer"
                       >
@@ -542,34 +544,8 @@ export function ConnectAccountsModal() {
                   اتصال پیام‌رسان بله از طریق بازوی رسمی (Bale Bot API)
                 </h3>
                 <p className="text-xs text-gray-500">
-                  بازوی اختصاصی بله ساخته شده و به اپلیکیشن متصل گردید:
+                  برای انتشار خودکار در کانال بله، بازوی اختصاصی خود را بسازید و توکن آن را وارد فرمایید:
                 </p>
-              </div>
-
-              {/* Bot Info Card */}
-              <div className="p-4 rounded-2xl bg-teal-50/80 border border-teal-200 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-teal-500 animate-pulse" />
-                    <span className="text-xs font-black text-teal-950">بازوی فعال بله: SocialMan</span>
-                  </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-800">
-                    توکن فعال و متصل ✓
-                  </span>
-                </div>
-                <div className="text-xs text-teal-900 flex items-center justify-between">
-                  <span>نام بازو: <strong className="font-mono">@SocialManPublishBot</strong></span>
-                  <button
-                    onClick={() => handleCopyBotId('@SocialManPublishBot')}
-                    className="text-teal-600 hover:text-teal-800 flex items-center gap-1 text-[11px]"
-                  >
-                    {copiedBot ? <Check className="w-3.5 h-3.5 text-teal-600" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>کپی آیدی بازو</span>
-                  </button>
-                </div>
-                <div className="text-[10px] text-gray-500 font-mono bg-white p-2 rounded-xl border border-teal-100 truncate">
-                  توکن دسترسی: 369114062:R7BeEnjLaDSiFv26-wsP-4ol_aGbTKmBNo
-                </div>
               </div>
 
               <div className="space-y-2.5 text-xs">
@@ -578,9 +554,9 @@ export function ConnectAccountsModal() {
                     ۱
                   </span>
                   <div>
-                    <span className="font-bold text-gray-800 block">افزودن بازوی رسمی به کانال بله:</span>
+                    <span className="font-bold text-gray-800 block">ساخت بازوی اختصاصی در بله:</span>
                     <span className="text-gray-500 text-[11px] leading-relaxed">
-                      در پیام‌رسان بله وارد کانال خود شوید، به بخش مدیران بروید و بازوی <strong>@SocialManPublishBot</strong> (لینک ble.ir/SocialManPublishBot) را با دسترسی ارسال پیام ادمین نمایید.
+                      در پیام‌رسان بله، وارد بازوی <strong>پدر بله (@BotFather)</strong> شوید (لینک: <a href="https://ble.ir/botfather" target="_blank" rel="noreferrer" className="text-teal-600 underline font-mono">ble.ir/botfather</a>) و با دستور <code className="bg-teal-50 text-teal-800 px-1 rounded">/newbot</code> یک بازو بسازید و توکن اختصاصی (Token) آن را کپی کنید.
                     </span>
                   </div>
                 </div>
@@ -589,32 +565,57 @@ export function ConnectAccountsModal() {
                   <span className="w-5 h-5 rounded-full bg-teal-600 text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
                     ۲
                   </span>
-                  <div className="w-full">
-                    <span className="font-bold text-gray-800 block mb-1">ثبت شناسه کانال بله:</span>
-                    <span className="text-gray-500 text-[11px] leading-relaxed block mb-2">
-                      آیدی کانال بله خود (مثلاً @mychannel یا ble.ir/mychannel) را وارد فرمایید:
+                  <div>
+                    <span className="font-bold text-gray-800 block">افزودن بازو به عنوان مدیر در کانال بله:</span>
+                    <span className="text-gray-500 text-[11px] leading-relaxed">
+                      وارد کانال خود در بله شوید، به بخش «مدیران کانال» بروید و بازوی ساخته‌شده‌تان را با دسترسی «ارسال پیام» مدیر (ادمین) فرمایید.
                     </span>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-teal-50/70 border border-teal-200 space-y-3">
+                  <div>
+                    <label className="font-bold text-gray-800 text-xs block mb-1">توکن بازوی بله (Bot Token):</label>
+                    <input
+                      type="text"
+                      placeholder="مثال: 123456789:ABCdefGHI..."
+                      value={baleTokenInput}
+                      onChange={(e) => setBaleTokenInput(e.target.value)}
+                      className="w-full bg-white border border-teal-200 rounded-xl px-3 py-2 text-xs text-left font-mono outline-none focus:border-teal-600"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-gray-800 text-xs block mb-1">شناسه یا لینک کانال بله:</label>
                     <div className="flex gap-2">
                       <input
                         type="text"
-                        placeholder="@bale_channel یا شناسه بله"
+                        placeholder="@channel_id یا ble.ir/channel_id"
                         value={channelInput}
                         onChange={(e) => setChannelInput(e.target.value)}
-                        className="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs text-left font-mono outline-none focus:border-teal-600"
+                        className="flex-1 bg-white border border-teal-200 rounded-xl px-3 py-2 text-xs text-left font-mono outline-none focus:border-teal-600"
                       />
                       <button
                         onClick={() => {
-                          if (channelInput.trim()) {
-                            const clean = channelInput.trim().startsWith('@') ? channelInput.trim() : `@${channelInput.trim()}`;
-                            toggleAccountConnection('bale', clean, `کانال بله ${clean}`, true);
-                            setTestSuccess(true);
-                            setTestMessage(`کانال بله ${clean} متصل گردید! ✅`);
-                            setTimeout(() => setTestSuccess(false), 4000);
+                          if (!baleTokenInput.trim()) {
+                            setTestError('لطفاً ابتدا توکن بازوی بله را وارد فرمایید.');
+                            setTimeout(() => setTestError(null), 5000);
+                            return;
                           }
+                          if (!channelInput.trim()) {
+                            setTestError('لطفاً شناسه کانال بله را وارد فرمایید.');
+                            setTimeout(() => setTestError(null), 5000);
+                            return;
+                          }
+                          const clean = channelInput.trim().startsWith('@') ? channelInput.trim() : `@${channelInput.trim()}`;
+                          toggleAccountConnection('bale', clean, `کانال بله ${clean}`, true, baleTokenInput.trim());
+                          setTestSuccess(true);
+                          setTestMessage(`بازو و کانال بله ${clean} با موفقیت متصل گردید! ✅`);
+                          setTimeout(() => setTestSuccess(false), 4000);
                         }}
-                        className="px-4 py-2 rounded-xl bg-teal-600 text-white text-xs font-black hover:bg-teal-700 cursor-pointer"
+                        className="px-4 py-2 rounded-xl bg-teal-600 text-white text-xs font-black hover:bg-teal-700 cursor-pointer shrink-0"
                       >
-                        تایید و اتصال
+                        تایید و اتصال به بله
                       </button>
                     </div>
                   </div>
