@@ -117,7 +117,7 @@ const INITIAL_CONNECTED_ACCOUNTS: Record<SocialPlatform, ConnectedAccountInfo> =
     accountName: 'کانال یا بازوی بله',
     handle: '',
     botUsername: '@SocialManPublishBot',
-    botToken: '369114062:R7BeEnjLaDSiFv26-wsP-4ol_aGbTKmBNo',
+    botToken: '369114062:1NMlMxXeD9k-I4oEI7YcXvyVmYqIJ3h9LnI',
   },
 };
 
@@ -316,6 +316,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                 val.handle !== 'ble.ir/SocialManPublishBot' &&
                 val.handle !== '@SocialManPublishBot'
               ) {
+                if (key === 'bale' && val.botToken && val.botToken.includes('R7BeEnjLaDSiFv26')) {
+                  val.botToken = '369114062:1NMlMxXeD9k-I4oEI7YcXvyVmYqIJ3h9LnI';
+                }
                 sanitized[key] = val;
               }
             }

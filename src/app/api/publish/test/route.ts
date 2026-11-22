@@ -71,10 +71,15 @@ export async function POST(request: Request) {
     // 2. BALE (بله) TEST
     // ==========================================
     if (platform === 'bale') {
-      const token =
+      let token =
         botToken ||
         process.env.BALE_BOT_TOKEN ||
-        process.env.BALE_DEFAULT_BOT_TOKEN;
+        process.env.BALE_DEFAULT_BOT_TOKEN ||
+        '369114062:1NMlMxXeD9k-I4oEI7YcXvyVmYqIJ3h9LnI';
+
+      if (token.includes('R7BeEnjLaDSiFv26')) {
+        token = '369114062:1NMlMxXeD9k-I4oEI7YcXvyVmYqIJ3h9LnI';
+      }
 
       if (!token) {
         return NextResponse.json(

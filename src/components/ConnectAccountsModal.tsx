@@ -544,8 +544,31 @@ export function ConnectAccountsModal() {
                   اتصال پیام‌رسان بله از طریق بازوی رسمی (Bale Bot API)
                 </h3>
                 <p className="text-xs text-gray-500">
-                  برای انتشار خودکار در کانال بله، بازوی اختصاصی خود را بسازید و توکن آن را وارد فرمایید:
+                  بازوی اختصاصی SocialMan در پیام‌رسان بله با موفقیت فعال و متصل گردید:
                 </p>
+              </div>
+
+              {/* Bot Info Card */}
+              <div className="p-4 rounded-2xl bg-teal-50/80 border border-teal-200 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-xs font-black text-teal-950">بازوی فعال بله: SocialMan</span>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                    توکن فعال و تایید شده ✓
+                  </span>
+                </div>
+                <div className="text-xs text-teal-900 flex items-center justify-between">
+                  <span>نام کاربری بازو: <strong className="font-mono">@SocialManPublishBot</strong></span>
+                  <button
+                    onClick={() => handleCopyBotId('@SocialManPublishBot')}
+                    className="text-teal-600 hover:text-teal-800 flex items-center gap-1 text-[11px]"
+                  >
+                    {copiedBot ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>کپی آیدی بازو</span>
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-2.5 text-xs">
@@ -554,61 +577,34 @@ export function ConnectAccountsModal() {
                     ۱
                   </span>
                   <div>
-                    <span className="font-bold text-gray-800 block">ساخت بازوی اختصاصی در بله:</span>
-                    <span className="text-gray-500 text-[11px] leading-relaxed">
-                      در پیام‌رسان بله، وارد بازوی <strong>پدر بله (@BotFather)</strong> شوید (لینک: <a href="https://ble.ir/botfather" target="_blank" rel="noreferrer" className="text-teal-600 underline font-mono">ble.ir/botfather</a>) و با دستور <code className="bg-teal-50 text-teal-800 px-1 rounded">/newbot</code> یک بازو بسازید و توکن اختصاصی (Token) آن را کپی کنید.
-                    </span>
-                  </div>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3">
-                  <span className="w-5 h-5 rounded-full bg-teal-600 text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
-                    ۲
-                  </span>
-                  <div>
                     <span className="font-bold text-gray-800 block">افزودن بازو به عنوان مدیر در کانال بله:</span>
                     <span className="text-gray-500 text-[11px] leading-relaxed">
-                      وارد کانال خود در بله شوید، به بخش «مدیران کانال» بروید و بازوی ساخته‌شده‌تان را با دسترسی «ارسال پیام» مدیر (ادمین) فرمایید.
+                      وارد کانال خود در بله شوید، به بخش «مدیران کانال» بروید و بازوی <strong>@SocialManPublishBot</strong> را با دسترسی «ارسال پیام» مدیر (ادمین) فرمایید.
                     </span>
                   </div>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-teal-50/70 border border-teal-200 space-y-3">
                   <div>
-                    <label className="font-bold text-gray-800 text-xs block mb-1">توکن بازوی بله (Bot Token):</label>
-                    <input
-                      type="text"
-                      placeholder="مثال: 123456789:ABCdefGHI..."
-                      value={baleTokenInput}
-                      onChange={(e) => setBaleTokenInput(e.target.value)}
-                      className="w-full bg-white border border-teal-200 rounded-xl px-3 py-2 text-xs text-left font-mono outline-none focus:border-teal-600"
-                    />
-                  </div>
-
-                  <div>
                     <label className="font-bold text-gray-800 text-xs block mb-1">شناسه یا لینک کانال بله:</label>
                     <div className="flex gap-2">
                       <input
                         type="text"
-                        placeholder="@channel_id یا ble.ir/channel_id"
+                        placeholder="@channel_id یا شناسه کانال"
                         value={channelInput}
                         onChange={(e) => setChannelInput(e.target.value)}
                         className="flex-1 bg-white border border-teal-200 rounded-xl px-3 py-2 text-xs text-left font-mono outline-none focus:border-teal-600"
                       />
                       <button
                         onClick={() => {
-                          if (!baleTokenInput.trim()) {
-                            setTestError('لطفاً ابتدا توکن بازوی بله را وارد فرمایید.');
-                            setTimeout(() => setTestError(null), 5000);
-                            return;
-                          }
                           if (!channelInput.trim()) {
                             setTestError('لطفاً شناسه کانال بله را وارد فرمایید.');
                             setTimeout(() => setTestError(null), 5000);
                             return;
                           }
                           const clean = channelInput.trim().startsWith('@') ? channelInput.trim() : `@${channelInput.trim()}`;
-                          toggleAccountConnection('bale', clean, `کانال بله ${clean}`, true, baleTokenInput.trim());
+                          const tokenToSave = baleTokenInput.trim() || '369114062:1NMlMxXeD9k-I4oEI7YcXvyVmYqIJ3h9LnI';
+                          toggleAccountConnection('bale', clean, `کانال بله ${clean}`, true, tokenToSave);
                           setTestSuccess(true);
                           setTestMessage(`بازو و کانال بله ${clean} با موفقیت متصل گردید! ✅`);
                           setTimeout(() => setTestSuccess(false), 4000);
@@ -618,6 +614,17 @@ export function ConnectAccountsModal() {
                         تایید و اتصال به بله
                       </button>
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-gray-500 block mb-1">توکن بازو (پیش‌فرض سیستم تنظیم شده، در صورت داشتن بازوی اختصاصی تغییر دهید):</label>
+                    <input
+                      type="text"
+                      placeholder="369114062:1NMlMxXeD9k-I4oEI7YcXvyVmYqIJ3h9LnI"
+                      value={baleTokenInput}
+                      onChange={(e) => setBaleTokenInput(e.target.value)}
+                      className="w-full bg-white border border-teal-200 rounded-xl px-3 py-1.5 text-[11px] text-left font-mono outline-none focus:border-teal-600 text-gray-600"
+                    />
                   </div>
                 </div>
               </div>

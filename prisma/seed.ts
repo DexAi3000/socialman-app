@@ -197,7 +197,7 @@ async function main() {
   const accounts = [
     { platform: 'telegram', handle: '@SocialManPublishBot', accountName: 'ربات انتشار تلگرام', botToken: '9115798954:AAHHygpdWUJlhI3k-FX7rtU2egGt7wwHwrg', isConnected: true },
     { platform: 'rubika', handle: '@SocialManPublishBot', accountName: 'بات رسمی روبیکا', botToken: 'CJIJEG0ICJPDQSHEUWTHRWIDFFITRQUHWBZFEAQAYUJHCUZUGSYBGUQXCUZHERIR', isConnected: true },
-    { platform: 'bale', handle: '@SocialManPublishBot', accountName: 'بازوی ارتباطی بله', botToken: '369114062:R7BeEnjLaDSiFv26-wsP-4ol_aGbTKmBNo', isConnected: true },
+    { platform: 'bale', handle: '@SocialManPublishBot', accountName: 'بازوی ارتباطی بله', botToken: '369114062:1NMlMxXeD9k-I4oEI7YcXvyVmYqIJ3h9LnI', isConnected: true },
     { platform: 'instagram', handle: '@socialman.app', accountName: 'پیج اینستاگرام سوشال‌من', isConnected: true },
     { platform: 'whatsapp', handle: '+989123456789', accountName: 'واتساپ بیزینس', isConnected: true },
   ];
