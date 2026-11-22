@@ -51,7 +51,6 @@ export function ConnectAccountsModal() {
 
   const [copiedBot, setCopiedBot] = useState(false);
   const [channelInput, setChannelInput] = useState('');
-  const [baleTokenInput, setBaleTokenInput] = useState('');
   const [testingConnection, setTestingConnection] = useState(false);
   const [testSuccess, setTestSuccess] = useState(false);
   const [testMessage, setTestMessage] = useState('');
@@ -66,15 +65,12 @@ export function ConnectAccountsModal() {
 
   const currentAccount = connectedAccounts[activeTab];
 
-  // Pre-fill channel input with existing handle and bot token
+  // Pre-fill channel input with existing handle
   React.useEffect(() => {
     if (currentAccount?.handle && currentAccount.handle !== '@SocialManPublishBot') {
       setChannelInput(currentAccount.handle);
     }
-    if (activeTab === 'bale' && currentAccount?.botToken) {
-      setBaleTokenInput(currentAccount.botToken);
-    }
-  }, [activeTab, currentAccount?.handle, currentAccount?.botToken]);
+  }, [activeTab, currentAccount?.handle]);
 
   if (!isConnectModalOpen) return null;
 
@@ -97,7 +93,6 @@ export function ConnectAccountsModal() {
         body: JSON.stringify({
           platform: activeTab,
           channelId: channelInput.trim() || currentAccount?.handle || '@novexalab',
-          botToken: activeTab === 'bale' ? (baleTokenInput.trim() || currentAccount?.botToken) : undefined,
         }),
       });
       const data = await res.json().catch(() => null);
@@ -264,9 +259,6 @@ export function ConnectAccountsModal() {
                     {copiedBot ? <Check className="w-3.5 h-3.5 text-sky-600" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>کپی آیدی بات</span>
                   </button>
-                </div>
-                <div className="text-[10px] text-gray-500 font-mono bg-white p-2 rounded-xl border border-sky-100 truncate">
-                  توکن HTTP API: 9115798954:AAHHygpdWUJlhI3k-FX7rtU2egGt7wwHwrg
                 </div>
               </div>
 
@@ -603,8 +595,7 @@ export function ConnectAccountsModal() {
                             return;
                           }
                           const clean = channelInput.trim().startsWith('@') ? channelInput.trim() : `@${channelInput.trim()}`;
-                          const tokenToSave = baleTokenInput.trim() || '369114062:1NMlMxXeD9k-I4oEI7YcXvyVmYqIJ3h9LnI';
-                          toggleAccountConnection('bale', clean, `کانال بله ${clean}`, true, tokenToSave);
+                          toggleAccountConnection('bale', clean, `کانال بله ${clean}`, true);
                           setTestSuccess(true);
                           setTestMessage(`بازو و کانال بله ${clean} با موفقیت متصل گردید! ✅`);
                           setTimeout(() => setTestSuccess(false), 4000);
@@ -614,17 +605,6 @@ export function ConnectAccountsModal() {
                         تایید و اتصال به بله
                       </button>
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="text-[11px] font-bold text-gray-500 block mb-1">توکن بازو (پیش‌فرض سیستم تنظیم شده، در صورت داشتن بازوی اختصاصی تغییر دهید):</label>
-                    <input
-                      type="text"
-                      placeholder="369114062:1NMlMxXeD9k-I4oEI7YcXvyVmYqIJ3h9LnI"
-                      value={baleTokenInput}
-                      onChange={(e) => setBaleTokenInput(e.target.value)}
-                      className="w-full bg-white border border-teal-200 rounded-xl px-3 py-1.5 text-[11px] text-left font-mono outline-none focus:border-teal-600 text-gray-600"
-                    />
                   </div>
                 </div>
               </div>

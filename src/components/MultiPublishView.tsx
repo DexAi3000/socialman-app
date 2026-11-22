@@ -126,12 +126,11 @@ export function MultiPublishView() {
 
     try {
       // Build accounts config from user's connected channels
-      const accountsConfig: Record<string, { channelId?: string; botToken?: string }> = {};
+      const accountsConfig: Record<string, { channelId?: string }> = {};
       for (const p of selectedPlatforms) {
         if (connectedAccounts[p]?.handle) {
           accountsConfig[p] = {
             channelId: connectedAccounts[p].handle,
-            botToken: connectedAccounts[p].botToken,
           };
         }
       }

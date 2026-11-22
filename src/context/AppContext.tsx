@@ -95,7 +95,6 @@ const INITIAL_CONNECTED_ACCOUNTS: Record<SocialPlatform, ConnectedAccountInfo> =
     accountName: 'کانال یا گروه تلگرام',
     handle: '',
     botUsername: '@SocialManPublishBot',
-    botToken: '9115798954:AAHHygpdWUJlhI3k-FX7rtU2egGt7wwHwrg',
   },
   whatsapp: {
     platform: 'whatsapp',
@@ -109,7 +108,6 @@ const INITIAL_CONNECTED_ACCOUNTS: Record<SocialPlatform, ConnectedAccountInfo> =
     accountName: 'کانال یا ربات روبیکا',
     handle: '',
     botUsername: '@SocialManPublishBot',
-    botToken: 'CJIJEG0ICJPDQSHEUWTHRWIDFFITRQUHWBZFEAQAYUJHCUZUGSYBGUQXCUZHERIR',
   },
   bale: {
     platform: 'bale',
@@ -117,7 +115,6 @@ const INITIAL_CONNECTED_ACCOUNTS: Record<SocialPlatform, ConnectedAccountInfo> =
     accountName: 'کانال یا بازوی بله',
     handle: '',
     botUsername: '@SocialManPublishBot',
-    botToken: '369114062:1NMlMxXeD9k-I4oEI7YcXvyVmYqIJ3h9LnI',
   },
 };
 
@@ -247,9 +244,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             );
           }
           if (d.connectedAccounts && typeof d.connectedAccounts === 'object') {
-            if (d.connectedAccounts.bale?.botToken?.includes('R7BeEnjLaDSiFv26')) {
-              d.connectedAccounts.bale.botToken = '369114062:1NMlMxXeD9k-I4oEI7YcXvyVmYqIJ3h9LnI';
-            }
             setConnectedAccounts((prev) => ({ ...prev, ...d.connectedAccounts }));
             try {
               localStorage.setItem('socialman_connected_accounts', JSON.stringify(d.connectedAccounts));
@@ -271,9 +265,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           .then((r) => r.json())
           .then((data) => {
             if (data?.success && data?.connectedAccounts && typeof data.connectedAccounts === 'object') {
-              if (data.connectedAccounts.bale?.botToken?.includes('R7BeEnjLaDSiFv26')) {
-                data.connectedAccounts.bale.botToken = '369114062:1NMlMxXeD9k-I4oEI7YcXvyVmYqIJ3h9LnI';
-              }
               setConnectedAccounts((prev) => ({ ...prev, ...data.connectedAccounts }));
               try {
                 localStorage.setItem('socialman_connected_accounts', JSON.stringify(data.connectedAccounts));
@@ -328,9 +319,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (cachedAccounts) {
         const parsed = JSON.parse(cachedAccounts);
         if (parsed && typeof parsed === 'object') {
-          if (parsed.bale?.botToken?.includes('R7BeEnjLaDSiFv26')) {
-            parsed.bale.botToken = '369114062:1NMlMxXeD9k-I4oEI7YcXvyVmYqIJ3h9LnI';
-          }
           setConnectedAccounts((prev) => ({ ...prev, ...parsed }));
         }
       }
