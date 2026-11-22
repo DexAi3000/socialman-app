@@ -15,6 +15,8 @@ model User {
   fullName              String          @default("کاربر جدید")
   role                  String          @default("admin") // admin, creator, client
   plan                  String          @default("free") // free, pro, agency
+  planStartedAt         DateTime?
+  planExpiresAt         DateTime?
   avatarUrl             String?
   connectedAccountsData String?         // JSON string of Record<SocialPlatform, ConnectedAccountInfo>
   createdAt             DateTime        @default(now())
@@ -24,6 +26,15 @@ model User {
   posts                 Post[]
   tickets               Ticket[]
   socialAccounts        SocialAccount[]
+  notificationReads     NotificationRead[]
+}
+
+model NotificationRead {
+  userId String
+  key    String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, key])
 }
 
 model OtpCode {

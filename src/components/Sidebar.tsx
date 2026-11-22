@@ -61,7 +61,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       id: 'ai-studio',
       label: 'استودیوی هوش مصنوعی',
       icon: Sparkles,
-      badge: 'Gemini ✨',
+      badge: 'هوش مصنوعی',
       badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
     },
     {

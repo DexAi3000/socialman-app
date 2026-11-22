@@ -14,6 +14,7 @@ import {
   Send,
   CalendarDays,
   ListOrdered,
+  Star,
 } from 'lucide-react';
 import {
   InstagramIcon,
@@ -164,25 +165,25 @@ export function CalendarView() {
   });
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto w-full select-none">
+    <div className="mx-auto w-full max-w-5xl space-y-4">
       {/* 1. Calendar Header & Controls */}
-      <div className="p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-3.5">
+      <div className="space-y-3.5 rounded-2xl border border-slate-200/80 bg-white p-3.5 sm:p-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="p-2.5 sm:p-3 rounded-2xl bg-sky-50 text-[#3b96cc] border border-sky-200 shrink-0">
               <CalendarIcon className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
-                  تقویم محتوایی ۵ شبکه ({today.fullTitle})
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-lg font-black text-slate-900 sm:text-2xl">
+                  تقویم محتوا
                 </h1>
                 <span className="text-[11px] bg-sky-50 text-[#3b96cc] border border-sky-200 px-2.5 py-0.5 rounded-full font-mono font-black">
                   {toPersianDigits(workspacePosts.length)} پست
                 </span>
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
-                امروز: <strong className="text-slate-800">{today.fullDateWithWeekday}</strong> • زمان‌بندی خودکار در اینستاگرام، تلگرام، واتساپ، روبیکا و بله
+              <p className="mt-0.5 text-sm text-slate-600">
+                {today.fullDateWithWeekday}
               </p>
             </div>
           </div>
@@ -190,6 +191,8 @@ export function CalendarView() {
           {/* View Mode Toggle Button */}
           <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-2xl border border-slate-200 self-start sm:self-auto">
             <button
+              type="button"
+              aria-pressed={viewMode === 'month'}
               onClick={() => setViewMode('month')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
                 viewMode === 'month'
@@ -201,6 +204,8 @@ export function CalendarView() {
               <span>نمای ماهانه</span>
             </button>
             <button
+              type="button"
+              aria-pressed={viewMode === 'agenda'}
               onClick={() => setViewMode('agenda')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
                 viewMode === 'agenda'
@@ -215,7 +220,7 @@ export function CalendarView() {
         </div>
 
         {/* Platform Filter Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1 text-xs no-scrollbar">
+        <div role="group" aria-label="فیلتر پلتفرم" className="flex flex-wrap items-center gap-1.5 pt-1">
           {[
             { id: 'all', label: 'همه پلتفرم‌ها' },
             { id: 'instagram', label: 'اینستاگرام' },
@@ -226,8 +231,10 @@ export function CalendarView() {
           ].map((item) => (
             <button
               key={item.id}
+              type="button"
+              aria-pressed={platformFilter === item.id}
               onClick={() => setPlatformFilter(item.id)}
-              className={`px-3 py-1.5 rounded-xl transition-all font-black text-[11px] whitespace-nowrap cursor-pointer active:scale-95 ${
+              className={`min-h-9 cursor-pointer whitespace-nowrap rounded-lg px-2.5 text-xs font-bold transition-colors ${
                 platformFilter === item.id
                   ? 'bg-[#3b96cc] text-white shadow-xs'
                   : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100'
@@ -329,7 +336,11 @@ export function CalendarView() {
                         title={dayEvent.title}
                         className="text-[9px] sm:text-[10px] flex items-center justify-center"
                       >
-                        {dayEvent.type === 'hot' ? '🔥' : '⭐'}
+                        {dayEvent.type === 'hot' ? (
+                          <Flame className="h-3.5 w-3.5 text-rose-500" fill="currentColor" />
+                        ) : (
+                          <Star className="h-3.5 w-3.5 text-amber-500" fill="currentColor" />
+                        )}
                       </span>
                     )}
                   </div>

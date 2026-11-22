@@ -1,8 +1,10 @@
-import { NextResponse } from 'next/server';
+import { connection, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession, verifySession, setSessionCookie, signSession } from '@/lib/session';
+import { getEffectivePlan, getSubscriptionPeriod } from '@/lib/subscription';
+import { getSession, verifySession, signSession } from '@/lib/session';
 
 export async function GET(request: Request) {
+  await connection();
   try {
     let session = await getSession();
 
@@ -26,38 +28,6 @@ export async function GET(request: Request) {
           workspaces: true,
         },
       });
-    }
-
-    // 2. Fallback to cached headers if cookie was lost or dropped by browser over HTTP
-    if (!user) {
-      const fallbackId = request.headers.get('x-user-id');
-      const fallbackPhone = request.headers.get('x-user-phone');
-
-      if (fallbackId || fallbackPhone) {
-        user = await prisma.user.findFirst({
-          where: {
-            OR: [
-              fallbackId ? { id: fallbackId } : undefined,
-              fallbackPhone ? { phone: fallbackPhone } : undefined,
-            ].filter(Boolean) as any,
-          },
-          include: {
-            workspaces: true,
-          },
-        });
-
-        // Re-issue cookie so future requests have it automatically
-        if (user) {
-          try {
-            await setSessionCookie({
-              userId: user.id,
-              phone: user.phone,
-              role: user.role,
-              fullName: user.fullName || user.username || 'کاربر',
-            });
-          } catch (_) {}
-        }
-      }
     }
 
     if (!user) {
@@ -95,7 +65,8 @@ export async function GET(request: Request) {
           phone: user.phone,
           username: user.username,
           role: user.role,
-          plan: user.plan || 'free',
+          plan: getEffectivePlan(user),
+          subscription: getSubscriptionPeriod(user),
           avatarUrl: user.avatarUrl,
         },
         workspaces: user.workspaces,

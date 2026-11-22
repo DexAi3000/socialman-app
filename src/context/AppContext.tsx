@@ -197,12 +197,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const refreshSession = () => {
     const headers: Record<string, string> = {};
     try {
-      const cached = localStorage.getItem('socialman_user');
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (parsed?.id) headers['x-user-id'] = parsed.id;
-        if (parsed?.phone) headers['x-user-phone'] = parsed.phone;
-      }
       const token = localStorage.getItem('socialman_token');
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
@@ -213,8 +207,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       headers,
       cache: 'no-store',
     })
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error('Session check failed');
+        return r.json();
+      })
       .then((d) => {
+        if (d.authenticated === false) {
+          try {
+            const latestToken = localStorage.getItem('socialman_token');
+            if (latestToken && headers.Authorization !== `Bearer ${latestToken}`) return;
+            localStorage.removeItem('socialman_user');
+            localStorage.removeItem('socialman_token');
+          } catch {}
+          setCurrentUser(null);
+          setCurrentPlan('free');
+          return;
+        }
         if (d.authenticated && d.user) {
           const profile: UserProfile = {
             id: d.user.id,
@@ -223,6 +231,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             username: d.user.username,
             role: d.user.role,
             plan: (d.user.plan || 'free') as PlanType,
+            subscription: d.user.subscription ?? null,
             avatarUrl: d.user.avatarUrl,
             isLoggedIn: true,
           };

@@ -31,6 +31,7 @@ import {
   SnappWhatsappIcon,
   SnappRubikaIcon,
   SnappBaleIcon,
+  SnappPublishIcon,
 } from './SnappIcons';
 import { SocialPlatform } from '@/types';
 import { toPersianDigits, getShamsiToday } from '@/lib/utils';
@@ -237,21 +238,15 @@ export function MultiPublishView() {
   };
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header Info */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-100">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <div className="p-2 rounded-2xl bg-sky-50 text-[#3b96cc] border border-sky-100 shadow-xs">
-              <Send className="w-5 h-5 fill-[#3b96cc] rotate-45 -mr-0.5" />
-            </div>
-            <h1 className="text-lg sm:text-xl font-black text-gray-900">
-              مرکز انتشار و زمان‌بندی همزمان ۵ پلتفرم
-            </h1>
+      <div className="flex flex-col justify-between gap-3 rounded-2xl border border-slate-200/80 bg-white p-4 sm:flex-row sm:items-center sm:p-5">
+        <div className="flex min-w-0 items-center gap-3">
+          <SnappPublishIcon className="size-11 sm:size-12" />
+          <div className="min-w-0">
+            <h1 className="text-lg font-black text-slate-900 sm:text-2xl">انتشار و زمان‌بندی</h1>
+            <p className="mt-0.5 text-sm leading-6 text-slate-600">یک پست بساز و کانال‌های مقصدش را انتخاب کن.</p>
           </div>
-          <p className="text-xs text-gray-500 font-medium">
-            محتوا را یک‌بار آماده کنید و همزمان در اینستاگرام، تلگرام، واتساپ، روبیکا و بله منتشر یا زمان‌بندی نمایید.
-          </p>
         </div>
 
         {/* AI Generator Gate status chip */}
@@ -259,7 +254,7 @@ export function MultiPublishView() {
           {currentPlan === 'agency' ? (
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-black">
               <Sparkles className="w-3.5 h-3.5 text-indigo-600 fill-indigo-600" />
-              <span>هوش مصنوعی Gemini فعال ✨</span>
+              <span>هوش مصنوعی فعال</span>
             </span>
           ) : (
             <button
@@ -274,15 +269,16 @@ export function MultiPublishView() {
       </div>
 
       {/* Main Composer Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid min-w-0 grid-cols-1 items-start gap-4 lg:grid-cols-12 lg:gap-5">
         {/* Left Column: Post Creator Form (7 cols) */}
-        <div className="lg:col-span-7 bg-white rounded-3xl border border-gray-100 p-5 sm:p-7 shadow-xs space-y-5">
+        <div className="min-w-0 space-y-5 rounded-2xl border border-slate-200/80 bg-white p-3.5 sm:p-6 lg:col-span-7">
           {/* 1. Target Platforms Toggle Bar */}
-          <div>
-            <label className="block text-xs font-black text-gray-800 mb-2.5 text-right">
-              ۱. انتخاب شبکه‌های هدف برای انتشار همزمان ({toPersianDigits(selectedPlatforms.length)} پلتفرم انتخاب شده):
-            </label>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+          <div role="group" aria-labelledby="publish-networks">
+            <div className="mb-2.5 flex flex-wrap items-center justify-between gap-1">
+              <h2 id="publish-networks" className="text-sm font-black text-slate-900">کانال‌های مقصد</h2>
+              <span className="text-xs font-medium text-slate-600">{toPersianDigits(selectedPlatforms.length)} انتخاب‌شده</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2 min-[360px]:grid-cols-3 sm:grid-cols-5">
               {[
                 { id: 'instagram' as SocialPlatform, name: 'اینستاگرام', icon: SnappInstagramIcon },
                 { id: 'telegram' as SocialPlatform, name: 'تلگرام', icon: SnappTelegramIcon },
@@ -297,13 +293,14 @@ export function MultiPublishView() {
                   <button
                     key={item.id}
                     type="button"
+                    aria-pressed={isSelected}
                     onClick={() => togglePlatform(item.id)}
-                    className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border transition-all text-center ${
+                    className={`flex min-w-0 cursor-pointer flex-col items-center gap-1.5 rounded-xl border px-1 py-2.5 text-center transition-colors ${
                       isSelected
                         ? isConnected
                           ? 'bg-sky-50/70 border-[#3b96cc] shadow-xs'
                           : 'bg-amber-50/50 border-amber-300 shadow-xs'
-                        : 'bg-gray-50 border-gray-200 opacity-60 hover:opacity-100'
+                        : 'border-slate-200 bg-slate-50 hover:bg-slate-100'
                     }`}
                   >
                     <IconComponent className="w-8 h-8" />
@@ -321,8 +318,8 @@ export function MultiPublishView() {
                     >
                       {isSelected
                         ? isConnected
-                          ? '✓ متصل و فعال'
-                          : '⚠ نیاز به اتصال'
+                          ? 'متصل و فعال'
+                          : 'نیاز به اتصال'
                         : isConnected
                         ? 'متصل'
                         : 'غیرفعال'}
@@ -335,49 +332,52 @@ export function MultiPublishView() {
 
           {/* 2. Post Title / Hook */}
           <div>
-            <label className="block text-xs font-black text-gray-800 mb-1.5 text-right">
-              ۲. عنوان یا قلاب پست (Hook):
+            <label htmlFor="publish-title" className="mb-1.5 block text-sm font-bold text-slate-900">
+              عنوان پست
             </label>
             <input
+              id="publish-title"
               type="text"
               placeholder="مثال: ۵ راز مهم برای افزایش فروش پاییزی در شبکه‌های اجتماعی"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl px-4 py-3 text-xs sm:text-sm text-gray-900 font-medium outline-none transition-all"
+              className="min-h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-base font-medium text-slate-900 focus:bg-white sm:text-sm"
             />
           </div>
 
           {/* 3. Main Content / Caption Body */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-black text-gray-800 text-right">
-                ۳. متن پست و کپشن مشترک:
+              <label htmlFor="publish-caption" className="block text-sm font-bold text-slate-900">
+                متن پست
               </label>
               <span className="text-[10px] text-gray-400 font-mono">
-                {toPersianDigits(caption.length)} کاراکتر
+                {toPersianDigits(caption.length)} نویسه
               </span>
             </div>
             <textarea
+              id="publish-caption"
               rows={5}
-              placeholder="متن اصلی پست را اینجا بنویسید... (این متن همزمان برای تلگرام، واتساپ، بله، اینستاگرام و روبیکا ارسال خواهد شد)"
+              placeholder="متن یا کپشن پست را بنویس…"
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl p-4 text-xs sm:text-sm text-gray-900 font-medium outline-none leading-relaxed transition-all resize-none"
+              className="w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-base leading-7 font-medium text-slate-900 focus:bg-white sm:text-sm"
             />
           </div>
 
           {/* 4. Hashtags */}
           <div>
-            <label className="block text-xs font-black text-gray-800 mb-1.5 text-right">
-              ۴. هشتگ‌ها (با کاما جدا کنید):
+            <label htmlFor="publish-hashtags" className="mb-1.5 block text-sm font-bold text-slate-900">
+              هشتگ‌ها
             </label>
             <div className="relative">
               <input
+                id="publish-hashtags"
                 type="text"
                 placeholder="سوشال_من، رشد_کسب_و_کار، بازاریابی"
                 value={hashtags}
                 onChange={(e) => setHashtags(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#3b96cc] rounded-2xl px-4 py-2.5 text-xs text-gray-800 font-medium outline-none pr-9"
+                className="min-h-11 w-full rounded-xl border border-slate-200 bg-slate-50 py-2 ps-9 pe-3 text-base font-medium text-slate-900 focus:bg-white sm:text-sm"
               />
               <Hash className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
             </div>
@@ -385,9 +385,7 @@ export function MultiPublishView() {
 
           {/* 5. Media Upload (Photo / Banner) */}
           <div>
-            <label className="block text-xs font-black text-gray-800 mb-1.5 text-right">
-              ۵. تصویر یا بنر ضمیمه پست:
-            </label>
+            <h2 className="mb-1.5 text-sm font-bold text-slate-900">تصویر پست</h2>
             <input
               ref={fileInputRef}
               type="file"
@@ -400,6 +398,7 @@ export function MultiPublishView() {
                 <img src={imagePreview} alt="پیش‌نمایش" className="w-full h-full object-cover" />
                 <button
                   type="button"
+                  aria-label="حذف تصویر پست"
                   onClick={() => setImagePreview(null)}
                   className="absolute top-2 left-2 p-1.5 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors"
                 >
@@ -407,41 +406,46 @@ export function MultiPublishView() {
                 </button>
               </div>
             ) : (
-              <div
+              <button
+                type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-gray-200 hover:border-sky-300 rounded-2xl p-6 text-center cursor-pointer transition-colors bg-gray-50/50 hover:bg-sky-50/30 flex flex-col items-center justify-center gap-2"
+                className="flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center transition-colors hover:border-sky-500 hover:bg-sky-50"
               >
                 <div className="w-10 h-10 rounded-xl bg-sky-50 text-[#3b96cc] flex items-center justify-center shadow-xs">
                   <ImageIcon className="w-5 h-5" />
                 </div>
                 <span className="text-xs font-black text-gray-700">کلیک برای انتخاب تصویر پست</span>
                 <span className="text-[10px] text-gray-400">فرمت‌های PNG، JPG، WebP تا حجم ۱۰ مگابایت</span>
-              </div>
+              </button>
             )}
           </div>
 
           {/* 6. Scheduling or Immediate Publish Option */}
-          <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black text-gray-800">نحوه انتشار:</span>
-              <div className="flex items-center gap-2">
+          <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-sm font-bold text-slate-900">زمان انتشار</span>
+              <div className="flex flex-wrap items-center gap-1.5">
                 <button
                   type="button"
+                  aria-pressed={!isScheduledMode}
                   onClick={() => setIsScheduledMode(false)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  className={`inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2.5 text-xs font-bold transition-colors ${
                     !isScheduledMode ? 'bg-[#3b96cc] text-white shadow-xs' : 'text-gray-500 bg-white border border-gray-200'
                   }`}
                 >
-                  انتشار آنی 🚀
+                  <Send className="h-4 w-4" />
+                  انتشار آنی
                 </button>
                 <button
                   type="button"
+                  aria-pressed={isScheduledMode}
                   onClick={() => setIsScheduledMode(true)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  className={`inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2.5 text-xs font-bold transition-colors ${
                     isScheduledMode ? 'bg-[#3b96cc] text-white shadow-xs' : 'text-gray-500 bg-white border border-gray-200'
                   }`}
                 >
-                  زمان‌بندی در تقویم 📅
+                  <Calendar className="h-4 w-4" />
+                  زمان‌بندی
                 </button>
               </div>
             </div>
@@ -449,21 +453,23 @@ export function MultiPublishView() {
             {isScheduledMode && (
               <div className="grid grid-cols-2 gap-3 pt-2 border-t border-gray-200">
                 <div>
-                  <label className="block text-[11px] font-bold text-gray-600 mb-1">تاریخ شمسی:</label>
+                  <label htmlFor="publish-date" className="mb-1 block text-xs font-bold text-slate-700">تاریخ شمسی</label>
                   <input
+                    id="publish-date"
                     type="text"
                     value={scheduleDate}
                     onChange={(e) => setScheduleDate(e.target.value)}
-                    className="w-full bg-white border border-gray-200 rounded-xl p-2 text-xs font-bold font-mono text-center outline-none"
+                    className="min-h-10 w-full rounded-lg border border-slate-200 bg-white p-2 text-center text-base font-bold sm:text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-gray-600 mb-1">ساعت انتشار:</label>
+                  <label htmlFor="publish-time" className="mb-1 block text-xs font-bold text-slate-700">ساعت انتشار</label>
                   <input
+                    id="publish-time"
                     type="text"
                     value={scheduleTime}
                     onChange={(e) => setScheduleTime(e.target.value)}
-                    className="w-full bg-white border border-gray-200 rounded-xl p-2 text-xs font-bold font-mono text-center outline-none"
+                    className="min-h-10 w-full rounded-lg border border-slate-200 bg-white p-2 text-center text-base font-bold sm:text-sm"
                   />
                 </div>
               </div>
@@ -499,14 +505,14 @@ export function MultiPublishView() {
                 className="w-full py-4 rounded-2xl font-black text-xs sm:text-sm bg-gradient-to-r from-[#3b96cc] to-sky-600 text-white shadow-lg shadow-[#3b96cc]/30 flex items-center justify-center gap-2 transition-transform active:scale-95 disabled:opacity-50"
               >
                 <Calendar className="w-4 h-4" />
-                <span>ثبت زمان‌بندی در تقویم محتوایی آذر</span>
+                <span>ثبت زمان‌بندی در تقویم</span>
               </button>
             )}
 
             {publishedSuccess && (
               <div className="mt-3 p-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-sky-900 text-xs font-black flex items-center justify-center gap-2 shadow-xs">
                 <CheckCircle2 className="w-5 h-5 text-[#3b96cc]" />
-                <span>پست با موفقیت در کانال‌های انتخابی منتشر گردید! 🚀</span>
+                <span>پست با موفقیت در کانال‌های انتخابی منتشر شد</span>
               </div>
             )}
 
@@ -520,7 +526,7 @@ export function MultiPublishView() {
         </div>
 
         {/* Right Column: Live Multi-Channel Simulator Preview (5 cols) */}
-        <div className="lg:col-span-5 space-y-4">
+        <div className="min-w-0 space-y-4 lg:col-span-5">
           <div className="bg-white rounded-3xl border border-gray-100 p-5 shadow-xs space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-gray-100">
               <span className="text-xs font-black text-gray-800 flex items-center gap-1.5">
@@ -531,24 +537,26 @@ export function MultiPublishView() {
             </div>
 
             {/* Platform Selector for Preview */}
-            <div className="flex items-center justify-between gap-1 p-1 bg-gray-50 rounded-2xl border border-gray-100">
+            <div className="flex flex-wrap items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1">
               {[
-                { id: 'instagram' as SocialPlatform, label: 'اینستاگرام', icon: '/instagram-clean.png' },
-                { id: 'telegram' as SocialPlatform, label: 'تلگرام', icon: '/telegram-clean.png' },
-                { id: 'whatsapp' as SocialPlatform, label: 'واتساپ', icon: '/whatsapp-clean.png' },
-                { id: 'rubika' as SocialPlatform, label: 'روبیکا', icon: '/rubika-icon.png' },
-                { id: 'bale' as SocialPlatform, label: 'بله' },
+                { id: 'instagram' as SocialPlatform, label: 'اینستاگرام', icon: <InstagramIcon className="h-3.5 w-3.5" /> },
+                { id: 'telegram' as SocialPlatform, label: 'تلگرام', icon: <TelegramIcon className="h-3.5 w-3.5" /> },
+                { id: 'whatsapp' as SocialPlatform, label: 'واتساپ', icon: <WhatsappIcon className="h-3.5 w-3.5" /> },
+                { id: 'rubika' as SocialPlatform, label: 'روبیکا', icon: <RubikaIcon className="h-3.5 w-3.5" /> },
+                { id: 'bale' as SocialPlatform, label: 'بله', icon: <BaleIcon className="h-3.5 w-3.5" /> },
               ].map((p) => (
                 <button
                   key={p.id}
+                  type="button"
+                  aria-pressed={activePreviewTab === p.id}
                   onClick={() => setActivePreviewTab(p.id)}
-                  className={`flex-1 py-1.5 text-[11px] font-bold rounded-xl transition-all flex items-center justify-center gap-1 ${
+                  className={`flex min-h-9 grow items-center justify-center gap-1 rounded-lg px-1.5 text-xs font-bold transition-colors ${
                     activePreviewTab === p.id
                       ? 'bg-white text-[#3b96cc] shadow-xs font-black'
                       : 'text-gray-500 hover:text-gray-900'
                   }`}
                 >
-                  {p.icon && <img src={p.icon} alt={p.label} className="w-3.5 h-3.5 object-contain" />}
+                  {p.icon}
                   <span>{p.label}</span>
                 </button>
               ))}
@@ -625,11 +633,11 @@ export function MultiPublishView() {
 
             <div className="space-y-2 text-xs">
               {[
-                { id: 'instagram' as SocialPlatform, name: 'اینستاگرام (Graph API)', desc: 'ریلز و استوری', icon: '/instagram-clean.png' },
-                { id: 'telegram' as SocialPlatform, name: 'تلگرام رسمی (Bot API)', desc: 'پست متنی و عکس', icon: '/telegram-clean.png' },
-                { id: 'whatsapp' as SocialPlatform, name: 'واتساپ (Cloud API)', desc: 'کانال و برودکست', icon: '/whatsapp-clean.png' },
-                { id: 'rubika' as SocialPlatform, name: 'روبیکا و روبینو', desc: 'کانال و روبینو', icon: '/rubika-icon.png' },
-                { id: 'bale' as SocialPlatform, name: 'پیام‌رسان بله (Bale Bot)', desc: 'کانال رسمی', icon: null },
+                { id: 'instagram' as SocialPlatform, name: 'اینستاگرام (Graph API)', desc: 'ریلز و استوری', icon: <InstagramIcon className="h-4 w-4" /> },
+                { id: 'telegram' as SocialPlatform, name: 'تلگرام رسمی (Bot API)', desc: 'پست متنی و عکس', icon: <TelegramIcon className="h-4 w-4" /> },
+                { id: 'whatsapp' as SocialPlatform, name: 'واتساپ (Cloud API)', desc: 'کانال و برودکست', icon: <WhatsappIcon className="h-4 w-4" /> },
+                { id: 'rubika' as SocialPlatform, name: 'روبیکا و روبینو', desc: 'کانال و روبینو', icon: <RubikaIcon className="h-4 w-4" /> },
+                { id: 'bale' as SocialPlatform, name: 'پیام‌رسان بله (Bale Bot)', desc: 'کانال رسمی', icon: <BaleIcon className="h-4 w-4" /> },
               ].map((c) => {
                 const isSelected = selectedPlatforms.includes(c.id);
                 const account = connectedAccounts[c.id];
@@ -646,11 +654,7 @@ export function MultiPublishView() {
                   >
                     <div className="flex items-center gap-2.5">
                       <div className="w-5 h-5 flex items-center justify-center shrink-0">
-                        {c.icon ? (
-                          <img src={c.icon} alt={c.name} className="w-4 h-4 object-contain" />
-                        ) : (
-                          <span className="w-3.5 h-3.5 rounded-full bg-teal-600 flex items-center justify-center text-[8px] text-white font-bold">ب</span>
-                        )}
+                        {c.icon}
                       </div>
                       <div className="flex flex-col text-right">
                         <span className="font-bold text-gray-800">{c.name}</span>
@@ -669,7 +673,7 @@ export function MultiPublishView() {
                             : 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
                         }`}
                       >
-                        {isConnected ? 'متصل ✓' : '+ اتصال اکانت'}
+                        {isConnected ? 'متصل' : '+ اتصال اکانت'}
                       </span>
                     </div>
                   </div>

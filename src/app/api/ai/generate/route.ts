@@ -3,6 +3,7 @@ import { AiGenerationParams, AiGenerationResponse } from '@/types';
 import { callGapGpt, getModelForPlan } from '@/lib/gapgpt';
 import { getSession } from '@/lib/session';
 import prisma from '@/lib/prisma';
+import { getEffectivePlan } from '@/lib/subscription';
 
 export async function POST(request: Request) {
   try {
@@ -20,10 +21,10 @@ export async function POST(request: Request) {
       if (session?.userId) {
         const user = await prisma.user.findUnique({
           where: { id: session.userId },
-          select: { plan: true },
+          select: { plan: true, planExpiresAt: true },
         });
         if (user?.plan) {
-          userPlan = user.plan;
+          userPlan = getEffectivePlan(user);
         }
       }
     } catch (e) {

@@ -1,70 +1,96 @@
 import React from 'react';
 
-// Instagram Official Icon
-export function InstagramIcon({ className = 'w-4 h-4' }: { className?: string }) {
+type SocialIconProps = {
+  className?: string;
+  decorative?: boolean;
+};
+
+type ImageIconProps = SocialIconProps & {
+  src: string;
+  label: string;
+};
+
+function ImageIcon({ src, label, className = 'w-4 h-4', decorative = false }: ImageIconProps) {
   return (
     <img
+      src={src}
+      alt={decorative ? '' : label}
+      aria-hidden={decorative || undefined}
+      draggable={false}
+      className={`${className} inline-block shrink-0 object-contain select-none`}
+    />
+  );
+}
+
+export function InstagramIcon({ className, decorative }: SocialIconProps) {
+  return (
+    <ImageIcon
       src="/socialman/instagram-clean.png"
-      alt="اینستاگرام"
-      className={`${className} object-contain inline-block shrink-0`}
+      label="اینستاگرام"
+      className={className}
+      decorative={decorative}
     />
   );
 }
 
-// Telegram Official Icon
-export function TelegramIcon({ className = 'w-4 h-4' }: { className?: string }) {
+export function TelegramIcon({ className, decorative }: SocialIconProps) {
   return (
-    <img
+    <ImageIcon
       src="/socialman/telegram-clean.png"
-      alt="تلگرام"
-      className={`${className} object-contain inline-block shrink-0`}
+      label="تلگرام"
+      className={className}
+      decorative={decorative}
     />
   );
 }
 
-// WhatsApp Official Icon
-export function WhatsappIcon({ className = 'w-4 h-4' }: { className?: string }) {
+export function WhatsappIcon({ className, decorative }: SocialIconProps) {
   return (
-    <img
+    <ImageIcon
       src="/socialman/whatsapp-clean.png"
-      alt="واتساپ"
-      className={`${className} object-contain inline-block shrink-0`}
+      label="واتساپ"
+      className={className}
+      decorative={decorative}
     />
   );
 }
 
-// Bale (Iranian messenger)
-export function BaleIcon({ className = 'w-4 h-4' }: { className?: string }) {
+export function BaleIcon({ className, decorative }: SocialIconProps) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <path d="M8 12l3 3 5-6" />
-    </svg>
+    <ImageIcon
+      src="/socialman/bale-mark.svg"
+      label="بله"
+      className={className}
+      decorative={decorative}
+    />
   );
 }
 
-// Rubika (Official Iranian Super-App Logo)
-export function RubikaIcon({ className = 'w-4 h-4' }: { className?: string }) {
+/** Vector Rubika mark without the watermark/background of the old bitmap. */
+export function RubikaIcon({ className = 'w-4 h-4', decorative = false }: SocialIconProps) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none">
-      <path
-        d="M12 2L20.5 7V17L12 22L3.5 17V7L12 2Z"
-        fill="currentColor"
-        fillOpacity="0.15"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinejoin="round"
-      />
-      {/* Central cube wireframe */}
-      <path
-        d="M12 7L16.5 9.5V14.5L12 17L7.5 14.5V9.5L12 7Z"
-        fill="currentColor"
-        fillOpacity="0.3"
-        stroke="currentColor"
-        strokeWidth="1.2"
-        strokeLinejoin="round"
-      />
-      <path d="M12 12V17M12 12L16.5 9.5M12 12L7.5 9.5" stroke="currentColor" strokeWidth="1.2" />
+    <svg
+      className={`${className} inline-block shrink-0`}
+      viewBox="0 0 80 80"
+      fill="none"
+      role={decorative ? undefined : 'img'}
+      aria-label={decorative ? undefined : 'روبیکا'}
+      aria-hidden={decorative || undefined}
+    >
+      <path d="M40 5 70.3 22.5v35L40 75 9.7 57.5v-35L40 5Z" fill="#fff" />
+      <path d="M40 5 25 13.7 40 22.4 55 13.7 40 5Z" fill="#8DC63F" />
+      <path d="m55 13.7 15.3 8.8L55 31.3 40 22.4l15-8.7Z" fill="#00AEEF" />
+      <path d="m70.3 22.5v17.6L55 31.3v-17.6l15.3 8.8Z" fill="#7048A5" />
+      <path d="m70.3 40.1v17.4L55 48.7V31.3l15.3 8.8Z" fill="#5A2C91" />
+      <path d="m70.3 57.5-15.3 8.8-15-8.7 15-8.9 15.3 8.8Z" fill="#F15A24" />
+      <path d="M55 48.7v17.6L40 75V57.6l15-8.9Z" fill="#F7941D" />
+      <path d="M40 57.6V75l-15-8.7V48.7l15 8.9Z" fill="#00A79D" />
+      <path d="M25 48.7v17.6L9.7 57.5V40.1L25 48.7Z" fill="#0072BC" />
+      <path d="M25 31.3v17.4L9.7 40.1V22.5L25 31.3Z" fill="#2E3192" />
+      <path d="m25 13.7 15 8.7-15 8.9-15.3-8.8L25 13.7Z" fill="#EC008C" />
+      <path d="m40 22.4 15 8.9-15 8.8-15-8.8 15-8.9Z" fill="#fff" />
+      <path d="M25 31.3 40 40v17.6l-15-8.9V31.3Z" fill="#F1F5F9" />
+      <path d="m40 40 15-8.7v17.4l-15 8.9V40Z" fill="#DDE3EA" />
     </svg>
   );
 }

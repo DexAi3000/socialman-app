@@ -230,7 +230,7 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
                   )}
                 </div>
                 <span className="hidden max-w-24 truncate text-sm font-bold text-slate-800 lg:block xl:max-w-36">{currentUser.fullName}</span>
-                <ChevronDown className="hidden size-3.5 shrink-0 text-slate-500 sm:block" />
+                <ChevronDown className="size-3.5 shrink-0 text-slate-500" />
               </button>
 
               {/* User Dropdown with Avatar Upload Control */}

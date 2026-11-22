@@ -1,306 +1,172 @@
 "use client";
 
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { CalendarDays, Clock, FileText, Search } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
-import {
-  Calendar,
-  Clock,
-  CheckCircle2,
-  ArrowUpRight,
-  Zap,
-  Search,
-  Link2,
-} from 'lucide-react';
-import { SnappHero } from '@/components/SnappHero';
-import { SnappCategoryTabs } from '@/components/SnappCategoryTabs';
-import { SnappTilesGrid } from '@/components/SnappTilesGrid';
-import {
-  InstagramIcon,
-  TelegramIcon,
-  WhatsappIcon,
-  BaleIcon,
-  RubikaIcon,
-} from '@/components/SocialIcons';
-import { toPersianDigits, IRANIAN_EVENTS } from '@/lib/utils';
-import { SocialPlatform, PostStatus } from '@/types';
+import { SnappHero } from './SnappHero';
+import { SnappCategoryTabs } from './SnappCategoryTabs';
+import { SnappTilesGrid } from './SnappTilesGrid';
+import { InstagramIcon, TelegramIcon, WhatsappIcon, BaleIcon, RubikaIcon } from './SocialIcons';
+import { getShamsiToday, IRANIAN_EVENTS, toEnglishDigits, toPersianDigits } from '@/lib/utils';
+import type { AppTab, PostStatus, SocialPlatform } from '@/types';
 
 interface DashboardViewProps {
-  onNavigateTab: (tab: 'dashboard' | 'publish' | 'ai-studio' | 'calendar' | 'pricing' | 'client-portal') => void;
-  onSetAiPlatform?: (platform: SocialPlatform) => void;
+  isWorkspace: boolean;
+  onNavigateTab: (tab: AppTab) => void;
 }
 
-export function DashboardView({ onNavigateTab, onSetAiPlatform }: DashboardViewProps) {
+const platforms = {
+  instagram: { name: 'اینستاگرام', icon: InstagramIcon },
+  telegram: { name: 'تلگرام', icon: TelegramIcon },
+  whatsapp: { name: 'واتساپ', icon: WhatsappIcon },
+  rubika: { name: 'روبیکا', icon: RubikaIcon },
+  bale: { name: 'بله', icon: BaleIcon },
+};
+
+const statuses: Record<PostStatus, { label: string; color: string }> = {
+  approved: { label: 'تأیید شده', color: 'bg-emerald-50 text-emerald-800' },
+  pending_approval: { label: 'در انتظار تأیید', color: 'bg-amber-50 text-amber-800' },
+  draft: { label: 'پیش‌نویس', color: 'bg-slate-100 text-slate-700' },
+  published: { label: 'منتشر شده', color: 'bg-sky-50 text-sky-800' },
+};
+
+function normalizeSearch(value: string) {
+  return toEnglishDigits(value.toLocaleLowerCase('fa').trim())
+    .replaceAll('ي', 'ی')
+    .replaceAll('ك', 'ک')
+    .replace(/[\s\u200c]+/g, ' ');
+}
+
+export function DashboardView({ isWorkspace, onNavigateTab }: DashboardViewProps) {
   const { posts, activeWorkspace, openConnectModal, connectedAccounts } = useApp();
-  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [platform, setPlatform] = useState<SocialPlatform | 'all'>('all');
+  const [search, setSearch] = useState('');
+  const today = getShamsiToday();
 
-  const connectedChannelsCount = Object.values(connectedAccounts || {}).filter(
-    (a) => a?.isConnected && a?.handle
-  ).length;
-
-  const workspacePosts = posts.filter(
-    (p) =>
-      p.workspaceId === activeWorkspace.id &&
-      (activeCategory === 'all' || activeCategory === 'more' || p.platform === activeCategory)
-  );
-
-  const getPlatformIcon = (platform: SocialPlatform) => {
-    switch (platform) {
-      case 'instagram':
-        return <InstagramIcon className="w-4 h-4 text-pink-500" />;
-      case 'telegram':
-        return <TelegramIcon className="w-4 h-4 text-sky-500" />;
-      case 'whatsapp':
-        return <WhatsappIcon className="w-4 h-4 text-[#25D366]" />;
-      case 'rubika':
-        return <RubikaIcon className="w-4 h-4 text-purple-500" />;
-      case 'bale':
-        return <BaleIcon className="w-4 h-4 text-teal-600" />;
-    }
-  };
-
-  const getPlatformName = (platform: SocialPlatform) => {
-    const names: Record<SocialPlatform, string> = {
-      instagram: 'اینستاگرام',
-      telegram: 'تلگرام',
-      whatsapp: 'واتساپ',
-      rubika: 'روبیکا',
-      bale: 'بله',
-    };
-    return names[platform] || platform;
-  };
-
-  const getStatusBadge = (status: PostStatus) => {
-    switch (status) {
-      case 'approved':
-        return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 text-[#3b96cc] border border-sky-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#3b96cc] animate-pulse" />
-            تایید شده
-          </span>
-        );
-      case 'pending_approval':
-        return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-            <Clock className="w-3 h-3 text-amber-500" />
-            در انتظار تایید کارفرما
-          </span>
-        );
-      case 'draft':
-        return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-600 border border-gray-200">
-            پیش‌نویس
-          </span>
-        );
-      case 'published':
-        return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200">
-            منتشر شده
-          </span>
-        );
-    }
-  };
-
-  const handleServiceSelect = (serviceId: string) => {
-    if (serviceId === 'publish') {
-      onNavigateTab('publish');
-    } else if (['instagram', 'telegram', 'whatsapp', 'rubika', 'bale'].includes(serviceId)) {
-      onNavigateTab('publish');
-    } else if (serviceId === 'ai-studio') {
-      onNavigateTab('ai-studio');
-    } else if (serviceId === 'calendar') {
-      onNavigateTab('calendar');
-    } else if (serviceId === 'client-portal') {
-      onNavigateTab('client-portal');
-    } else if (serviceId === 'pricing') {
-      onNavigateTab('pricing');
-    }
-  };
+  const connectedChannels = Object.values(connectedAccounts).filter((account) => account?.isConnected && account.handle).length;
+  const workspacePosts = posts.filter((post) => post.workspaceId === activeWorkspace.id);
+  const query = normalizeSearch(search);
+  const visiblePosts = workspacePosts.filter((post) => {
+    if (platform !== 'all' && post.platform !== platform) return false;
+    if (!query) return true;
+    const text = [post.title, post.content, post.hook, platforms[post.platform]?.name].filter(Boolean).join(' ');
+    return normalizeSearch(text).includes(query);
+  });
+  const occasions = IRANIAN_EVENTS
+    .filter((event) => event.month === today.monthName && event.day >= today.day)
+    .slice(0, 3);
 
   return (
-    <div className="space-y-6">
-      {/* 0. Mobile Search Bar (Directly matching Snapp mobile app top bar) */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-2">
-        <div className="bg-white rounded-2xl border border-gray-200/90 shadow-xs px-4 py-3 flex items-center gap-3">
-          <Search className="w-5 h-5 text-gray-400 shrink-0" />
-          <input
-            type="text"
-            placeholder="جست‌وجو در کانال‌ها، زمان‌بندی‌ها و ابزارهای انتشار سوشال‌من..."
-            className="w-full bg-transparent text-xs sm:text-sm font-medium text-gray-800 placeholder-gray-400 outline-none text-right"
-          />
-        </div>
-      </div>
-
-      {/* 1. Snapp Hero Section (3D Character + Headline) */}
-      <SnappHero
-        onOpenPublish={() => onNavigateTab('publish')}
-        onOpenCalendar={() => onNavigateTab('calendar')}
-      />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-6">
-        {/* 2. Snapp-Style Promo Banner (Matching Screenshot emerald banner) */}
-        <div className="rounded-3xl bg-gradient-to-r from-sky-950 via-teal-900 to-slate-900 p-5 sm:p-7 text-white shadow-lg relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="space-y-1.5 text-right z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-400/20 text-sky-300 text-[10px] font-black border border-sky-400/30">
-              <span>هاب متمرکز سوشال‌من</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping" />
-            </div>
-            <h3 className="text-sm sm:text-lg font-black tracking-tight text-white">
-              انتشار و زمان‌بندی همزمان در ۵ پلتفرم با ۱ کلیک 🚀
-            </h3>
-            <p className="text-xs text-sky-100 font-medium leading-relaxed">
-              اینستاگرام، تلگرام، واتساپ، روبیکا و بله را با یک کلیک مدیریت کنید و طبق تقویم شمسی منتشر کنید.
-            </p>
-          </div>
-          <button
-            onClick={() => onNavigateTab('publish')}
-            className="px-6 py-3 rounded-2xl bg-[#3b96cc] hover:bg-[#2c7ead] text-white font-black text-xs sm:text-sm shadow-lg shadow-[#3b96cc]/35 transition-transform active:scale-95 shrink-0 z-10"
-          >
-            شروع انتشار همزمان 🚀
-          </button>
-        </div>
-
-        {/* 2.5 Quick Account Connection Strip */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-3.5 px-5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
-          <div className="flex items-center gap-3">
-            <div
-              className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-                connectedChannelsCount > 0
-                  ? 'bg-sky-50 text-[#3b96cc]'
-                  : 'bg-amber-50 text-amber-600'
-              }`}
-            >
-              <Link2 className="w-4 h-4" />
-            </div>
-            <div className="text-right">
-              <span className="text-xs font-black text-gray-900 block">
-                {connectedChannelsCount === 0
-                  ? 'کانال‌های ارتباطی هنوز متصل نشده‌اند'
-                  : `وضعیت کانال‌های متصل به پیج ${activeWorkspace.name}`}
-              </span>
-              <span className="text-[10px] text-gray-500">
-                {connectedChannelsCount === 0
-                  ? 'برای فعال‌سازی انتشار خودکار در شبکه‌های اجتماعی، ابتدا اکانت خود را متصل کنید'
-                  : `${toPersianDigits(connectedChannelsCount)} از ۵ پلتفرم برای انتشار خودکار متصل و فعال هستند`}
-              </span>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => openConnectModal()}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer ${
-              connectedChannelsCount > 0
-                ? 'bg-sky-50 hover:bg-sky-100 border border-sky-200 text-[#3b96cc]'
-                : 'bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800'
-            }`}
-          >
-            <Link2 className="w-3.5 h-3.5" />
-            <span>{connectedChannelsCount === 0 ? '+ اتصال اولین اکانت' : 'تنظیم و اتصال اکانت‌ها'}</span>
-          </button>
-        </div>
-
-        {/* 3. Snapp 3-Column Large Cards + 4 Secondary Cards (Matching Screenshot) */}
-        <SnappTilesGrid onSelectService={handleServiceSelect} />
-
-        {/* 4. Snapp Category Icon Tabs (Horizontal Slider with Green Active Line) */}
-        <SnappCategoryTabs
-          activeCategory={activeCategory}
-          onSelectCategory={setActiveCategory}
+    <div className="space-y-6 sm:space-y-7">
+      {isWorkspace ? (
+        <SnappHero
+          workspaceName={activeWorkspace.name}
+          dateLabel={today.fullDateWithWeekday}
+          connectedChannels={connectedChannels}
+          postCount={workspacePosts.length}
+          onOpenPublish={() => onNavigateTab('publish')}
+          onOpenCalendar={() => onNavigateTab('calendar')}
+          onConnect={() => openConnectModal()}
         />
+      ) : (
+        <section aria-labelledby="workspace-services">
+          <h2 id="workspace-services" className="mb-2.5 text-base font-black sm:text-lg">ابزارهای مدیریت محتوا</h2>
+          <SnappTilesGrid onSelectService={onNavigateTab} />
+        </section>
+      )}
 
-        {/* 4. Scheduled Posts Timeline in Clean Snapp Light Cards */}
-        <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-            <div>
-              <h3 className="text-sm sm:text-base font-black text-[#212121]">
-                پست‌های آماده و زمان‌بندی شده در تقویم
-              </h3>
-              <p className="text-xs text-[#757575] font-medium">
-                نوبت انتشار در ۵ شبکه فعال ({activeWorkspace.name})
-              </p>
-            </div>
-            <button
-              onClick={() => onNavigateTab('calendar')}
-              className="text-xs font-black text-[#3b96cc] hover:underline flex items-center gap-1"
-            >
-              مشاهده تقویم کامل
-              <ArrowUpRight className="w-3.5 h-3.5" />
+      <div className={occasions.length ? 'grid items-start gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]' : undefined}>
+        <section aria-labelledby="workspace-posts" className="min-w-0 rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 id="workspace-posts" className="text-base font-black sm:text-lg">پست‌های فضای کاری</h2>
+            <button type="button" onClick={() => onNavigateTab('calendar')} className="inline-flex min-h-10 cursor-pointer items-center gap-1.5 rounded-lg px-2 text-sm font-bold text-sky-800 hover:bg-sky-50">
+              <CalendarDays aria-hidden="true" className="size-4" />
+              مشاهدهٔ تقویم
             </button>
           </div>
-
-          <div className="space-y-3">
-            {workspacePosts.map((post) => (
-              <div
-                key={post.id}
-                className="p-4 rounded-2xl bg-gray-50/70 border border-gray-100 hover:border-gray-200 hover:bg-white transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="p-2.5 rounded-xl bg-white border border-gray-200 shrink-0 mt-0.5 shadow-xs">
-                    {getPlatformIcon(post.platform)}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-black text-[#212121] line-clamp-1">
-                        {post.title}
-                      </span>
-                      <span className="text-[10px] text-gray-500 font-mono">
-                        ({getPlatformName(post.platform)})
-                      </span>
-                    </div>
-                    <p className="text-xs text-[#616161] line-clamp-1 mb-1.5 leading-relaxed">
-                      {post.hook || post.content}
-                    </p>
-                    <div className="flex items-center gap-3 text-[10px] text-gray-400 font-mono">
-                      <span>📅 {post.scheduledDateShamsi}</span>
-                      <span>⏰ ساعت {toPersianDigits(post.scheduledTime)}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
-                  {getStatusBadge(post.status)}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 5. Iranian Events & Marketing Opportunities */}
-        <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-xs space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-amber-500" />
-              <h3 className="text-sm font-black text-[#212121]">
-                مناسبت‌های ملی و پیک‌های فروش آذرماه (پیشنهادی اسنپ)
-              </h3>
+          {workspacePosts.length > 0 && (
+            <div className="my-3 space-y-2.5">
+              <label className="flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-sky-600">
+                <Search aria-hidden="true" className="size-4 shrink-0 text-slate-500" />
+                <span className="sr-only">جست‌وجوی پست‌ها</span>
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="جست‌وجو در عنوان و متن پست‌ها"
+                  className="min-w-0 flex-1 bg-transparent py-2 text-base text-slate-900 placeholder:text-slate-500 sm:text-sm"
+                />
+              </label>
+              <SnappCategoryTabs activeCategory={platform} onSelectCategory={setPlatform} />
             </div>
-            <span className="text-[10px] text-amber-800 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full font-black">
-              کمپین پاییزه
-            </span>
-          </div>
+          )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {IRANIAN_EVENTS.slice(0, 3).map((evt, idx) => (
-              <div
-                key={idx}
-                className={`p-4 rounded-2xl border text-xs transition-all ${
-                  evt.type === 'hot'
-                    ? 'bg-rose-50/80 border-rose-200 text-rose-900 shadow-xs'
-                    : 'bg-gray-50 border-gray-100 text-gray-800'
-                }`}
+          {visiblePosts.length === 0 ? (
+            <div className="mt-3 grid justify-items-center gap-2 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center">
+              <span className="grid size-10 place-items-center rounded-xl bg-white text-slate-500"><FileText aria-hidden="true" className="size-5" /></span>
+              <p className="text-sm font-bold text-slate-800">
+                {workspacePosts.length ? 'پستی با این جست‌وجو یا فیلتر پیدا نشد' : 'هنوز پستی در این فضای کاری نداری'}
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!workspacePosts.length) {
+                    onNavigateTab('publish');
+                    return;
+                  }
+
+                  setPlatform('all');
+                  setSearch('');
+                }}
+                className="min-h-10 cursor-pointer rounded-lg px-3 text-sm font-bold text-sky-800 hover:bg-sky-100"
               >
-                <div className="flex items-center justify-between font-black mb-1">
-                  <span>{toPersianDigits(evt.day)} {evt.month}</span>
-                  {evt.type === 'hot' && (
-                    <span className="text-[10px] text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full font-black">
-                      🔥 شب یلدا
+                {workspacePosts.length ? 'پاک‌کردن جست‌وجو و فیلتر' : 'ساخت اولین پست'}
+              </button>
+            </div>
+          ) : (
+            <ul className="mt-3 divide-y divide-slate-100 border-t border-slate-100">
+              {visiblePosts.map((post) => {
+                const social = platforms[post.platform];
+                const status = statuses[post.status];
+                const SocialIcon = social?.icon;
+                return (
+                  <li key={post.id} className="flex flex-wrap items-start gap-2.5 py-3 sm:items-center">
+                    <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-slate-100">
+                      {SocialIcon ? <SocialIcon decorative className="size-5" /> : <FileText className="size-4" />}
                     </span>
-                  )}
-                </div>
-                <p className="text-xs text-gray-600 line-clamp-1">{evt.title}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+                    <div className="min-w-0 flex-1 basis-32">
+                      <h3 className="truncate text-sm font-bold">{post.title}</h3>
+                      <p className="truncate text-xs text-slate-600">{post.hook || post.content}</p>
+                      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-600">
+                        <span>{social?.name ?? post.platform}</span>
+                        <span className="inline-flex items-center gap-1"><CalendarDays className="size-3.5" />{post.scheduledDateShamsi}</span>
+                        <span className="inline-flex items-center gap-1"><Clock className="size-3.5" />{toPersianDigits(post.scheduledTime)}</span>
+                      </div>
+                    </div>
+                    {status && <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold ${status.color}`}>{status.label}</span>}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+
+        {occasions.length > 0 && (
+          <section aria-labelledby="workspace-occasions" className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5">
+            <h2 id="workspace-occasions" className="mb-2 text-base font-black">مناسبت‌های پیش‌ رو</h2>
+            <ul className="divide-y divide-slate-100">
+              {occasions.map((event) => (
+                <li key={event.day} className="flex items-center gap-3 py-2.5">
+                  <span className="grid size-10 shrink-0 place-content-center rounded-lg bg-amber-50 p-1 text-center font-bold leading-tight text-amber-900">
+                    {toPersianDigits(event.day)}
+                    <span className="text-[10px]">{event.month}</span>
+                  </span>
+                  <p className="text-sm leading-6 text-slate-700">{event.title}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
     </div>
   );

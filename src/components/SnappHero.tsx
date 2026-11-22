@@ -1,81 +1,71 @@
 "use client";
 
-import React from 'react';
-import { Sparkles, Calendar, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { CalendarDays, Link2, Plus } from 'lucide-react';
+import { toPersianDigits } from '@/lib/utils';
 
 interface SnappHeroProps {
+  workspaceName: string;
+  dateLabel: string;
+  connectedChannels: number;
+  postCount: number;
   onOpenPublish: () => void;
   onOpenCalendar: () => void;
+  onConnect: () => void;
 }
 
-export function SnappHero({ onOpenPublish, onOpenCalendar }: SnappHeroProps) {
+export function SnappHero({
+  workspaceName,
+  dateLabel,
+  connectedChannels,
+  postCount,
+  onOpenPublish,
+  onOpenCalendar,
+  onConnect,
+}: SnappHeroProps) {
   return (
-    <section className="relative overflow-hidden py-6 sm:py-12 bg-white border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-        {/* Right Column: Snapp Big Title & Buttons (7 cols) */}
-        <div className="lg:col-span-7 space-y-5 text-right">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-[#3b96cc] text-xs font-black">
-            <span className="w-2 h-2 rounded-full bg-[#3b96cc] animate-ping" />
-            <span>یک اپلیکیشن، برای تمام کانال‌های ارتباطی شما</span>
-          </div>
-
-          <h1 className="text-2xl sm:text-4xl lg:text-[40px] font-black text-[#212121] leading-[1.35] tracking-tight">
-            مدیریت، زمان‌بندی و انتشار <span className="text-[#3b96cc]">یکپارچه</span> در{' '}
-            <span className="text-[#3b96cc]">۵ پلتفرم</span> با سوشال من!
-          </h1>
-
-          <p className="text-sm sm:text-base text-[#616161] font-medium leading-relaxed max-w-xl">
-            محتوا را یک‌بار آماده کنید و همزمان با ۱ کلیک در اینستاگرام، تلگرام، واتساپ، روبیکا و بله منتشر یا در تقویم شمسی زمان‌بندی نمایید.
-          </p>
-
-          {/* Snapp Action Buttons from Screenshot */}
-          <div className="flex flex-wrap items-center gap-3 pt-3">
-            {/* Primary Green Button: Publish Post */}
-            <button
-              onClick={onOpenPublish}
-              className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl text-xs sm:text-sm font-black bg-[#3b96cc] hover:bg-[#2c7ead] text-white shadow-lg shadow-[#3b96cc]/30 transition-transform active:scale-95"
-            >
-              <span>انتشار پست در ۵ پلتفرم 🚀</span>
-              <ArrowLeft className="w-4 h-4 mr-1" />
-            </button>
-
-            {/* Secondary Outline Button (like "دانلود برنامه") */}
-            <button
-              onClick={onOpenCalendar}
-              className="flex items-center gap-2 px-5 py-3.5 rounded-2xl text-xs sm:text-sm font-black text-[#212121] bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors shadow-xs"
-            >
-              <Calendar className="w-4 h-4 text-[#3b96cc]" />
-              <span>مشاهده تقویم محتوایی آذر</span>
-            </button>
-          </div>
-
-          {/* Social Proof Badges */}
-          <div className="flex items-center gap-5 pt-3 text-xs text-gray-500 font-bold">
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-[#3b96cc]" />
-              بدون نیاز به فیلترشکن
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-[#3b96cc]" />
-              پشتیبانی از زبان فارسی
-            </span>
-          </div>
+    <section aria-labelledby="dashboard-title" className="grid items-center gap-5 rounded-[1.65rem] bg-gradient-to-bl from-[#143b5c] via-[#102943] to-[#101e35] p-5 text-white sm:gap-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.6fr)] lg:px-10">
+      <div className="min-w-0">
+        <p className="mb-2 inline-flex items-center gap-2 text-xs font-semibold text-sky-100 sm:text-sm">
+          <CalendarDays aria-hidden="true" className="size-4 shrink-0" />
+          {dateLabel}
+        </p>
+        <h1 id="dashboard-title" className="text-[clamp(1.65rem,4vw,2.6rem)] leading-[1.4] font-black">
+          میز کار محتوا
+        </h1>
+        <p className="mt-2 max-w-lg text-sm leading-7 text-slate-200 sm:text-base">
+          پست‌هایت را آماده کن، برای انتشار زمان بگذار و کانال‌هایت را از همین‌جا مدیریت کن.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2.5 sm:mt-5">
+          <button type="button" onClick={onOpenPublish} className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl bg-sky-200 px-4 text-sm font-black text-slate-950 transition-colors hover:bg-white">
+            <Plus aria-hidden="true" className="size-[18px]" />
+            ساخت پست
+          </button>
+          <button type="button" onClick={onOpenCalendar} className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-white/25 px-4 text-sm font-bold text-white transition-colors hover:bg-white/10">
+            <CalendarDays aria-hidden="true" className="size-4" />
+            تقویم محتوا
+          </button>
         </div>
+      </div>
 
-        {/* Left Column: Seamless 3D Character Illustration (Part of Background) */}
-        <div className="lg:col-span-5 flex justify-center relative select-none">
-          <div className="relative w-80 sm:w-[460px] h-80 sm:h-[460px] flex items-center justify-center group">
-            {/* Ambient soft glow aura */}
-            <div className="absolute inset-8 rounded-full bg-gradient-to-tr from-[#3b96cc]/15 via-sky-100/30 to-transparent blur-3xl -z-10" />
-
-            {/* 3D Hero Character (Transparent Isolated PNG) */}
-            <img
-              src="/socialman/hero-character.png"
-              alt="سوشال‌من دستیار هوشمند محتوا"
-              className="w-full h-full object-contain filter drop-shadow-[0_15px_30px_rgba(33,170,88,0.18)] group-hover:scale-105 transition-transform duration-500 pointer-events-none"
-            />
-          </div>
+      <div className="min-w-0 rounded-2xl border border-white/15 bg-white/8 p-3.5 sm:p-4">
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+          <span className="text-xs font-medium text-slate-300">فضای کاری</span>
+          <span className="min-w-0 break-words text-sm font-bold text-white">{workspaceName}</span>
         </div>
+        <dl className="my-3 grid grid-cols-2 divide-x divide-x-reverse divide-white/15 rounded-xl bg-slate-950/25 p-3">
+          <div className="ps-1 pe-2">
+            <dt className="text-xs leading-5 text-slate-300">کانال متصل</dt>
+            <dd className="text-lg font-black text-white">{toPersianDigits(connectedChannels)} <span className="text-xs font-medium text-slate-300">از ۵</span></dd>
+          </div>
+          <div className="ps-3">
+            <dt className="text-xs leading-5 text-slate-300">پست در فضای کاری</dt>
+            <dd className="text-lg font-black text-white">{toPersianDigits(postCount)}</dd>
+          </div>
+        </dl>
+        <button type="button" onClick={onConnect} className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-white/10 px-3 text-sm font-bold text-white transition-colors hover:bg-white/20">
+          <Link2 aria-hidden="true" className="size-4 shrink-0" />
+          {connectedChannels === 0 ? 'اتصال اولین کانال' : 'مدیریت کانال‌ها'}
+        </button>
       </div>
     </section>
   );

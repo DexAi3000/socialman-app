@@ -2,11 +2,19 @@
 
 import React from 'react';
 import { useApp } from '@/context/AppContext';
-import { Crown, Check, Zap, ShieldCheck, Users, ArrowLeft } from 'lucide-react';
+import { CalendarClock, Crown, Check, Zap, ShieldCheck, Users, ArrowLeft } from 'lucide-react';
 import { PlanType } from '@/types';
+import { daysRemaining, EXPIRY_REMINDER_DAYS, formatSubscriptionDate, paidPlanNames } from '@/lib/subscription';
+import { toPersianDigits } from '@/lib/utils';
 
 export function PricingView() {
-  const { currentPlan, openUpgradeModal } = useApp();
+  const { currentPlan, currentUser, openUpgradeModal } = useApp();
+  const subscription = currentUser?.subscription;
+  const end = subscription?.expiresAt;
+  const remaining = end ? daysRemaining(end) : null;
+  const isExpired = remaining === 0;
+  const needsReminder = remaining !== null && remaining <= EXPIRY_REMINDER_DAYS;
+  const subscriptionName = subscription ? paidPlanNames[subscription.plan] : currentPlan === 'free' ? 'برنز (رایگان)' : paidPlanNames[currentPlan];
 
   const plans = [
     {
@@ -62,7 +70,7 @@ export function PricingView() {
       buttonDisabled: currentPlan === 'agency',
       features: [
         'انتشار نامحدود در تمام ۵ پلتفرم بدون هیچ سقف ارسالی',
-        '👑 دستیار نگارش و تولید محتوا با هوش مصنوعی Google Gemini',
+        'دستیار نگارش و تولید محتوا با هوش مصنوعی',
         'تولید خودکار هوک‌های ویروسی، کپشن و هشتگ‌های پربازدید',
         'پورتال اختصاصی تایید آنلاین کارفرما با لینک امن',
         'برندها و پیج‌های کاری نامحدود',
@@ -75,6 +83,46 @@ export function PricingView() {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
+      <section aria-labelledby="subscription-period" className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-sky-50 text-sky-800"><CalendarClock aria-hidden="true" className="size-5" /></span>
+            <div>
+              <h2 id="subscription-period" className="text-base font-black text-slate-900">زمان‌بندی اشتراک</h2>
+              <p className="text-sm text-slate-600">پلن {subscriptionName}</p>
+            </div>
+          </div>
+          <span className={`rounded-full px-3 py-1 text-xs font-bold ${needsReminder ? 'bg-amber-50 text-amber-900' : 'bg-sky-50 text-sky-900'}`}>
+            {isExpired ? 'پایان‌یافته' : 'فعال'}
+          </span>
+        </div>
+        {end ? (
+          <dl className="mt-3 grid gap-2 rounded-xl bg-slate-50 px-3 py-2.5 text-sm sm:grid-cols-3">
+            <div className="flex flex-wrap justify-between gap-1.5 sm:block">
+              <dt className="text-slate-600">شروع دوره</dt>
+              <dd className="font-bold text-slate-900">{subscription?.startedAt ? formatSubscriptionDate(subscription.startedAt) : 'ثبت نشده'}</dd>
+            </div>
+            <div className="flex flex-wrap justify-between gap-1.5 sm:block">
+              <dt className="text-slate-600">پایان دوره</dt>
+              <dd className="font-bold text-slate-900">{formatSubscriptionDate(end)}</dd>
+            </div>
+            <div className="flex flex-wrap justify-between gap-1.5 sm:block">
+              <dt className="text-slate-600">زمان باقی‌مانده</dt>
+              <dd className="font-bold text-slate-900">{toPersianDigits(remaining ?? 0)} روز</dd>
+            </div>
+          </dl>
+        ) : (
+          <p className="mt-3 text-sm leading-6 text-slate-600">
+            {currentPlan === 'free' ? 'اشتراک رایگان تاریخ پایان ندارد.' : 'تاریخ شروع و پایان برای این اشتراک ثبت نشده است.'}
+          </p>
+        )}
+        {isExpired && (
+          <button type="button" onClick={() => openUpgradeModal(subscription?.plan ?? 'pro')} className="mt-3 min-h-11 cursor-pointer rounded-xl bg-sky-800 px-4 text-sm font-bold text-white hover:bg-sky-900">
+            فعال‌سازی دوباره
+          </button>
+        )}
+      </section>
+
       {/* Title Header */}
       <div className="text-center space-y-2">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-amber-50 text-amber-800 border border-amber-200">

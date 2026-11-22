@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { callGapGpt, getModelForPlan } from '@/lib/gapgpt';
 import { getSession } from '@/lib/session';
 import prisma from '@/lib/prisma';
+import { getEffectivePlan } from '@/lib/subscription';
 
 export async function POST(request: Request) {
   try {
@@ -20,9 +21,9 @@ export async function POST(request: Request) {
       if (session?.userId) {
         const user = await prisma.user.findUnique({
           where: { id: session.userId },
-          select: { plan: true, fullName: true },
+          select: { plan: true, planExpiresAt: true, fullName: true },
         });
-        if (user?.plan) userPlan = user.plan;
+        if (user) userPlan = getEffectivePlan(user);
         if (user?.fullName) userName = user.fullName;
       }
     } catch (e) {

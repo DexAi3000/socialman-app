@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getEffectivePlan } from '@/lib/subscription';
 import { setSessionCookie } from '@/lib/session';
 import { hashPassword, verifyPassword } from '@/lib/auth';
 
@@ -364,7 +365,7 @@ export async function POST(request: Request) {
           phone: user.phone,
           username: user.username,
           role: user.role,
-          plan: user.plan,
+          plan: getEffectivePlan(user),
           avatarUrl: user.avatarUrl,
         },
         connectedAccounts,
@@ -494,7 +495,7 @@ export async function POST(request: Request) {
           phone: user.phone,
           username: user.username,
           role: user.role,
-          plan: user.plan,
+          plan: getEffectivePlan(user),
           avatarUrl: user.avatarUrl,
         },
         connectedAccounts,

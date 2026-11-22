@@ -247,7 +247,7 @@ export function ConnectAccountsModal() {
                     <span className="text-xs font-black text-sky-950">بات رسمی تلگرام: SocialMan</span>
                   </div>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800">
-                    Bot API فعال و تایید شده ✓
+                    Bot API فعال و تایید شده
                   </span>
                 </div>
                 <div className="text-xs text-sky-900 flex items-center justify-between">
@@ -414,7 +414,7 @@ export function ConnectAccountsModal() {
                     <span className="text-xs font-black text-purple-950">بات فعال روبیکا: SocialMan</span>
                   </div>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                    رسمی و متصل ✓
+                    رسمی و متصل
                   </span>
                 </div>
                 <div className="text-xs text-purple-900 flex items-center justify-between">
@@ -548,7 +548,7 @@ export function ConnectAccountsModal() {
                     <span className="text-xs font-black text-teal-950">بازوی فعال بله: SocialMan</span>
                   </div>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                    توکن فعال و تایید شده ✓
+                    توکن فعال و تایید شده
                   </span>
                 </div>
                 <div className="text-xs text-teal-900 flex items-center justify-between">

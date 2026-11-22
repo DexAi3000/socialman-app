@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getEffectivePlan, getPlanActivation, getSubscriptionPeriod, isPaidPlan } from '@/lib/subscription';
 
 export async function POST(request: Request) {
   try {
@@ -16,7 +17,7 @@ export async function POST(request: Request) {
     }
 
     const targetPlan = String(plan).toLowerCase().trim();
-    if (!['free', 'pro', 'agency'].includes(targetPlan)) {
+    if (targetPlan !== 'free' && !isPaidPlan(targetPlan)) {
       return NextResponse.json({ error: 'نام پلن نامعتبر است (free, pro, agency).' }, { status: 400 });
     }
 
@@ -45,11 +46,9 @@ export async function POST(request: Request) {
     }
 
     // Update user plan
-    const updatedUser = await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        plan: targetPlan,
-      },
+    const updatedUser = await prisma.$transaction(async (tx) => {
+      const latestUser = await tx.user.findUniqueOrThrow({ where: { id: user.id } });
+      return tx.user.update({ where: { id: user.id }, data: getPlanActivation(latestUser, targetPlan) });
     });
 
     return NextResponse.json({
@@ -60,7 +59,8 @@ export async function POST(request: Request) {
         fullName: updatedUser.fullName,
         username: updatedUser.username,
         phone: updatedUser.phone,
-        plan: updatedUser.plan,
+        plan: getEffectivePlan(updatedUser),
+        subscription: getSubscriptionPeriod(updatedUser),
         role: updatedUser.role,
       },
     });

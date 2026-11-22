@@ -142,7 +142,7 @@ export function AiStudioView({ initialPlatform = 'instagram' }: AiStudioViewProp
                 <span className="text-xs text-amber-700 font-bold">قابلیت VIP</span>
               </div>
               <h3 className="text-sm sm:text-base font-black text-amber-950 mt-1">
-                تولید محتوا با هوش مصنوعی Google Gemini
+                تولید محتوا با هوش مصنوعی
               </h3>
               <p className="text-xs text-amber-800 leading-relaxed font-medium mt-0.5">
                 تمرکز اصلی اپلیکیشن سوشال‌من بر روی انتشار و زمان‌بندی همزمان ۵ پلتفرم است. برای فعال‌سازی دستیار هوش مصنوعی و نگارش خودکار متن، پلن خود را به «طلایی» ارتقا دهید.
@@ -161,18 +161,18 @@ export function AiStudioView({ initialPlatform = 'instagram' }: AiStudioViewProp
       )}
 
       {/* Header Banner */}
-      <div className="p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col justify-between gap-3 rounded-2xl border border-slate-200/80 bg-white p-4 sm:flex-row sm:items-center sm:p-5">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <div className="p-2 rounded-xl bg-sky-50 text-[#3b96cc] border border-sky-200">
               <Sparkles className="w-5 h-5 fill-[#3b96cc]" />
             </div>
-            <h1 className="text-base sm:text-lg font-black text-slate-900">
-              استودیوی تولید محتوای هوشمند Gemini
+            <h1 className="text-lg font-black text-slate-900 sm:text-2xl">
+              استودیوی هوش مصنوعی
             </h1>
           </div>
-          <p className="text-xs text-slate-500">
-            تولید متن و هوک اختصاصی برای تلگرام، واتساپ، بله، اینستاگرام و روبیکا
+          <p className="text-sm leading-6 text-slate-600">
+            برای شبکهٔ دلخواهت عنوان و کپشن بساز.
           </p>
         </div>
 
@@ -189,7 +189,7 @@ export function AiStudioView({ initialPlatform = 'instagram' }: AiStudioViewProp
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Form Column (7 cols) */}
-        <div className="lg:col-span-7 p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+        <div className="min-w-0 space-y-4 rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-6 lg:col-span-7">
           <form onSubmit={handleGenerate} className="space-y-4">
             {/* 5 Platforms Selector */}
             <div>
@@ -313,12 +313,12 @@ export function AiStudioView({ initialPlatform = 'instagram' }: AiStudioViewProp
                 ) : currentPlan === 'agency' ? (
                   <>
                     <Sparkles className="w-4 h-4 fill-white" />
-                    <span>تولید خودکار پست با هوش مصنوعی Gemini</span>
+                    <span>تولید خودکار پست با هوش مصنوعی</span>
                   </>
                 ) : (
                   <>
                     <Crown className="w-4 h-4 fill-slate-950" />
-                    <span>تولید خودکار محتوا (ویژه پلن طلایی 👑)</span>
+                    <span>تولید خودکار محتوا (ویژه پلن طلایی)</span>
                   </>
                 )}
               </button>

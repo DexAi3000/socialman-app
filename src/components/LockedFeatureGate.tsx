@@ -105,7 +105,7 @@ export function LockedFeatureGate({
             className="w-full sm:flex-1 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs sm:text-sm font-black shadow-md shadow-amber-500/25 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <Zap className="w-4 h-4 fill-current" />
-            <span>ارتقای اشتراک و بازگشایی آنی ⚡</span>
+            <span>ارتقای اشتراک و بازگشایی آنی</span>
           </button>
           <button
             onClick={onBack}

@@ -1,4 +1,21 @@
 export type PlanType = 'free' | 'pro' | 'agency';
+export type PaidPlan = Exclude<PlanType, 'free'>;
+
+export interface SubscriptionPeriod {
+  plan: PaidPlan;
+  startedAt: string | null;
+  expiresAt: string | null;
+}
+
+export interface AppNotification {
+  id: string;
+  kind: 'subscription' | 'publication' | 'approval' | 'support';
+  title: string;
+  detail: string;
+  occurredAt: string;
+  read: boolean;
+  tab: AppTab;
+}
 
 export type SocialPlatform = 'instagram' | 'telegram' | 'whatsapp' | 'bale' | 'rubika';
 
@@ -37,6 +54,7 @@ export interface UserProfile {
   username?: string;
   role: string;
   plan?: PlanType;
+  subscription?: SubscriptionPeriod | null;
   isLoggedIn: boolean;
   verifiedVia?: string;
   avatarUrl?: string;
@@ -105,3 +123,5 @@ export interface AiGenerationResponse {
   hashtags: string[];
   suggestedBestTime: string;
 }
+export type AppTab = 'dashboard' | 'workspace' | 'publish' | 'ai-studio' | 'calendar' | 'pricing' | 'client-portal' | 'support';
+

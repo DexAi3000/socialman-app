@@ -15,6 +15,7 @@ import {
   PlusCircle,
   Sparkles,
   Link as LinkIcon,
+  CalendarDays,
 } from 'lucide-react';
 import { toPersianDigits } from '@/lib/utils';
 
@@ -167,7 +168,7 @@ export function ClientPortalView() {
                 className="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#3b96cc] hover:bg-[#2c7ead] text-white flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
               >
                 {copiedLink ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copiedLink ? 'کپی شد ✓' : 'کپی لینک'}</span>
+                <span>{copiedLink ? 'کپی شد' : 'کپی لینک'}</span>
               </button>
             </div>
           </div>
@@ -201,11 +202,11 @@ export function ClientPortalView() {
                 className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 outline-none focus:border-[#3b96cc]"
               >
                 <option value="workspace">
-                  🌐 لینک پورتال جامع پیج: {activeWorkspace?.name} (نمایش همه پست‌های در نوبت)
+                  لینک پورتال جامع پیج: {activeWorkspace?.name} (نمایش همه پست‌های در نوبت)
                 </option>
                 {pendingPosts.map((p) => (
                   <option key={p.id} value={p.id}>
-                    📄 لینک اختصاصی فقط برای: {p.title}
+                    لینک اختصاصی فقط برای: {p.title}
                   </option>
                 ))}
               </select>
@@ -286,8 +287,9 @@ export function ClientPortalView() {
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 pb-3">
                     <span className="text-sm font-black text-slate-900">{post.title}</span>
-                    <span className="text-[11px] text-slate-500 font-mono font-bold">
-                      📅 تاریخ: {post.scheduledDateShamsi} ساعت {toPersianDigits(post.scheduledTime)}
+                    <span className="inline-flex items-center gap-1 text-[11px] text-slate-500 font-mono font-bold">
+                      <CalendarDays className="h-3.5 w-3.5" />
+                      تاریخ: {post.scheduledDateShamsi} ساعت {toPersianDigits(post.scheduledTime)}
                     </span>
                   </div>
 

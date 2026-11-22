@@ -1,171 +1,86 @@
 "use client";
 
-import React from 'react';
-import { Send } from 'lucide-react';
-import { getShamsiToday } from '@/lib/utils';
+import type { AppTab } from '@/types';
 import {
+  SnappAiIcon,
+  SnappApprovalIcon,
+  SnappBaleIcon,
+  SnappCalendarIcon,
   SnappInstagramIcon,
+  SnappPublishIcon,
+  SnappRubikaIcon,
   SnappTelegramIcon,
   SnappWhatsappIcon,
-  SnappRubikaIcon,
-  SnappBaleIcon,
-  SnappAiIcon,
-  SnappCalendarIcon,
-  SnappApprovalIcon,
-  SnappCrownIcon,
-  SnappShopIcon,
-  SnappWalletIcon,
 } from './SnappIcons';
 
 interface SnappTilesGridProps {
-  onSelectService: (serviceId: string) => void;
+  onSelectService: (serviceId: AppTab) => void;
 }
 
+const channels = [
+  { id: 'instagram', title: 'اینستاگرام', detail: 'Graph API', icon: SnappInstagramIcon },
+  { id: 'telegram', title: 'تلگرام رسمی', detail: 'Bot API', icon: SnappTelegramIcon },
+  { id: 'rubika', title: 'روبیکا و روبینو', detail: 'کانال و روبینو', icon: SnappRubikaIcon },
+  { id: 'whatsapp', title: 'واتساپ تجاری', detail: 'Cloud API', icon: SnappWhatsappIcon },
+  { id: 'bale', title: 'پیام‌رسان بله', detail: 'Bale Bot', icon: SnappBaleIcon },
+  { id: 'ai-studio', title: 'استودیو AI', detail: 'پلن طلایی', icon: SnappAiIcon },
+];
+
+const cardInteraction = 'cursor-pointer border bg-white transition-colors hover:border-sky-300 hover:bg-sky-50/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600';
+
 export function SnappTilesGrid({ onSelectService }: SnappTilesGridProps) {
-  // 3 Primary Big Hero Cards (Like Snapp's Supermarket, Food, Snapp Car)
-  const primaryServices = [
+  const services = [
     {
       id: 'publish',
-      title: 'انتشار همزمان ۵ پلتفرم',
-      desc: 'اینستاگرام، تلگرام، واتساپ، روبیکا و بله',
-      icon: (
-        <div className="w-16 h-16 sm:w-20 sm:h-20 relative flex items-center justify-center">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#3b96cc] to-sky-400 flex items-center justify-center text-white shadow-lg shadow-[#3b96cc]/35 z-10 group-hover:scale-105 transition-transform">
-            <Send className="w-6 h-6 fill-white rotate-45 -mr-0.5" />
-          </div>
-          <img src="/socialman/instagram-clean.png" alt="Instagram" className="w-5 h-5 absolute -top-1 -right-1 drop-shadow-md z-20 group-hover:-translate-y-0.5 transition-transform" />
-          <img src="/socialman/telegram-clean.png" alt="Telegram" className="w-5 h-5 absolute -top-1 -left-1 drop-shadow-md z-20 group-hover:-translate-y-0.5 transition-transform" />
-          <img src="/socialman/whatsapp-clean.png" alt="WhatsApp" className="w-5 h-5 absolute -bottom-1 -right-1 drop-shadow-md z-20 group-hover:translate-y-0.5 transition-transform" />
-          <img src="/socialman/rubika-icon.png" alt="Rubika" className="w-5 h-5 absolute -bottom-1 -left-1 drop-shadow-md z-20 group-hover:translate-y-0.5 transition-transform" />
-        </div>
-      ),
-      badge: 'سرویس اصلی 🚀',
-      badgeColor: 'bg-sky-50 text-[#3b96cc] border-sky-200',
+      title: 'انتشار همزمان در ۵ پلتفرم',
+      detail: 'اینستاگرام، تلگرام، واتساپ، روبیکا و بله',
+      icon: SnappPublishIcon,
     },
     {
       id: 'calendar',
       title: 'زمان‌بندی تقویم شمسی',
-      desc: 'ارسال خودکار در تاریخ و ساعت مشخص',
-      icon: <SnappCalendarIcon className="w-16 h-16 sm:w-20 sm:h-20" />,
-      badge: `${getShamsiToday().fullTitle} 📅`,
-      badgeColor: 'bg-amber-50 text-amber-700 border-amber-200',
+      detail: 'ارسال خودکار در تاریخ و ساعت مشخص',
+      icon: SnappCalendarIcon,
     },
     {
       id: 'client-portal',
-      title: 'پورتال تایید کارفرما',
-      desc: 'لینک اختصاصی تایید پست‌ها قبل از انتشار',
-      icon: <SnappApprovalIcon className="w-16 h-16 sm:w-20 sm:h-20" />,
-      badge: 'ویژه آژانس 🤝',
-      badgeColor: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+      title: 'پورتال تأیید کارفرما',
+      detail: 'لینک اختصاصی تأیید پست‌ها قبل از انتشار',
+      icon: SnappApprovalIcon,
     },
-  ];
-
-  // Secondary Cards (5 Connected Channels + VIP Gemini AI Studio)
-  const secondaryServices = [
-    {
-      id: 'instagram',
-      title: 'اینستاگرام',
-      desc: 'ریلز، استوری و پست',
-      icon: <SnappInstagramIcon className="w-11 h-11 sm:w-13 sm:h-13" />,
-      badge: 'Graph API',
-      badgeColor: 'bg-rose-50 text-rose-600',
-    },
-    {
-      id: 'telegram',
-      title: 'تلگرام رسمی',
-      desc: 'کانال و سوپرگروه',
-      icon: <SnappTelegramIcon className="w-11 h-11 sm:w-13 sm:h-13" />,
-      badge: 'Bot API',
-      badgeColor: 'bg-sky-50 text-sky-600',
-    },
-    {
-      id: 'rubika',
-      title: 'روبیکا و روبینو',
-      desc: 'کانال و روبینو',
-      icon: <SnappRubikaIcon className="w-11 h-11 sm:w-13 sm:h-13" />,
-      badge: 'سریع ⚡',
-      badgeColor: 'bg-purple-50 text-purple-600',
-    },
-    {
-      id: 'whatsapp',
-      title: 'واتساپ تجاری',
-      desc: 'کانال و برودکست',
-      icon: <SnappWhatsappIcon className="w-11 h-11 sm:w-13 sm:h-13" />,
-      badge: 'Cloud API',
-      badgeColor: 'bg-sky-50 text-[#3b96cc]',
-    },
-    {
-      id: 'bale',
-      title: 'پیام‌رسان بله',
-      desc: 'کانال رسمی بانکی',
-      icon: <SnappBaleIcon className="w-11 h-11 sm:w-13 sm:h-13" />,
-      badge: 'Bale Bot',
-      badgeColor: 'bg-teal-50 text-teal-700',
-    },
-    {
-      id: 'ai-studio',
-      title: 'استودیو AI',
-      desc: 'تولید متن و هوک',
-      icon: <SnappAiIcon className="w-11 h-11 sm:w-13 sm:h-13" />,
-      badge: 'پلن طلایی 👑',
-      badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
-    },
-  ];
+  ] as const;
 
   return (
-    <div className="space-y-4 pt-2">
-      {/* 1. Top Tier: 3 Prominent Large Cards (Directly matching Snapp mobile screenshot) */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
-        {primaryServices.map((item) => (
-          <div
+    <div className="space-y-3.5 sm:space-y-4">
+      <div className="grid grid-cols-1 gap-2.5 sm:gap-3 md:grid-cols-3">
+        {services.map((item) => (
+          <button
             key={item.id}
+            type="button"
             onClick={() => onSelectService(item.id)}
-            className="relative bg-white rounded-3xl p-5 sm:p-6 border border-gray-100/90 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-xl hover:border-sky-200 transition-all cursor-pointer flex flex-col items-center justify-center text-center group active:scale-[0.98]"
+            className={`${cardInteraction} flex min-h-[88px] min-w-0 items-center gap-3 rounded-2xl p-3.5 text-start md:flex-col md:gap-3.5 md:p-5 md:text-center ${item.id === 'publish' ? 'border-sky-200' : 'border-slate-200/75'}`}
           >
-            {/* Top Corner Badge */}
-            <span className={`absolute top-3.5 right-3.5 text-[10px] font-black px-2.5 py-0.5 rounded-full border ${item.badgeColor}`}>
-              {item.badge}
+            <item.icon className="size-12 md:size-14" />
+            <span className="min-w-0">
+              <span className="block text-sm leading-6 font-black text-slate-900 md:text-base">{item.title}</span>
+              <span className="mt-0.5 block text-xs leading-5 font-medium text-slate-600">{item.detail}</span>
             </span>
-
-            {/* 3D Rendered Centered Icon */}
-            <div className="my-2 group-hover:scale-110 transition-transform duration-300">
-              {item.icon}
-            </div>
-
-            {/* Title & Desc */}
-            <h3 className="text-sm sm:text-base font-black text-[#212121] mt-2 group-hover:text-[#3b96cc] transition-colors">
-              {item.title}
-            </h3>
-            <p className="text-xs text-gray-400 font-medium mt-1 max-w-[200px]">
-              {item.desc}
-            </p>
-          </div>
+          </button>
         ))}
       </div>
 
-      {/* 2. Second Tier: 6 Connected Channel Cards (Direct access to channels + VIP Gemini AI) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-3.5">
-        {secondaryServices.map((item) => (
-          <div
+      <div className="grid grid-cols-2 gap-2.5 min-[360px]:grid-cols-3 sm:gap-3 lg:grid-cols-6">
+        {channels.map((item) => (
+          <button
             key={item.id}
-            onClick={() => onSelectService(item.id)}
-            className="bg-white rounded-2xl p-3.5 sm:p-4 border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-sky-200 transition-all cursor-pointer flex flex-col items-center text-center group active:scale-[0.98]"
+            type="button"
+            onClick={() => onSelectService(item.id === 'ai-studio' ? 'ai-studio' : 'publish')}
+            className={`${cardInteraction} grid min-w-0 grid-rows-[auto_1fr_auto] justify-items-center gap-1.5 rounded-2xl border-slate-200/75 px-2 py-3 text-center sm:p-4`}
           >
-            {/* 3D Icon */}
-            <div className="mb-2 group-hover:scale-105 transition-transform duration-300">
-              {item.icon}
-            </div>
-
-            {/* Title */}
-            <span className="text-xs sm:text-sm font-black text-[#212121] group-hover:text-[#3b96cc] transition-colors">
-              {item.title}
-            </span>
-
-            {/* Micro Badge */}
-            <span className={`mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-md ${item.badgeColor}`}>
-              {item.badge}
-            </span>
-          </div>
+            <item.icon className="size-10 sm:size-12" />
+            <span className="self-center text-xs leading-5 font-black text-slate-900 sm:text-sm">{item.title}</span>
+            <span className="text-[11px] leading-4 font-medium text-slate-600">{item.detail}</span>
+          </button>
         ))}
       </div>
     </div>
