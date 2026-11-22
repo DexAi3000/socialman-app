@@ -78,6 +78,13 @@ export async function GET(request: Request) {
       fullName: user.fullName || user.username || 'کاربر',
     });
 
+    let connectedAccounts = null;
+    if (user.connectedAccountsData) {
+      try {
+        connectedAccounts = JSON.parse(user.connectedAccountsData);
+      } catch (_) {}
+    }
+
     return NextResponse.json(
       {
         authenticated: true,
@@ -92,6 +99,7 @@ export async function GET(request: Request) {
           avatarUrl: user.avatarUrl,
         },
         workspaces: user.workspaces,
+        connectedAccounts,
       },
       {
         headers: {

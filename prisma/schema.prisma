@@ -8,20 +8,22 @@ datasource db {
 }
 
 model User {
-  id          String         @id @default(cuid())
-  phone       String         @unique
-  username    String?        @unique
-  password    String?
-  fullName    String         @default("کاربر جدید")
-  role        String         @default("admin") // admin, creator, client
-  plan        String         @default("free") // free, pro, agency
-  avatarUrl   String?
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  id                    String          @id @default(cuid())
+  phone                 String          @unique
+  username              String?         @unique
+  password              String?
+  fullName              String          @default("کاربر جدید")
+  role                  String          @default("admin") // admin, creator, client
+  plan                  String          @default("free") // free, pro, agency
+  avatarUrl             String?
+  connectedAccountsData String?         // JSON string of Record<SocialPlatform, ConnectedAccountInfo>
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
 
-  workspaces  Workspace[]
-  posts       Post[]
-  tickets     Ticket[]
+  workspaces            Workspace[]
+  posts                 Post[]
+  tickets               Ticket[]
+  socialAccounts        SocialAccount[]
 }
 
 model OtpCode {
@@ -33,15 +35,16 @@ model OtpCode {
 }
 
 model Workspace {
-  id                 String    @id @default(cuid())
-  name               String
-  category           String    @default("عمومی")
-  connectedPlatforms String    @default("[\"telegram\",\"instagram\"]") // JSON string array
-  userId             String?
-  user               User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  posts              Post[]
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  id                    String    @id @default(cuid())
+  name                  String
+  category              String    @default("عمومی")
+  connectedPlatforms    String    @default("[\"telegram\",\"instagram\"]") // JSON string array
+  connectedAccountsData String?   // JSON string of Record<SocialPlatform, ConnectedAccountInfo>
+  userId                String?
+  user                  User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  posts                 Post[]
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 }
 
 model Post {
@@ -68,7 +71,9 @@ model Post {
 
 model SocialAccount {
   id          String   @id @default(cuid())
-  platform    String   @unique // telegram, rubika, bale, instagram, whatsapp
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  platform    String   // telegram, rubika, bale, instagram, whatsapp
   accountName String?
   handle      String?
   botToken    String?

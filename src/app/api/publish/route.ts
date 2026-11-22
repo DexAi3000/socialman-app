@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { dispatchMultiPlatformPublish } from '@/lib/publishers';
+import { getSession, verifySession } from '@/lib/session';
 
 export async function POST(request: Request) {
   try {
@@ -60,7 +61,49 @@ export async function POST(request: Request) {
       }
     }
 
-    // 1. If immediate, run publisher engine for all chosen platforms
+    // 1. Enrich accountsConfig from database if missing
+    let resolvedAccountsConfig: Record<string, { channelId?: string; botToken?: string }> = {
+      ...(accountsConfig || {}),
+    };
+    try {
+      let user = null;
+      let session = await getSession();
+      if (!session) {
+        const authHeader = request.headers.get('authorization');
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+          session = verifySession(authHeader.substring(7).trim());
+        }
+      }
+      if (session?.userId) {
+        user = await prisma.user.findUnique({ where: { id: session.userId } });
+      }
+      if (!user && workspaceId) {
+        const ws = await prisma.workspace.findUnique({
+          where: { id: workspaceId },
+          include: { user: true },
+        });
+        user = ws?.user || null;
+      }
+      if (!user) {
+        user = await prisma.user.findFirst();
+      }
+
+      if (user?.connectedAccountsData) {
+        const dbAccounts = JSON.parse(user.connectedAccountsData);
+        for (const [p, info] of Object.entries(dbAccounts as Record<string, any>)) {
+          if (info && info.handle && !resolvedAccountsConfig[p]) {
+            resolvedAccountsConfig[p] = {
+              channelId: info.handle,
+              botToken: info.botToken,
+            };
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Could not enrich accountsConfig from DB:', e);
+    }
+
+    // 2. If immediate, run publisher engine for all chosen platforms
     let publishResults: any = null;
     if (isImmediate) {
       publishResults = await dispatchMultiPlatformPublish({
@@ -69,7 +112,7 @@ export async function POST(request: Request) {
         content,
         hashtags,
         mediaUrl: resolvedMediaUrl,
-        accountsConfig,
+        accountsConfig: resolvedAccountsConfig,
       });
     }
 

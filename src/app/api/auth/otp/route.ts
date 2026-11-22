@@ -347,6 +347,13 @@ export async function POST(request: Request) {
         fullName: user.fullName,
       });
 
+      let connectedAccounts = null;
+      if (user.connectedAccountsData) {
+        try {
+          connectedAccounts = JSON.parse(user.connectedAccountsData);
+        } catch (_) {}
+      }
+
       return NextResponse.json({
         success: true,
         message: 'ورود با موفقیت انجام شد.',
@@ -360,6 +367,7 @@ export async function POST(request: Request) {
           plan: user.plan,
           avatarUrl: user.avatarUrl,
         },
+        connectedAccounts,
       });
     }
 
@@ -470,6 +478,13 @@ export async function POST(request: Request) {
         fullName: user.fullName,
       });
 
+      let connectedAccounts = null;
+      if (user.connectedAccountsData) {
+        try {
+          connectedAccounts = JSON.parse(user.connectedAccountsData);
+        } catch (_) {}
+      }
+
       return NextResponse.json({
         success: true,
         token: sessionToken,
@@ -482,6 +497,7 @@ export async function POST(request: Request) {
           plan: user.plan,
           avatarUrl: user.avatarUrl,
         },
+        connectedAccounts,
       });
     }
 

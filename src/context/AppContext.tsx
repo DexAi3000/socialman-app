@@ -246,6 +246,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               prev && formattedWs.some((w: any) => w.id === prev) ? prev : formattedWs[0].id
             );
           }
+          if (d.connectedAccounts && typeof d.connectedAccounts === 'object') {
+            if (d.connectedAccounts.bale?.botToken?.includes('R7BeEnjLaDSiFv26')) {
+              d.connectedAccounts.bale.botToken = '369114062:1NMlMxXeD9k-I4oEI7YcXvyVmYqIJ3h9LnI';
+            }
+            setConnectedAccounts((prev) => ({ ...prev, ...d.connectedAccounts }));
+            try {
+              localStorage.setItem('socialman_connected_accounts', JSON.stringify(d.connectedAccounts));
+            } catch (_) {}
+          }
+
           try {
             localStorage.setItem('socialman_user', JSON.stringify(profile));
             if (d.token) {
@@ -253,6 +263,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             }
           } catch (_) {}
         }
+
+        // Fetch user accounts from database
+        fetch('/socialman/api/user/accounts', {
+          headers: getAuthHeaders(),
+        })
+          .then((r) => r.json())
+          .then((data) => {
+            if (data?.success && data?.connectedAccounts && typeof data.connectedAccounts === 'object') {
+              if (data.connectedAccounts.bale?.botToken?.includes('R7BeEnjLaDSiFv26')) {
+                data.connectedAccounts.bale.botToken = '369114062:1NMlMxXeD9k-I4oEI7YcXvyVmYqIJ3h9LnI';
+              }
+              setConnectedAccounts((prev) => ({ ...prev, ...data.connectedAccounts }));
+              try {
+                localStorage.setItem('socialman_connected_accounts', JSON.stringify(data.connectedAccounts));
+              } catch (_) {}
+            }
+          })
+          .catch(() => {});
       })
       .catch((err) => {
         console.log('Auth session check error:', err);
@@ -294,38 +322,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (_) {}
 
-    // Restore cached connected channels from localStorage (with clean migration)
+    // Restore cached connected channels from localStorage for instant initial render
     try {
-      const cacheVersion = localStorage.getItem('socialman_accounts_v3');
-      if (!cacheVersion) {
-        localStorage.removeItem('socialman_connected_accounts');
-        localStorage.setItem('socialman_accounts_v3', 'true');
-      } else {
-        const cachedAccounts = localStorage.getItem('socialman_connected_accounts');
-        if (cachedAccounts) {
-          const parsed = JSON.parse(cachedAccounts);
-          if (parsed && typeof parsed === 'object') {
-            const sanitized: Record<string, any> = {};
-            for (const [key, val] of Object.entries(parsed as Record<string, any>)) {
-              if (
-                val &&
-                val.handle &&
-                val.handle !== '@growth_academy_ir' &&
-                val.handle !== '@novexalab' &&
-                val.handle !== '+989123456789' &&
-                val.handle !== 'ble.ir/SocialManPublishBot' &&
-                val.handle !== '@SocialManPublishBot'
-              ) {
-                if (key === 'bale' && val.botToken && val.botToken.includes('R7BeEnjLaDSiFv26')) {
-                  val.botToken = '369114062:1NMlMxXeD9k-I4oEI7YcXvyVmYqIJ3h9LnI';
-                }
-                sanitized[key] = val;
-              }
-            }
-            if (Object.keys(sanitized).length > 0) {
-              setConnectedAccounts((prev) => ({ ...prev, ...sanitized }));
-            }
+      const cachedAccounts = localStorage.getItem('socialman_connected_accounts');
+      if (cachedAccounts) {
+        const parsed = JSON.parse(cachedAccounts);
+        if (parsed && typeof parsed === 'object') {
+          if (parsed.bale?.botToken?.includes('R7BeEnjLaDSiFv26')) {
+            parsed.bale.botToken = '369114062:1NMlMxXeD9k-I4oEI7YcXvyVmYqIJ3h9LnI';
           }
+          setConnectedAccounts((prev) => ({ ...prev, ...parsed }));
         }
       }
     } catch (_) {}
@@ -442,6 +448,29 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('socialman_connected_accounts', JSON.stringify(updated));
         localStorage.setItem('socialman_accounts_v3', 'true');
       } catch (_) {}
+
+      // Persist to database immediately
+      try {
+        const headers = getAuthHeaders();
+        headers['Content-Type'] = 'application/json';
+        fetch('/socialman/api/user/accounts', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            accounts: updated,
+            workspaceId: activeWorkspaceId,
+          }),
+        })
+          .then((r) => r.json())
+          .then((res) => {
+            console.log('Persisted accounts to database:', res);
+          })
+          .catch((err) => {
+            console.error('Failed to persist accounts to database:', err);
+          });
+      } catch (err) {
+        console.error('Error invoking accounts API:', err);
+      }
 
       return updated;
     });

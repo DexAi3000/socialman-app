@@ -203,18 +203,32 @@ async function main() {
   ];
 
   for (const acc of accounts) {
-    await prisma.socialAccount.upsert({
-      where: { platform: acc.platform },
-      update: {},
-      create: {
-        platform: acc.platform,
-        handle: acc.handle,
-        accountName: acc.accountName,
-        botToken: acc.botToken,
-        isConnected: acc.isConnected,
-        connectedAt: 'امروز',
-      },
+    const existing = await prisma.socialAccount.findFirst({
+      where: { platform: acc.platform, userId: user.id },
     });
+    if (existing) {
+      await prisma.socialAccount.update({
+        where: { id: existing.id },
+        data: {
+          handle: acc.handle,
+          accountName: acc.accountName,
+          botToken: acc.botToken,
+          isConnected: acc.isConnected,
+        },
+      });
+    } else {
+      await prisma.socialAccount.create({
+        data: {
+          userId: user.id,
+          platform: acc.platform,
+          handle: acc.handle,
+          accountName: acc.accountName,
+          botToken: acc.botToken,
+          isConnected: acc.isConnected,
+          connectedAt: 'امروز',
+        },
+      });
+    }
   }
   console.log('✅ Social Accounts seeded');
 }
