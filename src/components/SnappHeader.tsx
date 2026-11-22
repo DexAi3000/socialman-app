@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useId, useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/context/AppContext';
 import {
@@ -10,60 +10,62 @@ import {
   Camera,
   Trash2,
   Menu,
+  Home,
+  CalendarDays,
+  ClipboardCheck,
+  Sparkles,
 } from 'lucide-react';
 import { toPersianDigits } from '@/lib/utils';
+import type { AppTab } from '@/types';
+import { PublishGlyph } from './SnappIcons';
+import { NotificationBell } from './NotificationBell';
 
-// Cute 3D Illustrated Character Avatar
+// Clean Minimalist User Outline Avatar
 function DefaultAvatarGraphic() {
   return (
-    <svg viewBox="0 0 48 48" fill="none" className="w-full h-full">
-      <defs>
-        <linearGradient id="avatarBg" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#38bdf8" />
-          <stop offset="100%" stopColor="#0284c7" />
-        </linearGradient>
-        <linearGradient id="avatarSkin" x1="16" y1="12" x2="32" y2="28" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#ffedd5" />
-          <stop offset="100%" stopColor="#fed7aa" />
-        </linearGradient>
-        <linearGradient id="avatarHair" x1="14" y1="8" x2="34" y2="22" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#451a03" />
-          <stop offset="100%" stopColor="#1c1917" />
-        </linearGradient>
-      </defs>
-      <rect width="48" height="48" rx="14" fill="url(#avatarBg)" />
-      {/* Body / Shirt */}
-      <path d="M10 44c0-7.7 6.3-14 14-14s14 6.3 14 14v4H10v-4z" fill="#22c55e" />
-      <path d="M22 30l2 4 2-4z" fill="#ffffff" />
-      {/* Head */}
-      <circle cx="24" cy="19" r="8" fill="url(#avatarSkin)" />
-      {/* Eyes & Smile */}
-      <circle cx="21" cy="18" r="1.1" fill="#1c1917" />
-      <circle cx="27" cy="18" r="1.1" fill="#1c1917" />
-      <path d="M22 22.5c1 1 3 1 4 0" stroke="#1c1917" strokeWidth="1.2" strokeLinecap="round" />
-      {/* Stylish 3D Hair */}
-      <path d="M16 16c0-4.4 3.6-8 8-8s8 3.6 8 8c0 .7-.1 1.4-.3 2-1.3-1.8-3.4-3-5.7-3-2.6 0-4.9 1.5-6 3.7-.7-.9-1.2-1.9-1.2-3.1" fill="url(#avatarHair)" />
-    </svg>
+    <div className="w-full h-full bg-white flex items-center justify-center">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#1e293b"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="w-[60%] h-[60%]"
+      >
+        <circle cx="12" cy="7.8" r="3.8" />
+        <path d="M5.2 20.2a6.8 6.8 0 0 1 13.6 0" />
+      </svg>
+    </div>
   );
 }
 
 interface SnappHeaderProps {
-  activeTab: string;
-  setActiveTab: (tab: any) => void;
+  activeTab: AppTab;
+  setActiveTab: (tab: AppTab) => void;
 }
+
+const desktopLinks = [
+  { id: 'dashboard', label: 'خانه', icon: Home },
+  { id: 'publish', label: 'انتشار', icon: PublishGlyph },
+  { id: 'calendar', label: 'تقویم', icon: CalendarDays },
+  { id: 'client-portal', label: 'کارفرما', icon: ClipboardCheck },
+  { id: 'ai-studio', label: 'استودیو', icon: Sparkles },
+] as const;
 
 export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
   const {
     currentUser,
-    openAuthModal,
     logoutUser,
     updateUserAvatar,
     setIsHamburgerMenuOpen,
   } = useApp();
 
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const profilePanelId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const profileButtonRef = useRef<HTMLButtonElement>(null);
 
   // Close profile dropdown when clicking outside or pressing Escape
   useEffect(() => {
@@ -76,6 +78,7 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         setIsUserDropdownOpen(false);
+        profileButtonRef.current?.focus();
       }
     }
 
@@ -134,39 +137,56 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
   };
 
   return (
-    <header className="w-full bg-white border-b border-gray-100 sticky top-0 z-40 shadow-xs">
-      <div className="max-w-md mx-auto px-3 h-16 flex items-center justify-between gap-2">
-        {/* Right side: 3-line Hamburger Menu Button (No text) */}
-        <div className="w-10 flex items-center justify-start shrink-0">
+    <header className="sticky top-0 z-40 border-b border-slate-200/85 bg-white/95 pt-[env(safe-area-inset-top)] backdrop-blur">
+      <div className="mx-auto grid h-14 w-full max-w-7xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 px-3.5 sm:px-6 lg:h-[4.25rem] lg:gap-4 lg:px-8">
+        <div className="col-start-1 row-start-1 flex items-center gap-3 justify-self-start">
           <button
+            type="button"
             onClick={() => setIsHamburgerMenuOpen(true)}
-            className="w-10 h-10 rounded-2xl bg-gray-50 hover:bg-sky-50 text-gray-700 hover:text-[#3b96cc] border border-gray-200 hover:border-sky-200 flex items-center justify-center transition-all shadow-2xs group cursor-pointer active:scale-95"
+            className="grid size-11 shrink-0 cursor-pointer place-items-center rounded-xl text-slate-700 transition-colors hover:bg-sky-50 hover:text-sky-800"
             title="منو"
             aria-label="منو"
           >
-            <Menu className="w-5 h-5 text-gray-700 group-hover:text-[#3b96cc] transition-colors" />
+            <Menu className="size-5" strokeWidth={1.8} />
           </button>
         </div>
 
-        {/* Center: Brand Logo + Social Man (Centered in flex flow, never overlaps) */}
-        <div
+        <button
+          type="button"
+          aria-label="خانهٔ سوشال‌من"
           onClick={() => setActiveTab('dashboard')}
-          className="flex-1 flex items-center justify-center gap-2 cursor-pointer select-none min-w-0"
+          className="col-start-2 row-start-1 inline-flex min-h-11 cursor-pointer items-center gap-2 justify-self-center rounded-xl px-1 lg:col-start-1 lg:ms-12 lg:justify-self-start"
         >
-          <div className="w-8 h-8 rounded-xl overflow-hidden shadow-xs border border-gray-100 shrink-0">
+          <span className="size-8 shrink-0 overflow-hidden rounded-lg md:size-9">
             <img
               src="/socialman/app-icon.jpg"
-              alt="Social Man"
+              alt=""
               className="w-full h-full object-cover"
             />
-          </div>
-          <span className="text-base sm:text-lg font-black text-gray-900 tracking-tight font-sans truncate">
+          </span>
+          <span dir="ltr" className="whitespace-nowrap text-sm font-black tracking-tight text-slate-900 lg:text-lg">
             Social Man
           </span>
-        </div>
+        </button>
+
+        <nav aria-label="بخش‌های اصلی" className="col-start-2 row-start-1 hidden items-center gap-1 lg:flex">
+          {desktopLinks.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              type="button"
+              aria-current={activeTab === id ? 'page' : undefined}
+              onClick={() => setActiveTab(id)}
+              className={`inline-flex min-h-11 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 text-sm font-bold transition-colors lg:px-3 ${activeTab === id ? 'bg-sky-100 text-sky-900' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+            >
+              <Icon className="size-[18px] shrink-0" strokeWidth={1.8} />
+              {label}
+            </button>
+          ))}
+        </nav>
 
         {/* Left side: User Auth */}
-        <div className="w-auto flex items-center justify-end shrink-0">
+        <div className="relative col-start-3 row-start-1 flex min-w-0 items-center gap-0.5 justify-self-end sm:gap-1">
+          {currentUser?.isLoggedIn && <NotificationBell key={currentUser.id} onNavigate={setActiveTab} />}
           {/* User Auth Profile / Login Button */}
           {currentUser?.isLoggedIn ? (
             <div className="relative" ref={dropdownRef}>
@@ -189,20 +209,16 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
               />
 
               <button
+                ref={profileButtonRef}
+                type="button"
+                aria-label="حساب کاربری"
+                aria-expanded={isUserDropdownOpen}
+                aria-controls={isUserDropdownOpen ? profilePanelId : undefined}
                 onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                className="flex items-center gap-2 p-1.5 pr-2.5 rounded-2xl bg-gray-50 hover:bg-gray-100 border border-gray-200 transition-colors group"
+                className="relative z-50 flex min-h-11 max-w-full cursor-pointer items-center gap-1.5 rounded-xl p-1 hover:bg-slate-100 md:gap-2 md:px-2"
               >
-                <div className="text-right hidden sm:block">
-                  <span className="text-xs font-black text-gray-900 block group-hover:text-[#3b96cc] transition-colors">
-                    {currentUser.fullName}
-                  </span>
-                  <span className="text-[10px] text-gray-400 font-mono block">
-                    {toPersianDigits(currentUser.phone)}
-                  </span>
-                </div>
-
-                {/* 3D Illustrated Character Avatar or Uploaded Photo */}
-                <div className="w-9 h-9 rounded-xl overflow-hidden shadow-xs border border-white/80 shrink-0 relative bg-sky-100">
+                {/* Outline User Avatar or Uploaded Photo */}
+                <div className="size-8 rounded-xl overflow-hidden border border-slate-200/90 bg-white shrink-0 relative sm:size-9 flex items-center justify-center shadow-xs">
                   {currentUser.avatarUrl ? (
                     <img
                       src={currentUser.avatarUrl}
@@ -213,17 +229,18 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
                     <DefaultAvatarGraphic />
                   )}
                 </div>
-                <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
+                <span className="hidden max-w-24 truncate text-sm font-bold text-slate-800 lg:block xl:max-w-36">{currentUser.fullName}</span>
+                <ChevronDown className="hidden size-3.5 shrink-0 text-slate-500 sm:block" />
               </button>
 
               {/* User Dropdown with Avatar Upload Control */}
               {isUserDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-100 rounded-3xl shadow-2xl p-3 z-50 space-y-3">
+                <div id={profilePanelId} className="absolute end-0 top-full z-50 mt-2 w-64 space-y-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl">
                   {/* Avatar & User Details */}
                   <div className="flex flex-col items-center text-center p-2 border-b border-gray-100">
                     <div
                       onClick={() => fileInputRef.current?.click()}
-                      className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-md border-2 border-[#3b96cc] cursor-pointer group/avatar shrink-0 mb-2 bg-sky-100"
+                      className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-xs border-2 border-slate-200 hover:border-[#3b96cc] cursor-pointer group/avatar shrink-0 mb-2 bg-white flex items-center justify-center"
                       title="برای تغییر عکس کلیک کنید"
                     >
                       {currentUser.avatarUrl ? (

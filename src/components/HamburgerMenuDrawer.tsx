@@ -1,41 +1,32 @@
 "use client";
 
-import React, { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useApp } from '@/context/AppContext';
 import {
-  X,
-  Home,
-  Share2,
-  Calendar,
-  Users,
-  Sparkles,
-  Crown,
-  CreditCard,
-  Link2,
-  Headphones,
-  MessageSquare,
-  LogOut,
-  ChevronLeft,
-  CheckCircle2,
-  Layers,
-  HelpCircle,
-  PhoneCall,
-  Zap,
-  Smartphone,
+  CalendarDays, ChevronLeft, ClipboardCheck, CreditCard, Crown, Headphones, Home,
+  LayoutDashboard, Link2, LogOut, Sparkles, X,
 } from 'lucide-react';
-import { toPersianDigits, getShamsiToday } from '@/lib/utils';
-import { SocialPlatform } from '@/types';
+import { useApp } from '@/context/AppContext';
+import { toPersianDigits } from '@/lib/utils';
+import type { AppTab } from '@/types';
+import { PublishGlyph } from './SnappIcons';
 
 interface HamburgerMenuDrawerProps {
-  activeTab: string;
-  setActiveTab: (tab: any) => void;
+  activeTab: AppTab;
+  setActiveTab: (tab: AppTab) => void;
 }
 
-export function HamburgerMenuDrawer({
-  activeTab,
-  setActiveTab,
-}: HamburgerMenuDrawerProps) {
+const primaryLinks = [
+  { id: 'dashboard', label: 'خانه', icon: Home },
+  { id: 'publish', label: 'انتشار و زمان‌بندی', icon: PublishGlyph },
+  { id: 'calendar', label: 'تقویم محتوا', icon: CalendarDays },
+  { id: 'client-portal', label: 'تأیید کارفرما', icon: ClipboardCheck },
+  { id: 'ai-studio', label: 'هوش مصنوعی', icon: Sparkles },
+] as const;
+
+const planNames = { free: 'اشتراک برنز', pro: 'اشتراک نقره‌ای', agency: 'اشتراک طلایی' };
+
+export function HamburgerMenuDrawer({ activeTab, setActiveTab }: HamburgerMenuDrawerProps) {
   const {
     isHamburgerMenuOpen,
     setIsHamburgerMenuOpen,
@@ -47,346 +38,174 @@ export function HamburgerMenuDrawer({
     posts,
     openUpgradeModal,
     openConnectModal,
-    openAuthModal,
     logoutUser,
   } = useApp();
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
-  if (!isHamburgerMenuOpen) return null;
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!isHamburgerMenuOpen || !dialog) return;
 
-  const pendingApprovals = posts.filter(
-    (p) => p.status === 'pending_approval'
-  ).length;
+    const previousOverflow = document.body.style.overflow;
+    dialog.showModal();
+    closeButtonRef.current?.focus();
+    document.body.style.overflow = 'hidden';
 
-  const handleSelectTab = (tabId: string) => {
-    setActiveTab(tabId);
+    return () => {
+      dialog.close();
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isHamburgerMenuOpen]);
+
+  function closeMenu() {
     setIsHamburgerMenuOpen(false);
-  };
+  }
 
-  const navMenuItems = [
-    {
-      id: 'dashboard',
-      label: 'داشبورد اصلی',
-      desc: 'مرور کلی وضعیت کانال‌ها و آمار',
-      icon: Home,
-      badge: null,
-      badgeColor: '',
-    },
-    {
-      id: 'publish',
-      label: 'انتشار همزمان ۵ پلتفرم',
-      desc: 'ارسال همزمان به اینستاگرام، تلگرام، بله، روبیکا و واتساپ',
-      icon: Share2,
-      badge: 'اصلی 🚀',
-      badgeColor: 'bg-sky-100 text-[#3b96cc]',
-    },
-    {
-      id: 'calendar',
-      label: 'تقویم محتوایی شمسی',
-      desc: 'زمان‌بندی و مدیریت هوشمند ماه آذر',
-      icon: Calendar,
-      badge: getShamsiToday().fullTitle,
-      badgeColor: 'bg-amber-100 text-amber-800',
-    },
-    {
-      id: 'client-portal',
-      label: 'پورتال تایید کارفرما',
-      desc: 'لینک اختصاصی تایید پست‌ها قبل از ارسال',
-      icon: Users,
-      badge: pendingApprovals > 0 ? `${toPersianDigits(pendingApprovals)} در انتظار` : null,
-      badgeColor: 'bg-rose-100 text-rose-700',
-    },
-    {
-      id: 'ai-studio',
-      label: 'استودیوی هوش مصنوعی Gemini',
-      desc: 'تولید هوشمند متن، هوک و کپشن',
-      icon: Sparkles,
-      badge: 'پلن طلایی 👑',
-      badgeColor: 'bg-amber-100 text-amber-900 border border-amber-300',
-    },
-    {
-      id: 'pricing',
-      label: 'تعرفه‌ها و پلن‌های اشتراک',
-      desc: 'ارتقای حساب و مشاهده ویژگی‌های پلن‌ها',
-      icon: CreditCard,
-      badge: null,
-      badgeColor: '',
-    },
-    {
-      id: 'support',
-      label: 'پشتیبانی (تیکت و چت‌بات)',
-      desc: 'گفتگوی آنلاین ۲۴ ساعته و ارسال تیکت',
-      icon: Headphones,
-      badge: '۲۴/۷ آنلاین ⚡',
-      badgeColor: 'bg-indigo-100 text-indigo-700 font-black',
-    },
-  ];
+  function navigate(tab: AppTab) {
+    closeMenu();
+    setActiveTab(tab);
+  }
+
+  const pendingApprovals = posts.filter((post) => post.status === 'pending_approval').length;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end animate-in fade-in duration-200">
-      {/* Dark backdrop blur */}
-      <div
-        onClick={() => setIsHamburgerMenuOpen(false)}
-        className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
-      />
-
-      {/* Sliding Drawer Container from Right (RTL) */}
-      <div className="relative w-full max-w-sm sm:max-w-md bg-white h-full shadow-2xl flex flex-col z-10 animate-in slide-in-from-right duration-300">
-        {/* Drawer Header with 3 Highlighted Sections: User & Plan, Workspace Selector, Support Hub */}
-        <div className="p-4 sm:p-5 border-b border-gray-100 bg-gradient-to-b from-sky-50/70 to-white flex flex-col gap-3">
-          {/* Top Bar: Title + Close Button */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-[#3b96cc] flex items-center justify-center text-white shadow-xs">
-                <Share2 className="w-4 h-4 fill-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-sm font-black text-gray-900 leading-tight font-sans">
-                  Social Man
-                </span>
-                <span className="text-[10px] text-gray-400 font-bold">منوی دسترسی سریع</span>
-              </div>
+    <dialog
+      ref={dialogRef}
+      aria-labelledby="app-menu-title"
+      onCancel={(event) => {
+        event.preventDefault();
+        closeMenu();
+      }}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) closeMenu();
+      }}
+      className="fixed inset-y-0 start-0 end-auto m-0 h-dvh max-h-none w-full max-w-[24rem] overflow-hidden border-0 bg-white p-0 text-slate-900 shadow-2xl backdrop:bg-slate-950/40"
+    >
+      {isHamburgerMenuOpen && (
+        <div className="flex h-full min-h-0 flex-col">
+          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-200 px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2">
+            <div className="flex items-center gap-2.5">
+              <img src="/socialman/app-icon.jpg" alt="" className="size-9 rounded-xl" />
+              <h2 id="app-menu-title" className="text-base font-black">منوی سوشال‌من</h2>
             </div>
             <button
-              onClick={() => setIsHamburgerMenuOpen(false)}
-              className="w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition-colors cursor-pointer"
+              ref={closeButtonRef}
+              type="button"
+              aria-label="بستن منو"
+              onClick={closeMenu}
+              className="grid size-11 cursor-pointer place-items-center rounded-xl text-slate-600 transition-colors hover:bg-slate-100 focus-visible:outline-sky-600"
             >
-              <X className="w-4 h-4" />
+              <X aria-hidden="true" className="size-5" strokeWidth={1.8} />
             </button>
           </div>
 
-          {/* 1. User Card & Plan Status (پلن اشتراک) */}
-          <div className="bg-white rounded-2xl p-3 border border-gray-100 shadow-xs flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-sky-100 overflow-hidden border border-white shadow-xs shrink-0 flex items-center justify-center">
-                {currentUser?.avatarUrl ? (
-                  <img
-                    src={currentUser.avatarUrl}
-                    alt={currentUser.fullName}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-sm font-black text-[#3b96cc]">
-                    {currentUser?.fullName?.charAt(0) || 'س'}
-                  </span>
-                )}
-              </div>
-              <div className="text-right">
-                <span className="text-xs font-black text-gray-900 block truncate max-w-[130px]">
-                  {currentUser?.fullName || 'کاربر مهمان'}
-                </span>
-                <span className="text-[10px] text-gray-400 font-mono block">
-                  {currentUser?.phone ? toPersianDigits(currentUser.phone) : 'ورود نکرده'}
-                </span>
-              </div>
-            </div>
-
-            {/* Plan Badge & Upgrade Action */}
-            <div className="flex flex-col items-end gap-1">
-              <span
-                className={`text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
-                  currentPlan === 'agency'
-                    ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                    : currentPlan === 'pro'
-                    ? 'bg-sky-100 text-[#3b96cc]'
-                    : 'bg-sky-50 text-sky-700 border border-sky-200'
-                }`}
-              >
-                {currentPlan === 'agency' ? (
-                  <Crown className="w-3 h-3 text-amber-600 fill-amber-600" />
-                ) : (
-                  <Zap className="w-3 h-3 text-[#3b96cc] fill-[#3b96cc]" />
-                )}
-                <span>
-                  {currentPlan === 'agency'
-                    ? 'پلن: طلایی (نامحدود)'
-                    : currentPlan === 'pro'
-                    ? 'پلن: نقره‌ای'
-                    : 'پلن: برنز (رایگان)'}
-                </span>
+          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-4">
+            <button
+              type="button"
+              aria-current={activeTab === 'workspace' ? 'page' : undefined}
+              onClick={() => navigate('workspace')}
+              className="flex w-full cursor-pointer items-center gap-3 rounded-2xl bg-[#153550] p-3 text-start text-white transition-colors hover:bg-[#1a4a6f] focus-visible:outline-sky-600"
+            >
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white/15 text-sky-100">
+                <LayoutDashboard aria-hidden="true" className="size-5" strokeWidth={1.8} />
               </span>
-              {currentPlan !== 'agency' ? (
-                <button
-                  onClick={() => {
-                    setIsHamburgerMenuOpen(false);
-                    openUpgradeModal('agency');
-                  }}
-                  className="text-[9px] text-[#3b96cc] font-black hover:underline cursor-pointer"
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-black">میز کار محتوا</span>
+                <span className="block truncate text-xs leading-6 text-sky-100">{activeWorkspace.name}</span>
+              </span>
+              <ChevronLeft aria-hidden="true" className="size-4 shrink-0 text-sky-100" />
+            </button>
+
+            {workspaces.length > 1 && (
+              <label className="flex flex-wrap items-center justify-between gap-2 text-xs font-bold text-slate-700">
+                فضای کاری فعال
+                <select
+                  value={activeWorkspace.id}
+                  onChange={(event) => setActiveWorkspaceId(event.target.value)}
+                  className="min-h-10 max-w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 text-sm text-slate-900"
                 >
-                  ارتقای پلن ⚡
-                </button>
+                  {workspaces.map((workspace) => <option key={workspace.id} value={workspace.id}>{workspace.name}</option>)}
+                </select>
+              </label>
+            )}
+
+            <nav aria-label="بخش‌های سوشال‌من" className="space-y-1">
+              {primaryLinks.map(({ id, label, icon: Icon }) => {
+                const selected = activeTab === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    aria-current={selected ? 'page' : undefined}
+                    onClick={() => navigate(id)}
+                    className={`flex min-h-11 w-full cursor-pointer items-center gap-2.5 rounded-xl px-2 text-start text-sm font-bold transition-colors ${selected ? 'bg-sky-50 text-sky-900' : 'text-slate-700 hover:bg-slate-50'}`}
+                  >
+                    <span className={`grid size-8 shrink-0 place-items-center rounded-lg ${selected ? 'bg-sky-100 text-sky-800' : 'bg-slate-100 text-slate-600'}`}>
+                      <Icon className="size-[18px]" strokeWidth={1.8} />
+                    </span>
+                    <span className="flex-1">{label}</span>
+                    {id === 'client-portal' && pendingApprovals > 0 && (
+                      <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs text-amber-900">{toPersianDigits(pendingApprovals)} در انتظار</span>
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+
+            <div role="group" aria-label="تنظیمات و پشتیبانی" className="space-y-1 border-t border-slate-200 pt-3">
+              <button type="button" onClick={() => {
+                closeMenu();
+                openConnectModal();
+              }} className="flex min-h-11 w-full cursor-pointer items-center gap-2.5 rounded-xl px-2 text-start text-sm font-bold text-slate-700 hover:bg-slate-50">
+                <Link2 aria-hidden="true" className="mx-1.5 size-[18px] text-slate-600" /> اتصال کانال‌ها
+              </button>
+              <button type="button" aria-current={activeTab === 'pricing' ? 'page' : undefined} onClick={() => navigate('pricing')} className="flex min-h-11 w-full cursor-pointer items-center gap-2.5 rounded-xl px-2 text-start text-sm font-bold text-slate-700 hover:bg-slate-50 aria-[current=page]:bg-sky-50 aria-[current=page]:text-sky-900">
+                <CreditCard aria-hidden="true" className="mx-1.5 size-[18px] text-slate-600" /> پلن‌ها و اشتراک
+              </button>
+              <button type="button" aria-current={activeTab === 'support' ? 'page' : undefined} onClick={() => navigate('support')} className="flex min-h-11 w-full cursor-pointer items-center gap-2.5 rounded-xl px-2 text-start text-sm font-bold text-slate-700 hover:bg-slate-50 aria-[current=page]:bg-sky-50 aria-[current=page]:text-sky-900">
+                <Headphones aria-hidden="true" className="mx-1.5 size-[18px] text-slate-600" /> پشتیبانی
+              </button>
+            </div>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-2.5 border-t border-slate-200 bg-slate-50 px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+            {currentUser?.avatarUrl ? (
+              <img src={currentUser.avatarUrl} alt="" className="size-9 shrink-0 rounded-lg object-cover" />
+            ) : (
+              <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-slate-200 bg-white">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#1e293b" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="size-5">
+                  <circle cx="12" cy="7.8" r="3.8" />
+                  <path d="M5.2 20.2a6.8 6.8 0 0 1 13.6 0" />
+                </svg>
+              </span>
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-bold">{currentUser?.fullName || 'کاربر مهمان'}</p>
+              {currentPlan === 'agency' ? (
+                <p className="inline-flex items-center gap-1 text-xs text-amber-900"><Crown aria-hidden="true" className="size-3.5" />{planNames[currentPlan]}</p>
               ) : (
-                <span className="text-[9px] text-emerald-600 font-bold">
-                  اشتراک فعال VIP ✓
-                </span>
+                <button type="button" onClick={() => {
+                  closeMenu();
+                  openUpgradeModal('agency');
+                }} className="inline-flex min-h-7 cursor-pointer items-center gap-1 rounded text-xs font-bold text-sky-800 hover:underline">
+                  {planNames[currentPlan]} · ارتقا
+                </button>
               )}
             </div>
-          </div>
-
-          {/* 2. Workspace Selector (پیج کاری و برند فعال) */}
-          <div className="bg-gray-50/90 rounded-2xl p-2.5 border border-gray-100 space-y-2">
-            <div className="flex items-center justify-between px-1">
-              <span className="text-[10px] font-bold text-gray-500">
-                پیج کاری / برند فعال:
-              </span>
-              <span className="text-[10px] font-black text-[#3b96cc] bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100 truncate max-w-[150px]">
-                {activeWorkspace.name}
-              </span>
-            </div>
-            <div className="grid grid-cols-2 gap-1.5">
-              {workspaces.map((ws) => (
-                <button
-                  key={ws.id}
-                  onClick={() => setActiveWorkspaceId(ws.id)}
-                  className={`px-2.5 py-2 rounded-xl text-[11px] font-bold text-right transition-all flex items-center justify-between border cursor-pointer ${
-                    ws.id === activeWorkspace.id
-                      ? 'bg-white border-[#3b96cc] text-[#3b96cc] font-black shadow-xs'
-                      : 'bg-white/80 border-gray-200 text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <span className="truncate">{ws.name}</span>
-                  {ws.id === activeWorkspace.id && (
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#3b96cc] shrink-0 mr-1" />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* 3. Support Hub (پشتیبانی: تیکت و چت‌بات) */}
-          <button
-            onClick={() => handleSelectTab('support')}
-            className="w-full flex items-center justify-between p-3 rounded-2xl bg-gradient-to-l from-sky-600 to-[#3b96cc] text-white shadow-md shadow-sky-600/20 hover:brightness-105 transition-all text-right group cursor-pointer"
-          >
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-white shrink-0">
-                <Headphones className="w-4 h-4" />
-              </div>
-              <div>
-                <span className="text-xs font-black block">پشتیبانی (تیکت و چت‌بات)</span>
-                <span className="text-[10px] text-sky-100 font-medium">
-                  پاسخگویی هوشمند ۲۴ ساعته و ارسال تیکت
-                </span>
-              </div>
-            </div>
-            <span className="text-[10px] bg-white text-[#3b96cc] px-2.5 py-1 rounded-full font-black shadow-xs shrink-0">
-              ورود به پشتیبانی
-            </span>
-          </button>
-        </div>
-
-        {/* Drawer Menu List */}
-        <div className="p-4 sm:p-5 overflow-y-auto space-y-1.5 flex-1">
-          <span className="text-[10px] font-bold text-gray-400 block px-2 mb-2 text-right">
-            دسترسی سریع به بخش‌ها:
-          </span>
-
-          {navMenuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleSelectTab(item.id)}
-                className={`w-full flex items-center justify-between p-3 rounded-2xl transition-all text-right group ${
-                  isActive
-                    ? 'bg-sky-50 text-[#3b96cc] font-black shadow-xs border border-sky-100'
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
-                      isActive
-                        ? 'bg-[#3b96cc] text-white shadow-xs'
-                        : 'bg-gray-100 text-gray-500 group-hover:bg-gray-200 group-hover:text-gray-800'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-xs font-black block">{item.label}</span>
-                    <span className="text-[10px] text-gray-400 font-medium">
-                      {item.desc}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {item.badge && (
-                    <span
-                      className={`text-[9px] px-2 py-0.5 rounded-full font-black ${item.badgeColor}`}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
-                  <ChevronLeft
-                    className={`w-4 h-4 transition-transform group-hover:-translate-x-0.5 ${
-                      isActive ? 'text-[#3b96cc]' : 'text-gray-300'
-                    }`}
-                  />
-                </div>
-              </button>
-            );
-          })}
-
-          {/* Quick Action: Connect Channels Modal */}
-          <div className="pt-2">
-            <button
-              onClick={() => {
-                setIsHamburgerMenuOpen(false);
-                openConnectModal();
-              }}
-              className="w-full flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-sky-50 via-teal-50 to-white border border-sky-200 text-[#3b96cc] text-right font-black text-xs hover:shadow-xs transition-all"
-            >
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#3b96cc] text-white flex items-center justify-center">
-                  <Link2 className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="block">اتصال کانال‌های ۵ پلتفرم</span>
-                  <span className="text-[10px] text-sky-700 font-medium font-mono">
-                    تلگرام، اینستاگرام، روبیکا، واتساپ، بله
-                  </span>
-                </div>
-              </div>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-sky-200/60 text-[#3b96cc] font-bold">
-                تنظیمات
-              </span>
-            </button>
-          </div>
-        </div>
-
-        {/* Drawer Footer */}
-        <div className="p-4 border-t border-gray-100 bg-gray-50/80 flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2 text-gray-400 font-medium text-[11px]">
-            <span>نسخه اپ: v18.40</span>
-            <span>•</span>
-            <span className="text-[#3b96cc] font-bold">پشتیبانی فعال</span>
-          </div>
-
-          {currentUser?.isLoggedIn ? (
-            <button
-              onClick={() => {
+            {currentUser?.isLoggedIn ? (
+              <button type="button" onClick={() => {
+                closeMenu();
                 logoutUser();
-                setIsHamburgerMenuOpen(false);
-              }}
-              className="flex items-center gap-1.5 text-gray-500 hover:text-rose-600 transition-colors font-bold text-[11px]"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>خروج از حساب</span>
-            </button>
-          ) : (
-            <Link
-              href="/login"
-              onClick={() => setIsHamburgerMenuOpen(false)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#3b96cc] hover:bg-[#2c7ead] text-white font-black text-xs transition-colors shadow-2xs"
-            >
-              <Smartphone className="w-3.5 h-3.5" />
-              <span>ورود / ثبت‌نام</span>
-            </Link>
-          )}
+              }} className="inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg px-2 text-xs font-bold text-rose-700 hover:bg-rose-100">
+                <LogOut aria-hidden="true" className="size-4" /> خروج از حساب
+              </button>
+            ) : (
+              <Link href="/login" onClick={closeMenu} className="inline-flex min-h-11 shrink-0 items-center rounded-lg px-2 text-xs font-bold text-sky-800 hover:bg-sky-100">ورود / ثبت‌نام</Link>
+            )}
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </dialog>
   );
 }
