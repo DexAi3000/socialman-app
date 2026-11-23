@@ -121,11 +121,9 @@ export function UpgradeModal() {
 
         {/* Bank Card Details Box (Bank Mellat Style Matching Image 2) */}
         <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-[#ef5992] via-[#e63f7e] to-[#d6286a] text-gray-900 space-y-3.5 shadow-xl shadow-pink-500/20 relative overflow-hidden border border-pink-300/40">
-          {/* Card Top Row: 'کارت پیش فرض' Badge + 'بانک ملت' with Official Mellat Emblem */}
+          {/* Card Top Row: 'بانک ملت' with Official Mellat Emblem */}
           <div className="flex items-center justify-between">
-            <span className="px-2.5 py-0.5 rounded-full bg-white/30 backdrop-blur-xs border border-white/40 text-white text-[10px] font-bold">
-              کارت پیش فرض
-            </span>
+            <div />
 
             <div className="flex items-center gap-2">
               <span className="text-xs sm:text-sm font-black text-gray-900">بانک ملت</span>

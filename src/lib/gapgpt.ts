@@ -2,7 +2,7 @@ export const GAPGPT_API_KEY =
   process.env.GAPGPT_API_KEY || 'sk-akooz8nPVHXug7DVvskSoLBAYNVLiYqpg3dUFlOWSrxtJOmF';
 
 export const GAPGPT_BASE_URL =
-  process.env.GAPGPT_BASE_URL || 'https://api.gapgpt.app/v1';
+  process.env.GAPGPT_BASE_URL || 'https://api.gapgpt.ir/v1';
 
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
