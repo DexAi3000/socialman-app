@@ -14,8 +14,12 @@ import {
   CalendarDays,
   ClipboardCheck,
   Sparkles,
+  Crown,
+  Clock,
+  AlertTriangle,
 } from 'lucide-react';
 import { toPersianDigits } from '@/lib/utils';
+import { daysRemaining, formatSubscriptionDate } from '@/lib/subscription';
 import type { AppTab } from '@/types';
 import { PublishGlyph } from './SnappIcons';
 import { NotificationBell } from './NotificationBell';
@@ -56,10 +60,16 @@ const desktopLinks = [
 export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
   const {
     currentUser,
+    currentPlan,
+    openUpgradeModal,
     logoutUser,
     updateUserAvatar,
     setIsHamburgerMenuOpen,
   } = useApp();
+
+  const subscription = currentUser?.subscription;
+  const remaining = subscription?.expiresAt ? daysRemaining(subscription.expiresAt) : null;
+  const isOneDayLeft = remaining !== null && remaining <= 1;
 
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const profilePanelId = useId();
@@ -185,7 +195,34 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
         </nav>
 
         {/* Left side: User Auth */}
-        <div className="relative col-start-3 row-start-1 flex min-w-0 items-center gap-0.5 justify-self-end sm:gap-1">
+        <div className="relative col-start-3 row-start-1 flex min-w-0 items-center gap-1 justify-self-end sm:gap-1.5">
+          {/* Subscription remaining countdown pill in header */}
+          {currentUser?.isLoggedIn && (
+            <button
+              type="button"
+              onClick={() => setActiveTab('pricing')}
+              className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-2xs ${
+                isOneDayLeft
+                  ? 'bg-rose-50 border-rose-300 text-rose-700 hover:bg-rose-100 animate-pulse'
+                  : currentPlan === 'agency'
+                  ? 'bg-amber-50 border-amber-300/80 text-amber-900 hover:bg-amber-100'
+                  : currentPlan === 'pro'
+                  ? 'bg-sky-50 border-sky-300/80 text-sky-900 hover:bg-sky-100'
+                  : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
+              }`}
+              title="مشاهده زمان‌بندی و وضعیت اشتراک"
+            >
+              <Crown className={`w-3.5 h-3.5 shrink-0 ${currentPlan === 'agency' ? 'text-amber-500 fill-amber-500' : currentPlan === 'pro' ? 'text-sky-600' : 'text-slate-400'}`} />
+              <span>
+                {remaining !== null
+                  ? `${toPersianDigits(remaining)} روز اشتراک`
+                  : currentPlan === 'free'
+                  ? 'پلن پایه'
+                  : 'اشتراک فعال'}
+              </span>
+            </button>
+          )}
+
           {currentUser?.isLoggedIn && <NotificationBell key={currentUser.id} onNavigate={setActiveTab} />}
           {/* User Auth Profile / Login Button */}
           {currentUser?.isLoggedIn ? (
@@ -281,6 +318,67 @@ export function SnappHeader({ activeTab, setActiveTab }: SnappHeaderProps) {
                         <span>بازگشت به آدمک پیش‌فرض</span>
                       </button>
                     )}
+                  </div>
+
+                  {/* Subscription Countdown & Timing Card */}
+                  <div className="rounded-xl p-3 bg-gradient-to-br from-slate-50 to-sky-50/60 border border-slate-200 text-right space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <Crown className={`w-4 h-4 ${currentPlan === 'agency' ? 'text-amber-500 fill-amber-500' : currentPlan === 'pro' ? 'text-sky-600' : 'text-slate-400'}`} />
+                        <span className="text-xs font-black text-slate-800">
+                          {currentPlan === 'agency' ? 'پلن طلایی (آژانس)' : currentPlan === 'pro' ? 'پلن نقره‌ای' : 'پلن برنز (پایه)'}
+                        </span>
+                      </div>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        isOneDayLeft
+                          ? 'bg-rose-100 text-rose-700 font-black animate-pulse'
+                          : remaining !== null
+                          ? 'bg-sky-100 text-sky-800 font-bold'
+                          : 'bg-slate-200 text-slate-600'
+                      }`}>
+                        {remaining !== null ? `${toPersianDigits(remaining)} روز مانده` : 'دائمی رایگان'}
+                      </span>
+                    </div>
+
+                    {subscription?.expiresAt ? (
+                      <>
+                        {/* Progress Bar (out of 30 days) */}
+                        <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${isOneDayLeft ? 'bg-rose-500' : 'bg-[#3b96cc]'}`}
+                            style={{ width: `${Math.min(100, Math.max(5, ((remaining ?? 0) / 30) * 100))}%` }}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between text-[10px] text-slate-500">
+                          <span>تاریخ انقضا:</span>
+                          <span className="font-bold text-slate-700 font-mono">{formatSubscriptionDate(subscription.expiresAt)}</span>
+                        </div>
+
+                        {isOneDayLeft && (
+                          <div className="flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-50 p-1.5 rounded-lg border border-rose-200">
+                            <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-rose-600" />
+                            <span>تنها ۱ روز تا پایان اشتراک باقیست!</span>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <p className="text-[10px] text-slate-500 leading-tight">
+                        برای فعال‌سازی انتشار همزمان در ۵ پلتفرم و هوش مصنوعی، پلن خود را ارتقا دهید.
+                      </p>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsUserDropdownOpen(false);
+                        openUpgradeModal(currentPlan === 'agency' ? 'agency' : 'agency');
+                      }}
+                      className="w-full mt-1 py-1.5 px-3 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-[11px] shadow-xs flex items-center justify-center gap-1.5 transition-transform active:scale-95"
+                    >
+                      <Crown className="w-3.5 h-3.5 fill-slate-950" />
+                      <span>{currentPlan === 'free' ? 'ارتقا به پلن طلایی' : 'تمدید یا تغییر اشتراک'}</span>
+                    </button>
                   </div>
 
                   <div className="pt-1 border-t border-gray-100 space-y-1">

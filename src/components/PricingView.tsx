@@ -97,20 +97,44 @@ export function PricingView() {
           </span>
         </div>
         {end ? (
-          <dl className="mt-3 grid gap-2 rounded-xl bg-slate-50 px-3 py-2.5 text-sm sm:grid-cols-3">
-            <div className="flex flex-wrap justify-between gap-1.5 sm:block">
-              <dt className="text-slate-600">شروع دوره</dt>
-              <dd className="font-bold text-slate-900">{subscription?.startedAt ? formatSubscriptionDate(subscription.startedAt) : 'ثبت نشده'}</dd>
-            </div>
-            <div className="flex flex-wrap justify-between gap-1.5 sm:block">
-              <dt className="text-slate-600">پایان دوره</dt>
-              <dd className="font-bold text-slate-900">{formatSubscriptionDate(end)}</dd>
-            </div>
-            <div className="flex flex-wrap justify-between gap-1.5 sm:block">
-              <dt className="text-slate-600">زمان باقی‌مانده</dt>
-              <dd className="font-bold text-slate-900">{toPersianDigits(remaining ?? 0)} روز</dd>
-            </div>
-          </dl>
+          <>
+            <dl className="mt-3 grid gap-2 rounded-xl bg-slate-50 px-3 py-2.5 text-sm sm:grid-cols-3">
+              <div className="flex flex-wrap justify-between gap-1.5 sm:block">
+                <dt className="text-slate-600">شروع دوره</dt>
+                <dd className="font-bold text-slate-900">{subscription?.startedAt ? formatSubscriptionDate(subscription.startedAt) : 'ثبت نشده'}</dd>
+              </div>
+              <div className="flex flex-wrap justify-between gap-1.5 sm:block">
+                <dt className="text-slate-600">پایان دوره</dt>
+                <dd className="font-bold text-slate-900">{formatSubscriptionDate(end)}</dd>
+              </div>
+              <div className="flex flex-wrap justify-between gap-1.5 sm:block">
+                <dt className="text-slate-600">زمان باقی‌مانده</dt>
+                <dd className="font-black text-[#3b96cc]">{toPersianDigits(remaining ?? 0)} روز</dd>
+              </div>
+            </dl>
+
+            {remaining !== null && (
+              <div className="mt-3 space-y-1">
+                <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all ${remaining <= 1 ? 'bg-rose-500 animate-pulse' : 'bg-[#3b96cc]'}`}
+                    style={{ width: `${Math.min(100, Math.max(4, (remaining / 30) * 100))}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-[11px] text-slate-500 font-bold">
+                  <span>{toPersianDigits(remaining)} روز مانده از دوره ۳۰ روزه</span>
+                  <span>{toPersianDigits(Math.round((remaining / 30) * 100))}٪ باقی‌مانده</span>
+                </div>
+              </div>
+            )}
+
+            {remaining !== null && remaining <= 1 && !isExpired && (
+              <div className="mt-3 flex items-center gap-2 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold">
+                <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping shrink-0" />
+                <span>⚠️ تنها ۱ روز تا پایان دوره اشتراک شما باقی مانده است. جهت عدم قطعی سرویس انتشار خودکار، لطفاً اشتراک خود را تمدید کنید.</span>
+              </div>
+            )}
+          </>
         ) : (
           <p className="mt-3 text-sm leading-6 text-slate-600">
             {currentPlan === 'free' ? 'اشتراک رایگان تاریخ پایان ندارد.' : 'تاریخ شروع و پایان برای این اشتراک ثبت نشده است.'}

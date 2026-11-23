@@ -48,7 +48,17 @@ export async function POST(request: Request) {
     // Update user plan
     const updatedUser = await prisma.$transaction(async (tx) => {
       const latestUser = await tx.user.findUniqueOrThrow({ where: { id: user.id } });
-      return tx.user.update({ where: { id: user.id }, data: getPlanActivation(latestUser, targetPlan) });
+      const updated = await tx.user.update({ where: { id: user.id }, data: getPlanActivation(latestUser, targetPlan) });
+
+      // Clear any previous subscription notification reads so the new activation notification triggers immediately as unread
+      await tx.notificationRead.deleteMany({
+        where: {
+          userId: user.id,
+          key: { startsWith: 'subscription:' },
+        },
+      });
+
+      return updated;
     });
 
     return NextResponse.json({

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { toPersianDigits } from '@/lib/utils';
+import { daysRemaining } from '@/lib/subscription';
 import type { AppTab } from '@/types';
 import { PublishGlyph } from './SnappIcons';
 
@@ -183,7 +184,28 @@ export function HamburgerMenuDrawer({ activeTab, setActiveTab }: HamburgerMenuDr
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-bold">{currentUser?.fullName || 'کاربر مهمان'}</p>
               {currentPlan === 'agency' ? (
-                <p className="inline-flex items-center gap-1 text-xs text-amber-900"><Crown aria-hidden="true" className="size-3.5" />{planNames[currentPlan]}</p>
+                <div className="flex flex-col">
+                  <p className="inline-flex items-center gap-1 text-xs text-amber-900 font-bold">
+                    <Crown aria-hidden="true" className="size-3.5 text-amber-500 fill-amber-500" />
+                    {planNames[currentPlan]}
+                  </p>
+                  {currentUser?.subscription?.expiresAt && (
+                    <span className="text-[10px] text-amber-800 font-bold">
+                      {toPersianDigits(daysRemaining(currentUser.subscription.expiresAt))} روز باقی‌مانده
+                    </span>
+                  )}
+                </div>
+              ) : currentPlan === 'pro' ? (
+                <div className="flex flex-col">
+                  <p className="inline-flex items-center gap-1 text-xs text-sky-900 font-bold">
+                    {planNames[currentPlan]}
+                  </p>
+                  {currentUser?.subscription?.expiresAt && (
+                    <span className="text-[10px] text-sky-700 font-bold">
+                      {toPersianDigits(daysRemaining(currentUser.subscription.expiresAt))} روز باقی‌مانده
+                    </span>
+                  )}
+                </div>
               ) : (
                 <button type="button" onClick={() => {
                   closeMenu();

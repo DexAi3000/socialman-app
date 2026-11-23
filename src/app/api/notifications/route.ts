@@ -1,7 +1,7 @@
 import { connection, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSession, verifySession } from '@/lib/session';
-import { DAY_MS, daysRemaining, EXPIRY_REMINDER_DAYS, getSubscriptionPeriod } from '@/lib/subscription';
+import { DAY_MS, daysRemaining, EXPIRY_REMINDER_DAYS, formatSubscriptionDate, getSubscriptionPeriod, paidPlanNames } from '@/lib/subscription';
 import type { AppNotification } from '@/types';
 import { toPersianDigits } from '@/lib/utils';
 
@@ -68,28 +68,55 @@ async function getFeed(userId: string): Promise<Omit<AppNotification, 'read'>[]>
   })));
 
   const subscription = user ? getSubscriptionPeriod(user) : null;
-  if (subscription?.expiresAt) {
-    const expires = Date.parse(subscription.expiresAt);
-    const reminder = expires - EXPIRY_REMINDER_DAYS * DAY_MS;
-    if (expires <= now.getTime()) {
+  if (subscription) {
+    const planName = paidPlanNames[subscription.plan] || (subscription.plan === 'agency' ? 'طلایی' : 'نقره‌ای');
+
+    // 1. Notification for Subscription Purchase & Activation (after bot/admin approval)
+    if (subscription.startedAt) {
       activity.push({
-        id: `subscription:expired:${subscription.expiresAt}`,
+        id: `subscription:activated:${subscription.startedAt}:${subscription.plan}`,
         kind: 'subscription',
-        title: 'دورهٔ اشتراک به پایان رسید',
-        detail: 'برای فعال‌سازی دوباره، پلن‌های اشتراک را ببین.',
-        occurredAt: subscription.expiresAt,
+        title: `اشتراک ${planName} فعال شد 🎉`,
+        detail: `پرداخت شما با موفقیت تایید شد. دسترسی نامحدود به تمامی امکانات تا تاریخ ${subscription.expiresAt ? formatSubscriptionDate(subscription.expiresAt) : 'پایان دوره'} فعال گردید.`,
+        occurredAt: subscription.startedAt,
         tab: 'pricing',
       });
-    } else if (reminder <= now.getTime()) {
+    }
+
+    // 2. Notifications for Expiration & Reminders
+    if (subscription.expiresAt) {
+      const expires = Date.parse(subscription.expiresAt);
       const days = daysRemaining(subscription.expiresAt, now.getTime());
-      activity.push({
-        id: `subscription:reminder:${subscription.expiresAt}`,
-        kind: 'subscription',
-        title: 'پایان اشتراک نزدیک است',
-        detail: `تا ${toPersianDigits(days)} روز دیگر به پایان دوره می‌رسی.`,
-        occurredAt: new Date(reminder).toISOString(),
-        tab: 'pricing',
-      });
+
+      if (expires <= now.getTime()) {
+        activity.push({
+          id: `subscription:expired:${subscription.expiresAt}`,
+          kind: 'subscription',
+          title: 'دورهٔ اشتراک به پایان رسید',
+          detail: 'برای ادامه فعالیت و انتشار خودکار بدون وقفه، پلن اشتراک خود را تمدید کنید.',
+          occurredAt: subscription.expiresAt,
+          tab: 'pricing',
+        });
+      } else if (days <= 1) {
+        // Urgent 1-Day Remaining Notification requested by user
+        activity.push({
+          id: `subscription:urgent-1day:${subscription.expiresAt}`,
+          kind: 'subscription',
+          title: '⚠️ تنها ۱ روز تا پایان اشتراک شما باقی مانده است!',
+          detail: 'جهت جلوگیری از قطع شدن دسترسی و عدم وقفه در انتشار خودکار ۵ پلتفرم، همین حالا نسبت به تمدید اشتراک اقدام کنید.',
+          occurredAt: new Date(expires - 1 * DAY_MS).toISOString(),
+          tab: 'pricing',
+        });
+      } else if (days <= 3) {
+        activity.push({
+          id: `subscription:reminder:${subscription.expiresAt}`,
+          kind: 'subscription',
+          title: 'یادآوری پایان اشتراک',
+          detail: `تا ${toPersianDigits(days)} روز دیگر به پایان دوره اشتراک خود می‌رسید.`,
+          occurredAt: new Date(expires - 3 * DAY_MS).toISOString(),
+          tab: 'pricing',
+        });
+      }
     }
   }
 
