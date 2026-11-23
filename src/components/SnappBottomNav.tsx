@@ -110,7 +110,7 @@ export function SnappBottomNav({ activeTab, setActiveTab }: SnappBottomNavProps)
               </span>
             )}
           </div>
-          <span className="text-[10px] sm:text-[11px] font-bold whitespace-nowrap">استودیو AI</span>
+          <span className="text-[9.5px] sm:text-[11px] font-bold whitespace-nowrap">استودیوی هوش مصنوعی</span>
         </button>
 
         {/* Tab 5: Client Approval Portal */}

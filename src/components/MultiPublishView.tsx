@@ -251,26 +251,15 @@ export function MultiPublishView({ onNavigateTab }: { onNavigateTab?: (tab: AppT
 
         {/* AI Generator Gate status chip */}
         <div className="flex items-center gap-2">
-          {currentPlan === 'agency' ? (
-            <button
-              type="button"
-              onClick={() => onNavigateTab?.('ai-studio')}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 text-xs font-black transition-all cursor-pointer shadow-xs active:scale-95"
-              title="ورود به استودیوی هوش مصنوعی"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-indigo-600 fill-indigo-600" />
-              <span>هوش مصنوعی فعال ✦</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => onNavigateTab ? onNavigateTab('ai-studio') : openUpgradeModal('agency')}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 text-xs font-black transition-colors"
-            >
-              <Crown className="w-3.5 h-3.5 text-amber-600" />
-              <span>دستیار هوش مصنوعی (ویژه پلن طلایی)</span>
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => onNavigateTab?.('ai-studio')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 text-xs font-black transition-all cursor-pointer shadow-xs active:scale-95"
+            title="ورود به استودیوی هوش مصنوعی"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-indigo-600 fill-indigo-600" />
+            <span>هوش مصنوعی فعال</span>
+          </button>
         </div>
       </div>
 
