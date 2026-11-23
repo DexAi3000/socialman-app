@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import { CalendarDays, ClipboardCheck, Sparkles, Star } from 'lucide-react';
+import { CalendarDays, ClipboardCheck, MessageSquare, Sparkles, Star } from 'lucide-react';
 import {
   BaleIcon,
   InstagramIcon,
@@ -87,4 +87,8 @@ export function SnappCalendarIcon(props: IconProps) {
 
 export function SnappApprovalIcon(props: IconProps) {
   return <FeatureIcon {...props} icon={ClipboardCheck} tone="bg-emerald-50 text-emerald-700" />;
+}
+
+export function SnappDirectsIcon(props: IconProps) {
+  return <FeatureIcon {...props} icon={MessageSquare} tone="bg-indigo-50 text-indigo-700" />;
 }

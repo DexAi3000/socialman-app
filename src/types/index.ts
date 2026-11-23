@@ -123,5 +123,5 @@ export interface AiGenerationResponse {
   hashtags: string[];
   suggestedBestTime: string;
 }
-export type AppTab = 'dashboard' | 'workspace' | 'publish' | 'ai-studio' | 'calendar' | 'pricing' | 'client-portal' | 'support';
+export type AppTab = 'dashboard' | 'workspace' | 'publish' | 'directs' | 'ai-studio' | 'calendar' | 'pricing' | 'client-portal' | 'support';
 

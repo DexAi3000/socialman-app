@@ -29,6 +29,7 @@ const CalendarView = dynamic(() => import('@/components/CalendarView').then((m) 
 const PricingView = dynamic(() => import('@/components/PricingView').then((m) => m.PricingView), { loading: () => <WorkspaceLoading /> });
 const ClientPortalView = dynamic(() => import('@/components/ClientPortalView').then((m) => m.ClientPortalView), { loading: () => <WorkspaceLoading /> });
 const MultiPublishView = dynamic(() => import('@/components/MultiPublishView').then((m) => m.MultiPublishView), { loading: () => <WorkspaceLoading /> });
+const DirectsInboxView = dynamic(() => import('@/components/DirectsInboxView').then((m) => m.DirectsInboxView), { loading: () => <WorkspaceLoading /> });
 const SupportView = dynamic(() => import('@/components/SupportView').then((m) => m.SupportView), { loading: () => <WorkspaceLoading /> });
 
 export default function Home() {
@@ -73,6 +74,7 @@ export default function Home() {
             <DashboardView isWorkspace={activeTab === 'workspace'} onNavigateTab={navigate} />
           )}
           {activeTab === 'publish' && <MultiPublishView onNavigateTab={navigate} />}
+          {activeTab === 'directs' && <DirectsInboxView />}
           {activeTab === 'ai-studio' && (
             currentPlan === 'free' ? (
               <LockedFeatureGate

@@ -6,6 +6,7 @@ import {
   SnappApprovalIcon,
   SnappBaleIcon,
   SnappCalendarIcon,
+  SnappDirectsIcon,
   SnappInstagramIcon,
   SnappPublishIcon,
   SnappRubikaIcon,
@@ -37,6 +38,12 @@ export function SnappTilesGrid({ onSelectService }: SnappTilesGridProps) {
       icon: SnappPublishIcon,
     },
     {
+      id: 'directs',
+      title: 'دایرکت هوشمند AI',
+      detail: 'پاسخ خودکار به پیام‌های تلگرام و اینستاگرام',
+      icon: SnappDirectsIcon,
+    },
+    {
       id: 'calendar',
       title: 'زمان‌بندی تقویم شمسی',
       detail: 'ارسال خودکار در تاریخ و ساعت مشخص',
@@ -52,7 +59,7 @@ export function SnappTilesGrid({ onSelectService }: SnappTilesGridProps) {
 
   return (
     <div className="space-y-3.5 sm:space-y-4">
-      <div className="grid grid-cols-1 gap-2.5 sm:gap-3 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4 sm:gap-3">
         {services.map((item) => (
           <button
             key={item.id}

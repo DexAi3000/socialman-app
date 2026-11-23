@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   CalendarDays, ChevronLeft, ClipboardCheck, CreditCard, Crown, Headphones, Home,
-  LayoutDashboard, Link2, LogOut, Sparkles, X,
+  LayoutDashboard, Link2, LogOut, MessageSquare, Sparkles, X,
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { toPersianDigits } from '@/lib/utils';
@@ -20,6 +20,7 @@ interface HamburgerMenuDrawerProps {
 const primaryLinks = [
   { id: 'dashboard', label: 'خانه', icon: Home },
   { id: 'publish', label: 'انتشار و زمان‌بندی', icon: PublishGlyph },
+  { id: 'directs', label: 'دایرکت هوشمند مشتریان (AI)', icon: MessageSquare },
   { id: 'calendar', label: 'تقویم محتوا', icon: CalendarDays },
   { id: 'client-portal', label: 'تأیید کارفرما', icon: ClipboardCheck },
   { id: 'ai-studio', label: 'هوش مصنوعی', icon: Sparkles },

@@ -17,6 +17,7 @@ import {
   Crown,
   Clock,
   AlertTriangle,
+  MessageSquare,
 } from 'lucide-react';
 import { toPersianDigits } from '@/lib/utils';
 import { daysRemaining, formatSubscriptionDate } from '@/lib/subscription';
@@ -52,6 +53,7 @@ interface SnappHeaderProps {
 const desktopLinks = [
   { id: 'dashboard', label: 'خانه', icon: Home },
   { id: 'publish', label: 'انتشار', icon: PublishGlyph },
+  { id: 'directs', label: 'دایرکت هوشمند', icon: MessageSquare },
   { id: 'calendar', label: 'تقویم', icon: CalendarDays },
   { id: 'client-portal', label: 'کارفرما', icon: ClipboardCheck },
   { id: 'ai-studio', label: 'استودیو', icon: Sparkles },
