@@ -72,7 +72,7 @@ export default function Home() {
           {(activeTab === 'dashboard' || activeTab === 'workspace') && (
             <DashboardView isWorkspace={activeTab === 'workspace'} onNavigateTab={navigate} />
           )}
-          {activeTab === 'publish' && <MultiPublishView />}
+          {activeTab === 'publish' && <MultiPublishView onNavigateTab={navigate} />}
           {activeTab === 'ai-studio' && (
             currentPlan === 'free' ? (
               <LockedFeatureGate

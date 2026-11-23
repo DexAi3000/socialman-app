@@ -6,6 +6,7 @@ import {
   CalendarDays,
   ClipboardCheck,
   Lock,
+  Sparkles,
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { toPersianDigits } from '@/lib/utils';
@@ -36,11 +37,12 @@ export function SnappBottomNav({ activeTab, setActiveTab }: SnappBottomNavProps)
   const pendingApprovals = posts.filter((p) => p.status === 'pending_approval').length;
 
   const isCalendarLocked = currentPlan === 'free';
+  const isAiStudioLocked = currentPlan === 'free';
   const isClientPortalLocked = currentPlan !== 'agency';
 
   return (
-    <nav aria-label="بخش‌های اصلی" className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 px-3 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
-      <div className="max-w-md mx-auto grid grid-cols-4 items-center">
+    <nav aria-label="بخش‌های اصلی" className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
+      <div className="max-w-md mx-auto grid grid-cols-5 items-center">
         {/* Tab 1: Dashboard / Home */}
         <button
           onClick={() => setActiveTab('dashboard')}
@@ -52,7 +54,7 @@ export function SnappBottomNav({ activeTab, setActiveTab }: SnappBottomNavProps)
           <NavIcon active={activeTab === 'dashboard'}>
             <Home className="size-[18px]" strokeWidth={1.8} />
           </NavIcon>
-          <span className="text-[11px] font-bold">خانه</span>
+          <span className="text-[10px] sm:text-[11px] font-bold">خانه</span>
         </button>
 
         {/* Tab 2: Multi-Platform Publisher */}
@@ -66,7 +68,7 @@ export function SnappBottomNav({ activeTab, setActiveTab }: SnappBottomNavProps)
           <NavIcon active={activeTab === 'publish'}>
             <PublishGlyph className="size-5" />
           </NavIcon>
-          <span className="text-[11px] font-bold">انتشار ۵ پلتفرم</span>
+          <span className="text-[10px] sm:text-[11px] font-bold">انتشار</span>
         </button>
 
         {/* Tab 3: Calendar */}
@@ -87,10 +89,31 @@ export function SnappBottomNav({ activeTab, setActiveTab }: SnappBottomNavProps)
               </span>
             )}
           </div>
-          <span className="text-[11px] font-bold">تقویم</span>
+          <span className="text-[10px] sm:text-[11px] font-bold">تقویم</span>
         </button>
 
-        {/* Tab 4: Client Approval Portal */}
+        {/* Tab 4: AI Studio (استودیوی هوش مصنوعی) */}
+        <button
+          onClick={() => setActiveTab('ai-studio')}
+          aria-current={activeTab === 'ai-studio' ? 'page' : undefined}
+          className={`group flex flex-col items-center gap-0.5 py-1 transition-all flex-1 active:scale-95 relative ${
+            activeTab === 'ai-studio' ? 'text-[#3b96cc] font-black' : 'text-gray-400 hover:text-gray-600'
+          }`}
+        >
+          <div className="relative">
+            <NavIcon active={activeTab === 'ai-studio'}>
+              <Sparkles className="size-[18px]" strokeWidth={1.8} />
+            </NavIcon>
+            {isAiStudioLocked && (
+              <span className="absolute -top-1 -end-2 flex size-3.5 items-center justify-center rounded-full bg-amber-100 text-amber-800">
+                <Lock className="size-2.5" />
+              </span>
+            )}
+          </div>
+          <span className="text-[10px] sm:text-[11px] font-bold whitespace-nowrap">استودیو AI</span>
+        </button>
+
+        {/* Tab 5: Client Approval Portal */}
         <button
           onClick={() => setActiveTab('client-portal')}
           aria-current={activeTab === 'client-portal' ? 'page' : undefined}
@@ -113,7 +136,7 @@ export function SnappBottomNav({ activeTab, setActiveTab }: SnappBottomNavProps)
               </span>
             )}
           </div>
-          <span className="text-[11px] font-bold">کارفرما</span>
+          <span className="text-[10px] sm:text-[11px] font-bold">کارفرما</span>
         </button>
       </div>
     </nav>
