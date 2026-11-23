@@ -17,6 +17,8 @@ import {
   Check,
   Info,
   Radio,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import {
   InstagramIcon,
@@ -56,6 +58,11 @@ export function ConnectAccountsModal() {
   const [testMessage, setTestMessage] = useState('');
   const [testError, setTestError] = useState<string | null>(null);
 
+  // Instagram Advanced Settings
+  const [showAdvancedIg, setShowAdvancedIg] = useState(false);
+  const [igTokenInput, setIgTokenInput] = useState('');
+  const [igPageIdInput, setIgPageIdInput] = useState('');
+
   // Sync tab with external caller
   React.useEffect(() => {
     if (targetPlatformForConnect) {
@@ -70,7 +77,13 @@ export function ConnectAccountsModal() {
     if (currentAccount?.handle && currentAccount.handle !== '@SocialManPublishBot') {
       setChannelInput(currentAccount.handle);
     }
-  }, [activeTab, currentAccount?.handle]);
+    if (activeTab === 'instagram' && currentAccount) {
+      if (currentAccount.botToken) setIgTokenInput(currentAccount.botToken);
+      if (currentAccount.handle && !currentAccount.handle.startsWith('@')) {
+        setIgPageIdInput(currentAccount.handle);
+      }
+    }
+  }, [activeTab, currentAccount]);
 
   if (!isConnectModalOpen) return null;
 
@@ -339,31 +352,46 @@ export function ConnectAccountsModal() {
                   راهنمای اتصال اینستاگرام از طریق Meta Graph API
                 </h3>
                 <p className="text-xs text-gray-500">
-                  اینستاگرام از پروتکل رسمی Meta Content Publishing API استفاده می‌کند که ایمن‌ترین روش بین‌المللی است:
+                  اینستاگرام از پروتکل رسمی Meta Content Publishing API برای انتشار خودکار و امن پست‌ها استفاده می‌کند:
                 </p>
               </div>
 
               <div className="space-y-2.5 text-xs">
+                {/* Step 1 */}
                 <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3">
                   <span className="w-5 h-5 rounded-full bg-gradient-to-tr from-pink-500 to-rose-500 text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
                     ۱
                   </span>
                   <div>
-                    <span className="font-bold text-gray-800 block">تبدیل پیج به Professional / Business:</span>
-                    <span className="text-gray-500 text-[11px] leading-relaxed">
-                      در اپلیکیشن اینستاگرام به Settings & Privacy ◂ Account type ◂ Switch to professional account بروید (کاملاً رایگان).
+                    <span className="font-bold text-gray-800 block">تبدیل پیج اینستاگرام به تجاری (Professional / Creator):</span>
+                    <span className="text-gray-500 text-[11px] leading-relaxed block mt-0.5">
+                      در اپلیکیشن اینستاگرام به <span className="font-medium text-gray-700">Settings and privacy ◂ Account type and tools ◂ Switch to professional account</span> بروید و نوع حساب را روی Business یا Creator تنظیم فرمایید (کاملاً رایگان).
                     </span>
                   </div>
                 </div>
 
+                {/* Step 2 */}
                 <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3">
                   <span className="w-5 h-5 rounded-full bg-gradient-to-tr from-pink-500 to-rose-500 text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
                     ۲
                   </span>
+                  <div>
+                    <span className="font-bold text-gray-800 block">اتصال پیج به صفحه فیس‌بوک (Facebook Page):</span>
+                    <span className="text-gray-500 text-[11px] leading-relaxed block mt-0.5">
+                      طبق پروتکل امنیتی Meta، برای صدور مجوز انتشار محتوا، پیج شما باید به یک صفحه فیس‌بوک متصل باشد. در اپلیکیشن اینستاگرام وارد <span className="font-medium text-gray-700">Edit profile ◂ Public business information ◂ Page</span> شوید و یک صفحه ایجاد یا متصل کنید.
+                    </span>
+                  </div>
+                </div>
+
+                {/* Step 3: Registration */}
+                <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3">
+                  <span className="w-5 h-5 rounded-full bg-gradient-to-tr from-pink-500 to-rose-500 text-white flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
+                    ۳
+                  </span>
                   <div className="w-full">
-                    <span className="font-bold text-gray-800 block mb-1">ثبت نام کاربری پیج اینستاگرام:</span>
+                    <span className="font-bold text-gray-800 block mb-1">ثبت نام کاربری پیج جهت انتشار خودکار:</span>
                     <span className="text-gray-500 text-[11px] leading-relaxed block mb-2">
-                      آیدی پیج تجاری خود را جهت زمان‌بندی و انتشار وارد فرمایید:
+                      آیدی پیج تجاری خود را جهت زمان‌بندی و انتشار هوشمند وارد نمایید:
                     </span>
                     <div className="flex gap-2">
                       <input
@@ -377,18 +405,82 @@ export function ConnectAccountsModal() {
                         onClick={() => {
                           if (channelInput.trim()) {
                             const clean = channelInput.trim().startsWith('@') ? channelInput.trim() : `@${channelInput.trim()}`;
-                            toggleAccountConnection('instagram', clean, `پیج اینستاگرام ${clean}`, true);
+                            toggleAccountConnection('instagram', clean, `پیج اینستاگرام ${clean}`, true, igTokenInput.trim() || undefined);
                             setTestSuccess(true);
                             setTestMessage(`پیج ${clean} با موفقیت متصل گردید! ✅`);
                             setTimeout(() => setTestSuccess(false), 4000);
                           }
                         }}
-                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-pink-600 via-rose-500 to-amber-500 text-white text-xs font-black shadow-sm hover:opacity-95 cursor-pointer"
+                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-pink-600 via-rose-500 to-amber-500 text-white text-xs font-black shadow-sm hover:opacity-95 cursor-pointer whitespace-nowrap"
                       >
                         تایید و اتصال
                       </button>
                     </div>
                   </div>
+                </div>
+
+                {/* Step 4: Advanced Meta Graph API Settings Accordion */}
+                <div className="p-3.5 rounded-2xl bg-pink-50/50 border border-pink-100">
+                  <button
+                    type="button"
+                    onClick={() => setShowAdvancedIg(!showAdvancedIg)}
+                    className="w-full flex items-center justify-between text-pink-900 font-bold text-xs cursor-pointer"
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <span>⚙️ تنظیمات پیشرفته: اتصال مستقیم توکن اختصاصی Graph API (اختیاری)</span>
+                    </span>
+                    {showAdvancedIg ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </button>
+                  {showAdvancedIg && (
+                    <div className="mt-3 pt-3 border-t border-pink-200/60 space-y-2.5">
+                      <p className="text-[11px] text-pink-950/80 leading-relaxed">
+                        اگر اپلیکیشن در <a href="https://developers.facebook.com" target="_blank" rel="noreferrer" className="underline font-bold text-pink-700">Meta Developers</a> ساخته‌اید، می‌توانید Long-Lived Token و Facebook Page ID خود را مستقیماً وارد کنید تا انتشار مستقیماً با کلیدهای اختصاصی شما انجام پذیرد:
+                      </p>
+                      <div>
+                        <label className="text-[11px] font-bold text-gray-700 block mb-1">Facebook Page ID / Instagram Business ID:</label>
+                        <input
+                          type="text"
+                          placeholder="مثال: 104523984512938"
+                          value={igPageIdInput}
+                          onChange={(e) => setIgPageIdInput(e.target.value)}
+                          className="w-full bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-xs text-left font-mono outline-none focus:border-pink-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-gray-700 block mb-1">Long-Lived Access Token (توکن معتبر ۶۰ روزه):</label>
+                        <input
+                          type="password"
+                          placeholder="EAA..."
+                          value={igTokenInput}
+                          onChange={(e) => setIgTokenInput(e.target.value)}
+                          className="w-full bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-xs text-left font-mono outline-none focus:border-pink-500"
+                        />
+                      </div>
+                      <button
+                        onClick={() => {
+                          const handle = channelInput.trim() || igPageIdInput.trim() || '@instagram';
+                          const clean = handle.startsWith('@') ? handle : `@${handle}`;
+                          toggleAccountConnection('instagram', igPageIdInput.trim() || clean, `پیج اینستاگرام ${clean}`, true, igTokenInput.trim());
+                          setTestSuccess(true);
+                          setTestMessage('تنظیمات اختصاصی اینستاگرام با موفقیت ذخیره گردید! ✅');
+                          setTimeout(() => setTestSuccess(false), 4000);
+                        }}
+                        className="w-full py-2 rounded-xl bg-pink-600 text-white text-xs font-black hover:bg-pink-700 transition cursor-pointer"
+                      >
+                        ذخیره تنظیمات پیشرفته
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Tips Box */}
+                <div className="p-3 rounded-2xl bg-amber-50/80 border border-amber-200 text-amber-900 space-y-1 text-[11px]">
+                  <span className="font-bold block">💡 نکات کلیدی انتشار موفق در اینستاگرام:</span>
+                  <ul className="list-disc list-inside space-y-0.5 text-amber-800 leading-relaxed">
+                    <li>تصاویر باید دارای نسبت ابعاد استاندارد اینستاگرام (مربع ۱:۱ یا عمودی ۴:۵) باشند.</li>
+                    <li>فرمت تصاویر ارسالی باید JPG یا PNG با حجم مناسب باشد.</li>
+                    <li>پست‌ها بر اساس تقویم محتوایی و زمان‌بندی دقیق به صورت خودکار ارسال خواهند شد.</li>
+                  </ul>
                 </div>
               </div>
             </div>
