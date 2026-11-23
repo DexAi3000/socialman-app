@@ -23,8 +23,6 @@ export function PricingView() {
       priceFormatted: 'رایگان همیشگی',
       priceSubtitle: 'برای شروع و تست انتشار در پلتفرم‌ها',
       popular: false,
-      buttonText: 'پلن فعلی شما',
-      buttonDisabled: currentPlan === 'free',
       features: [
         '۱ برند / پیج اختصاصی',
         'اتصال ۲ پلتفرم همزمان',
@@ -45,8 +43,6 @@ export function PricingView() {
       priceFormatted: '۱۸۹٬۰۰۰ تومان',
       priceSubtitle: 'ویژه ادمین‌ها و مدیران شبکه‌های اجتماعی',
       popular: true,
-      buttonText: currentPlan === 'pro' ? 'پلن فعال شما' : 'ارتقا به پلن حرفه‌ای',
-      buttonDisabled: currentPlan === 'pro',
       features: [
         'اتصال کامل هر ۵ پلتفرم (اینستاگرام، تلگرام، واتساپ، روبیکا، بله)',
         'انتشار و زمان‌بندی نامحدود پست‌ها',
@@ -66,8 +62,6 @@ export function PricingView() {
       priceFormatted: '۵۸۰٬۰۰۰ تومان',
       priceSubtitle: 'پکیج کامل انتشار ۵ پلتفرم + تولید هوش مصنوعی',
       popular: false,
-      buttonText: currentPlan === 'agency' ? 'پلن فعال شما' : 'فعال‌سازی پلن طلایی',
-      buttonDisabled: currentPlan === 'agency',
       features: [
         'انتشار نامحدود در تمام ۵ پلتفرم بدون هیچ سقف ارسالی',
         'دستیار نگارش و تولید محتوا با هوش مصنوعی',
@@ -80,6 +74,68 @@ export function PricingView() {
       notIncluded: [],
     },
   ];
+
+  const getPlanAction = (planId: PlanType) => {
+    // ۱. پلن فعال فقط روی همان پلنی که هست
+    if (currentPlan === planId) {
+      return {
+        show: true,
+        text: 'پلن فعال شما',
+        isCurrent: true,
+      };
+    }
+
+    // ۲. اگر کسی پلن رایگان (برنزی) داشت: برای دوتای دیگه بزنه خرید پلن نقره‌ای و خرید پلن طلایی
+    if (currentPlan === 'free') {
+      if (planId === 'pro') {
+        return {
+          show: true,
+          text: 'خرید پلن نقره‌ای',
+          isCurrent: false,
+        };
+      }
+      if (planId === 'agency') {
+        return {
+          show: true,
+          text: 'خرید پلن طلایی',
+          isCurrent: false,
+        };
+      }
+    }
+
+    // ۳. اگر کسی پلن نقره داشت: برای پلن طلایی بزنه ارتقا به پلن طلایی، برای برنزی هیچی نزنه
+    if (currentPlan === 'pro') {
+      if (planId === 'free') {
+        return {
+          show: false,
+          text: '',
+          isCurrent: false,
+        };
+      }
+      if (planId === 'agency') {
+        return {
+          show: true,
+          text: 'ارتقا به پلن طلایی',
+          isCurrent: false,
+        };
+      }
+    }
+
+    // ۴. اگر هم کسی پلن طلایی داشت: برای بقیه هیچی نزنه
+    if (currentPlan === 'agency') {
+      return {
+        show: false,
+        text: '',
+        isCurrent: false,
+      };
+    }
+
+    return {
+      show: false,
+      text: '',
+      isCurrent: false,
+    };
+  };
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
@@ -164,21 +220,30 @@ export function PricingView() {
       {/* Pricing Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
         {plans.map((p) => {
-          const isCurrent = currentPlan === p.id;
+          const action = getPlanAction(p.id);
+          const isCurrent = action.isCurrent;
+
           return (
             <div
               key={p.id}
               className={`relative flex flex-col justify-between rounded-3xl p-5 sm:p-6 transition-all ${
-                p.popular
+                isCurrent
+                  ? 'bg-white border-2 border-emerald-500 shadow-xl shadow-emerald-500/10 ring-1 ring-emerald-500/30'
+                  : p.popular
                   ? 'bg-white border-2 border-[#3b96cc] shadow-xl shadow-[#3b96cc]/10'
                   : 'bg-white border border-slate-200/90 shadow-xs'
               }`}
             >
-              {p.popular && (
+              {isCurrent ? (
+                <div className="absolute -top-3 right-1/2 translate-x-1/2 bg-emerald-600 text-white text-xs font-black px-4 py-1 rounded-full shadow-md whitespace-nowrap border border-white/80 tracking-wide flex items-center gap-1">
+                  <Check className="w-3.5 h-3.5 stroke-[3]" />
+                  <span>پلن فعال شما</span>
+                </div>
+              ) : p.popular ? (
                 <div className="absolute -top-3 right-1/2 translate-x-1/2 bg-gradient-to-r from-sky-500 to-[#3b96cc] text-white text-xs font-black px-4 py-1 rounded-full shadow-md whitespace-nowrap border border-white/80 tracking-wide">
                   محبوب ترین
                 </div>
-              )}
+              ) : null}
 
               <div>
                 {/* Plan Title & Price */}
@@ -214,27 +279,36 @@ export function PricingView() {
               </div>
 
               {/* Action Button */}
-              <div className="pt-3 border-t border-slate-100">
-                <button
-                  disabled={isCurrent}
-                  onClick={() => openUpgradeModal(p.id)}
-                  className={`w-full py-3 rounded-2xl font-black text-xs transition-all flex items-center justify-center gap-1.5 ${
-                    isCurrent
-                      ? 'bg-slate-100 text-slate-400 cursor-default'
-                      : p.popular
-                      ? 'bg-[#00D166] hover:bg-[#00be5b] text-slate-950 shadow-md shadow-[#00D166]/20 active:scale-95'
-                      : 'bg-slate-900 hover:bg-slate-800 text-white active:scale-95'
-                  }`}
-                >
-                  {isCurrent ? (
-                    'پلن فعال شما'
-                  ) : (
-                    <>
-                      <span>{p.buttonText}</span>
-                      <ArrowLeft className="w-3.5 h-3.5" />
-                    </>
-                  )}
-                </button>
+              <div className="pt-3 border-t border-slate-100 min-h-[58px] flex items-center">
+                {action.show ? (
+                  <button
+                    disabled={action.isCurrent}
+                    onClick={() => openUpgradeModal(p.id)}
+                    className={`w-full py-3 rounded-2xl font-black text-xs transition-all flex items-center justify-center gap-1.5 ${
+                      action.isCurrent
+                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 cursor-default shadow-xs'
+                        : p.popular
+                        ? 'bg-[#00D166] hover:bg-[#00be5b] text-slate-950 shadow-md shadow-[#00D166]/20 active:scale-95'
+                        : 'bg-slate-900 hover:bg-slate-800 text-white active:scale-95'
+                    }`}
+                  >
+                    {action.isCurrent ? (
+                      <span className="flex items-center gap-1.5">
+                        <Check className="w-3.5 h-3.5 stroke-[3]" />
+                        <span>پلن فعال شما</span>
+                      </span>
+                    ) : (
+                      <>
+                        <span>{action.text}</span>
+                        <ArrowLeft className="w-3.5 h-3.5" />
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  <div className="w-full py-3 text-center text-xs text-slate-300 select-none">
+                    &nbsp;
+                  </div>
+                )}
               </div>
             </div>
           );
