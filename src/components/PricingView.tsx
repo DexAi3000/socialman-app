@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useApp } from '@/context/AppContext';
-import { CalendarClock, Crown, Check, Zap, ShieldCheck, Users, ArrowLeft } from 'lucide-react';
+import { CalendarClock, Crown, Check, Zap, Users, ArrowLeft } from 'lucide-react';
 import { PlanType } from '@/types';
 import { daysRemaining, EXPIRY_REMINDER_DAYS, formatSubscriptionDate, paidPlanNames } from '@/lib/subscription';
 import { toPersianDigits } from '@/lib/utils';
@@ -213,7 +213,7 @@ export function PricingView() {
           انتخاب پلن مناسب برای مدیریت ۵ شبکه اجتماعی
         </h1>
         <p className="text-xs text-slate-500 max-w-xl mx-auto">
-          با درگاه مستقیم شاپرک / زرین‌پال، اشتراک خود را در کمتر از ۱ دقیقه فعال کنید و بدون محدودیت محتوا تولید کنید.
+          اشتراک مورد نظر خود را انتخاب کنید و بدون محدودیت در شبکه‌های اجتماعی محتوا تولید و منتشر کنید.
         </p>
       </div>
 
@@ -316,16 +316,11 @@ export function PricingView() {
       </div>
 
       {/* Trust Badges */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-slate-200 text-center">
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
-          <ShieldCheck className="w-5 h-5 text-[#00A852] mx-auto mb-1.5" />
-          <h4 className="text-xs font-black text-slate-800 mb-0.5">پرداخت امن شاپرک</h4>
-          <p className="text-[10px] text-slate-500">اتصال مستقیم به درگاه شتاب بانکی</p>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-slate-200 text-center">
         <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
           <Zap className="w-5 h-5 text-amber-500 mx-auto mb-1.5" />
-          <h4 className="text-xs font-black text-slate-800 mb-0.5">فعال‌سازی آنی</h4>
-          <p className="text-[10px] text-slate-500">ارتقای سهمیه بلافاصله بعد از تراکنش</p>
+          <h4 className="text-xs font-black text-slate-800 mb-0.5">فعال‌سازی سریع</h4>
+          <p className="text-[10px] text-slate-500">ارتقای سهمیه و فعال‌سازی اشتراک پس از تأیید رسید</p>
         </div>
         <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
           <Users className="w-5 h-5 text-indigo-500 mx-auto mb-1.5" />
