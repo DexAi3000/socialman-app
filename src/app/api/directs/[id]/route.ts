@@ -70,7 +70,7 @@ export async function POST(request: Request, context: RouteContext) {
   try {
     const { id } = await context.params;
     const body = await request.json();
-    const { text, sender = 'admin', senderName = 'مدیر پیج' } = body;
+    const { text, sender = 'admin', senderName = 'مدیر پیج', settings } = body;
 
     if (!text || !text.trim()) {
       return NextResponse.json({ error: 'متن پیام الزامی است.' }, { status: 400 });
@@ -127,11 +127,36 @@ export async function POST(request: Request, context: RouteContext) {
           .map((m) => `${m.sender === 'customer' ? 'مشتری' : 'پشتیبان/هوش مصنوعی'}: ${m.text}`)
           .join('\n');
 
-        const systemPrompt = `تو پاسخگوی خودکار و دستیار هوشمند فروشگاه و پیج ایرانی در شبکه اجتماعی ${platformNames[direct.platform] || direct.platform} هستی.
-نام مشتری: ${direct.customerName}.
-وظیفه تو این است که بسیار با ادب، صمیمی، پرانرژی و راهنما به سوال مشتری پاسخ بدهی.
-اگر سوال درباره قیمت، موجودی یا خرید پرسید، با خوش‌رویی راهنمایی کن و از ایموجی‌های مناسب استفاده کن.
-پاسخ باید کوتاه، جذاب، متناسب با چت و محاوره‌ای محترمانه باشد (حداکثر ۲ تا ۳ جمله).`;
+        const toneDescriptions: Record<string, string> = {
+          friendly: 'بسیار صمیمی، پرانرژی، مهربان و با استفاده از ایموجی‌های شاد و محترمانه 🌸',
+          formal: 'بسیار محترمانه، رسمی، اداری، بدون شوخی و شیک 💼',
+          sales: 'فروشنده حرفه‌ای، ترغیب‌کننده مشتری به نهایی کردن خرید، معرفی تخفیف‌ها و پیشنهاد جذاب 🛍️',
+          fast: 'بسیار کوتاه، مختصر، سریع و بدون اضافه گویی ⚡',
+        };
+
+        const chosenTone = toneDescriptions[settings?.aiTone] || toneDescriptions.friendly;
+        const bName = settings?.businessName?.trim() || 'فروشگاه ما';
+        const kb = settings?.knowledgeBase?.trim() || 'تمامی اجناس دارای ضمانت بازگشت و ارسال سریع هستند.';
+        const ship = settings?.shippingInfo?.trim() ? `نحوه و زمان ارسال: ${settings.shippingInfo}` : '';
+        const disc = settings?.discountCode?.trim() ? `کد تخفیف ویژه مشتریان: ${settings.discountCode}` : '';
+        const phone = settings?.supportPhone?.trim() ? `تلفن پشتیبانی اضطراری در صورت درخواست مشتری: ${settings.supportPhone}` : '';
+        const customRule = settings?.customInstructions?.trim() ? `دستورالعمل ویژه مدیر: ${settings.customInstructions}` : '';
+
+        const systemPrompt = `تو پاسخگوی خودکار و دستیار فروش و پشتیبانی مشتریان برای "${bName}" در ${platformNames[direct.platform] || direct.platform} هستی.
+نام مشتری طرف گفتگو: ${direct.customerName}.
+لحن پاسخگویی تو: ${chosenTone}.
+
+اطلاعات و راهنمای فروشگاه:
+- ${kb}
+${ship ? `- ${ship}` : ''}
+${disc ? `- ${disc}` : ''}
+${phone ? `- ${phone}` : ''}
+${customRule ? `- ${customRule}` : ''}
+
+قوانین پاسخگویی:
+۱. کوتاه، دقیق و به زبان فارسی محاوره‌ای و روان چت کن (حداکثر ۲ تا ۳ جمله).
+۲. دقیقاً بر اساس اطلاعات بالا به مشتری پاسخ بده.
+۳. اگر مشتری چیزی خواست که در اطلاعات بالا نبود، با احترام بگو که به همکاران پشتیبان اطلاع می‌دهی تا بررسی کنند.`;
 
         const userPrompt = `تاریخچه مکالمه اخیر:
 ${recentHistory}

@@ -245,25 +245,49 @@ export function ConnectAccountsModal() {
             <div className="space-y-4">
               <div className="space-y-1">
                 <h3 className="text-sm font-black text-gray-900">
-                  راهنمای اتصال کانال تلگرام برای انتشار خودکار
+                  اتصال تلگرام: ربات اختصاصی برند شما یا ربات آماده
                 </h3>
                 <p className="text-xs text-gray-500">
-                  ربات رسمی تلگرام با توکن اختصاصی ساخته شده در BotFather متصل و تایید گردید:
+                  برای اینکه پیام‌های مشتریان ۱۰۰٪ مستقل و با نام برند خودتان باشد، می‌توانید ربات اختصاصی خود را متصل کنید:
                 </p>
               </div>
 
-              {/* Bot Info Card */}
-              <div className="p-4 rounded-2xl bg-sky-50/80 border border-sky-200 space-y-2">
+              {/* Exclusive Brand Bot Card (Recommended) */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-sky-50 to-indigo-50/60 border border-sky-200 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-sky-500 animate-pulse" />
-                    <span className="text-xs font-black text-sky-950">بات رسمی تلگرام: SocialMan</span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-xs font-black text-slate-900">گزینه پیشنهادی: ربات با برند اختصاصی خودتان</span>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800">
-                    Bot API فعال و تایید شده
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                    ایزولاسیون و امنیت ۱۰۰٪
                   </span>
                 </div>
-                <div className="text-xs text-sky-900 flex items-center justify-between">
+                <p className="text-[11px] text-slate-600 leading-relaxed">
+                  مشتریان هنگام چت کردن، عکس، نام و بیوگرافی برند <strong>خود شما</strong> را می‌بینند و هیچ اثری از سوشال‌من مشاهده نخواهند کرد.
+                </p>
+                <div className="p-3 bg-white rounded-xl border border-sky-200 space-y-2 text-xs">
+                  <span className="font-bold text-slate-800 block text-[11px]">مراحل ۱ دقیقه‌ای ساخت ربات رایگان در تلگرام:</span>
+                  <ol className="list-decimal list-inside space-y-1 text-[11px] text-slate-600 pr-1">
+                    <li>وارد ربات <strong className="font-mono text-sky-700">@BotFather</strong> در تلگرام شوید.</li>
+                    <li>دستور <strong className="font-mono text-slate-800">/newbot</strong> را بزنید و نام و آیدی ربات خود را تعیین کنید.</li>
+                    <li>کد توکن (HTTP API Token) دریافتی را کپی کنید.</li>
+                  </ol>
+                </div>
+              </div>
+
+              {/* Bot Info Card */}
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-sky-500" />
+                    <span className="text-xs font-bold text-slate-800">یا استفاده از ربات آماده برای انتشار در کانال:</span>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">
+                    انتشار سریع
+                  </span>
+                </div>
+                <div className="text-xs text-slate-700 flex items-center justify-between">
                   <span>نام کاربری بات: <strong className="font-mono">@SocialManPublishBot</strong></span>
                   <button
                     onClick={() => handleCopyBotId('@SocialManPublishBot')}
@@ -284,19 +308,8 @@ export function ConnectAccountsModal() {
                   <div>
                     <span className="font-bold text-gray-800 block">اضافه کردن ربات به کانال:</span>
                     <span className="text-gray-500 text-[11px] leading-relaxed">
-                      در تلگرام وارد بخش تنظیمات کانال خود شوید، به بخش <strong>Administrators</strong> بروید و ربات زیر را اضافه کنید:
+                      در تلگرام وارد بخش تنظیمات کانال خود شوید، به بخش <strong>Administrators</strong> بروید و ربات اختصاصی خود (یا ربات آماده بالا) را اضافه کنید.
                     </span>
-                    <div className="mt-2 flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-gray-200 w-fit">
-                      <span className="font-mono text-sky-700 font-black text-xs">
-                        @SocialManPublishBot
-                      </span>
-                      <button
-                        onClick={() => handleCopyBotId('@SocialManPublishBot')}
-                        className="text-gray-400 hover:text-gray-700"
-                      >
-                        {copiedBot ? <Check className="w-3.5 h-3.5 text-sky-600" /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
                   </div>
                 </div>
 
@@ -317,11 +330,11 @@ export function ConnectAccountsModal() {
                     ۳
                   </span>
                   <div className="w-full">
-                    <span className="font-bold text-gray-800 block mb-1">ثبت آیدی یا شناسه کانال:</span>
+                    <span className="font-bold text-gray-800 block mb-1">ثبت آیدی یا شناسه کانال / ربات:</span>
                     <div className="flex gap-2">
                       <input
                         type="text"
-                        placeholder="@channel_id"
+                        placeholder="@channel_id یا @bot_id"
                         value={channelInput}
                         onChange={(e) => setChannelInput(e.target.value)}
                         className="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-xs text-left font-mono outline-none focus:border-[#3b96cc]"

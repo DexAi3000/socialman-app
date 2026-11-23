@@ -17,6 +17,13 @@ import {
   RefreshCw,
   PlusCircle,
   Zap,
+  Key,
+  Shield,
+  HelpCircle,
+  Phone,
+  Tag,
+  Truck,
+  ExternalLink,
 } from 'lucide-react';
 import {
   InstagramIcon,
@@ -66,13 +73,65 @@ export function DirectsInboxView() {
   const [simulatedCustomerText, setSimulatedCustomerText] = useState('');
   const [simulating, setSimulating] = useState(false);
 
-  // Settings modal
+  // Settings modal & Complete Customization state
   const [showSettings, setShowSettings] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<'connection' | 'persona' | 'security'>('connection');
   const [businessName, setBusinessName] = useState('فروشگاه و برند من');
+  const [telegramBotUsername, setTelegramBotUsername] = useState('@MyBrand_Bot');
+  const [telegramBotToken, setTelegramBotToken] = useState('');
+  const [instagramHandle, setInstagramHandle] = useState('@mybrand_official');
+  const [aiTone, setAiTone] = useState<'friendly' | 'formal' | 'sales' | 'fast'>('friendly');
+  const [shippingInfo, setShippingInfo] = useState('ارسال با پست پیشتاز به سراسر کشور ظرف ۲ تا ۳ روز کاری. امکان پیک فوری در تهران.');
+  const [discountCode, setDiscountCode] = useState('OFF20');
+  const [supportPhone, setSupportPhone] = useState('۰۹۱۲۳۴۵۶۷۸۹');
   const [knowledgeBase, setKnowledgeBase] = useState(
     'سفارش‌ها ظرف ۲ روز با پست پیشتاز ارسال می‌شوند. ارسال بالای ۴۰۰ هزار تومان رایگان است. تمامی اجناس ضمانت بازگشت ۷ روزه دارند.'
   );
+  const [customInstructions, setCustomInstructions] = useState('در انتهای پیام مشتری را با روی خوش ترغیب کن که خریدش را نهایی کند.');
   const [settingsSaved, setSettingsSaved] = useState(false);
+
+  // Load custom settings on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('socialman_ai_direct_settings');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.businessName) setBusinessName(parsed.businessName);
+        if (parsed.telegramBotUsername) setTelegramBotUsername(parsed.telegramBotUsername);
+        if (parsed.telegramBotToken) setTelegramBotToken(parsed.telegramBotToken);
+        if (parsed.instagramHandle) setInstagramHandle(parsed.instagramHandle);
+        if (parsed.aiTone) setAiTone(parsed.aiTone);
+        if (parsed.shippingInfo) setShippingInfo(parsed.shippingInfo);
+        if (parsed.discountCode) setDiscountCode(parsed.discountCode);
+        if (parsed.supportPhone) setSupportPhone(parsed.supportPhone);
+        if (parsed.knowledgeBase) setKnowledgeBase(parsed.knowledgeBase);
+        if (parsed.customInstructions) setCustomInstructions(parsed.customInstructions);
+      }
+    } catch (_) {}
+  }, []);
+
+  const handleSaveSettings = () => {
+    try {
+      const dataToSave = {
+        businessName,
+        telegramBotUsername,
+        telegramBotToken,
+        instagramHandle,
+        aiTone,
+        shippingInfo,
+        discountCode,
+        supportPhone,
+        knowledgeBase,
+        customInstructions,
+      };
+      localStorage.setItem('socialman_ai_direct_settings', JSON.stringify(dataToSave));
+      setSettingsSaved(true);
+      setTimeout(() => {
+        setSettingsSaved(false);
+        setShowSettings(false);
+      }, 1000);
+    } catch (_) {}
+  };
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -219,6 +278,15 @@ export function DirectsInboxView() {
           text: text.trim(),
           sender: 'customer',
           senderName: selectedDirect.customerName,
+          settings: {
+            businessName,
+            aiTone,
+            shippingInfo,
+            discountCode,
+            supportPhone,
+            knowledgeBase,
+            customInstructions,
+          },
         }),
       });
 
@@ -636,69 +704,334 @@ export function DirectsInboxView() {
 
       {/* Settings Modal */}
       {showSettings && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md rounded-3xl bg-white p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-200 text-right">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 overflow-y-auto">
+          <div className="w-full max-w-xl rounded-3xl bg-white p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-200 text-right my-8 max-h-[90vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 shrink-0">
               <div className="flex items-center gap-2">
-                <Settings className="w-5 h-5 text-[#3b96cc]" />
-                <h3 className="text-base font-black text-slate-900">تنظیمات هوش مصنوعی دایرکت</h3>
+                <div className="p-2 rounded-xl bg-sky-50 text-[#3b96cc]">
+                  <Settings className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900">شخصی‌سازی و اتصال ربات اختصاصی</h3>
+                  <p className="text-[11px] text-slate-500">تنظیم هویت برند شما و تضمین تفکیک ۱۰۰٪ پیام‌ها</p>
+                </div>
               </div>
               <button
                 type="button"
                 onClick={() => setShowSettings(false)}
-                className="text-slate-400 hover:text-slate-600 text-xs font-bold"
+                className="text-slate-400 hover:text-slate-600 text-xs font-bold px-2 py-1 rounded-lg hover:bg-slate-100 transition-colors"
               >
-                بستن ✕
+                ✕ بستن
               </button>
             </div>
 
-            <div className="space-y-3 text-xs">
-              <div>
-                <label className="block font-black text-slate-800 mb-1">نام فروشگاه / برند شما:</label>
-                <input
-                  type="text"
-                  value={businessName}
-                  onChange={(e) => setBusinessName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#3b96cc]"
-                />
-              </div>
+            {/* Navigation Tabs */}
+            <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-2xl shrink-0">
+              <button
+                type="button"
+                onClick={() => setSettingsTab('connection')}
+                className={`flex-1 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
+                  settingsTab === 'connection'
+                    ? 'bg-white text-slate-900 shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Key className="w-3.5 h-3.5 text-[#3b96cc]" />
+                <span>۱. اتصال ربات اختصاصی</span>
+              </button>
 
-              <div>
-                <label className="block font-black text-slate-800 mb-1">
-                  اطلاعات کلیدی و سوالات متداول (راهنمای پاسخگو):
-                </label>
-                <textarea
-                  rows={4}
-                  value={knowledgeBase}
-                  onChange={(e) => setKnowledgeBase(e.target.value)}
-                  placeholder="قیمت‌ها، نحوه ارسال، تخفیف‌ها، شماره تماس، شرایط ضمانت..."
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#3b96cc]"
-                />
-                <span className="text-[10px] text-slate-400 mt-1 block">
-                  هوش مصنوعی از این اطلاعات برای پاسخ دقیق و رسمی به مشتریان استفاده خواهد کرد.
-                </span>
-              </div>
+              <button
+                type="button"
+                onClick={() => setSettingsTab('persona')}
+                className={`flex-1 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
+                  settingsTab === 'persona'
+                    ? 'bg-white text-slate-900 shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                <span>۲. لحن و اطلاعات فروشگاه</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSettingsTab('security')}
+                className={`flex-1 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
+                  settingsTab === 'security'
+                    ? 'bg-white text-slate-900 shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <span>۳. امنیت و تفکیک</span>
+              </button>
             </div>
 
-            {settingsSaved && (
-              <div className="p-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-bold text-center">
-                تنظیمات با موفقیت ذخیره گردید.
-              </div>
-            )}
+            {/* Modal Body / Scrollable Content */}
+            <div className="flex-1 overflow-y-auto space-y-4 pr-1 text-xs">
+              {/* TAB 1: CONNECTION GUIDE & INPUTS */}
+              {settingsTab === 'connection' && (
+                <div className="space-y-4">
+                  {/* Notice Banner */}
+                  <div className="p-3 rounded-2xl bg-sky-50/80 border border-sky-200 text-sky-950 space-y-1.5">
+                    <div className="flex items-center gap-1.5 font-black text-xs text-sky-900">
+                      <ShieldCheck className="w-4 h-4 text-[#3b96cc]" />
+                      <span>چرا ربات اختصاصی برای هر کاربر؟</span>
+                    </div>
+                    <p className="text-[11px] leading-relaxed text-sky-800">
+                      برای اینکه مشتریان نام و لوگوی برند <strong>خود شما</strong> را ببینند و پیام‌های هیچ کسب‌وکار دیگری با پیج شما تداخل پیدا نکند، هر کسب‌وکار ربات اختصاصی تلگرام و پیج رسمی اینستاگرام خود را متصل می‌کند.
+                    </p>
+                  </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                setSettingsSaved(true);
-                setTimeout(() => {
-                  setSettingsSaved(false);
-                  setShowSettings(false);
-                }, 1000);
-              }}
-              className="w-full py-3 rounded-2xl bg-[#3b96cc] hover:bg-[#2c7ead] text-white font-black text-xs shadow-md transition-all active:scale-95"
-            >
-              ذخیره تنظیمات
-            </button>
+                  {/* Step by step guide */}
+                  <div className="rounded-2xl border border-slate-200 p-3.5 bg-slate-50 space-y-2.5">
+                    <span className="font-black text-slate-800 block text-xs">
+                      راهنمای ۱ دقیقه‌ای ساخت ربات رایگان تلگرام با برند خودتان:
+                    </span>
+                    <ol className="space-y-2 text-[11px] text-slate-600 list-decimal list-inside pr-1">
+                      <li>
+                        در تلگرام وارد ربات رسمی تلگرام <strong className="font-mono text-sky-700">@BotFather</strong> شوید.
+                      </li>
+                      <li>
+                        دستور <strong className="font-mono text-slate-800">/newbot</strong> را ارسال کنید و نام برندتان (مثال: <em>فروشگاه پوشاک نورا</em>) را وارد کنید.
+                      </li>
+                      <li>
+                        یک آیدی انگلیسی با پسوند <strong className="font-mono">bot</strong> بنویسید (مثال: <span className="font-mono text-slate-800">Nora_Shop_Bot</span>).
+                      </li>
+                      <li>
+                        تلگرام یک کد توکن اختصاصی (API Token) به شما می‌دهد؛ آن را کپی کرده و در کادر پایین ثبت کنید.
+                      </li>
+                    </ol>
+                  </div>
+
+                  {/* Input Fields */}
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block font-black text-slate-800 mb-1">
+                        آیدی ربات تلگرام اختصاصی شما:
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="@YourBrand_Bot"
+                        value={telegramBotUsername}
+                        onChange={(e) => setTelegramBotUsername(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-left font-mono text-slate-900 focus:outline-none focus:border-[#3b96cc]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-black text-slate-800 mb-1">
+                        توکن اختصاصی ربات تلگرام (HTTP API Token):
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="password"
+                          placeholder="مثال: 123456789:ABCdefGhIklMnoPQRstuVWXyz..."
+                          value={telegramBotToken}
+                          onChange={(e) => setTelegramBotToken(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-left font-mono text-slate-900 focus:outline-none focus:border-[#3b96cc]"
+                        />
+                        <span className="absolute left-2.5 top-2.5 text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
+                          محرمانه و امن
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-slate-400 mt-1 block">
+                        این توکن کلید اتصال به تلگرام است و فقط توسط شما مدیریت می‌شود.
+                      </span>
+                    </div>
+
+                    <div>
+                      <label className="block font-black text-slate-800 mb-1">
+                        آیدی پیج اینستاگرام شما (جهت دایرکت اینستاگرام):
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="@yourbrand_page"
+                        value={instagramHandle}
+                        onChange={(e) => setInstagramHandle(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-left font-mono text-slate-900 focus:outline-none focus:border-[#3b96cc]"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 2: AI PERSONA & BUSINESS DETAILS */}
+              {settingsTab === 'persona' && (
+                <div className="space-y-3.5">
+                  <div>
+                    <label className="block font-black text-slate-800 mb-1">نام رسمی فروشگاه / برند شما:</label>
+                    <input
+                      type="text"
+                      value={businessName}
+                      onChange={(e) => setBusinessName(e.target.value)}
+                      placeholder="مثال: گالری شیک‌پوشان نیما"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#3b96cc]"
+                    />
+                  </div>
+
+                  {/* AI Tone Selection */}
+                  <div>
+                    <label className="block font-black text-slate-800 mb-1.5">انتخاب لحن صحبت هوش مصنوعی با مشتریان:</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { id: 'friendly', label: '🌸 صمیمی و پرانرژی', desc: 'استفاده از ایموجی‌های شاد، گرم و محترمانه' },
+                        { id: 'formal', label: '💼 رسمی و اداری', desc: 'بسیار متین، بدون شوخی، مناسب سازمان‌ها' },
+                        { id: 'sales', label: '🛍️ فروشنده حرفه‌ای', desc: 'ترغیب به خرید، پیشنهاد تخفیف و نهایی کردن' },
+                        { id: 'fast', label: '⚡ کوتاه و تلگرافی', desc: 'پاسخ مستقیم و بدون اضافه گویی به قیمت و موجودی' },
+                      ].map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => setAiTone(item.id as any)}
+                          className={`p-2.5 rounded-xl border text-right transition-all ${
+                            aiTone === item.id
+                              ? 'bg-sky-50 border-[#3b96cc] text-[#3b96cc] shadow-xs'
+                              : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span className="block font-black text-xs mb-0.5">{item.label}</span>
+                          <span className="block text-[10px] text-slate-500 leading-tight">{item.desc}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Shipping & Discounts */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-black text-slate-800 mb-1">کد تخفیف اختصاصی (اختیاری):</label>
+                      <input
+                        type="text"
+                        value={discountCode}
+                        onChange={(e) => setDiscountCode(e.target.value)}
+                        placeholder="مثال: WELCOME20"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#3b96cc]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-black text-slate-800 mb-1">شماره تماس پشتیبان انسانی:</label>
+                      <input
+                        type="text"
+                        value={supportPhone}
+                        onChange={(e) => setSupportPhone(e.target.value)}
+                        placeholder="مثال: ۰۹۱۲۳۴۵۶۷۸۹"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#3b96cc]"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-black text-slate-800 mb-1">شرایط و نحوه ارسال سفارشات:</label>
+                    <input
+                      type="text"
+                      value={shippingInfo}
+                      onChange={(e) => setShippingInfo(e.target.value)}
+                      placeholder="مثال: پست پیشتاز ۲ روزه به سراسر کشور - تهران پیک فوری"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#3b96cc]"
+                    />
+                  </div>
+
+                  {/* Knowledge Base */}
+                  <div>
+                    <label className="block font-black text-slate-800 mb-1">
+                      راهنمای محصولات، قیمت‌ها و سوالات متداول (پایگاه دانش AI):
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={knowledgeBase}
+                      onChange={(e) => setKnowledgeBase(e.target.value)}
+                      placeholder="قیمت‌ها، نحوه سفارش، شماره کارت، شرایط مرجوعی ۷ روزه و ضمانت..."
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#3b96cc]"
+                    />
+                    <span className="text-[10px] text-slate-400 mt-0.5 block">
+                      هوش مصنوعی با خواندن این بخش، دقیقاً به سوالات قیمت و اطلاعات شما پاسخ می‌دهد.
+                    </span>
+                  </div>
+
+                  {/* Custom Prompt */}
+                  <div>
+                    <label className="block font-black text-slate-800 mb-1">
+                      دستورالعمل ویژه به هوش مصنوعی (اختیاری):
+                    </label>
+                    <input
+                      type="text"
+                      value={customInstructions}
+                      onChange={(e) => setCustomInstructions(e.target.value)}
+                      placeholder="مثال: همیشه در انتهای پیام لینک خرید آنلاین را بفرست"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#3b96cc]"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 3: SECURITY & DATA ISOLATION */}
+              {settingsTab === 'security' && (
+                <div className="space-y-3">
+                  <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950 space-y-1.5">
+                    <div className="flex items-center gap-1.5 font-black text-xs text-emerald-900">
+                      <Shield className="w-4 h-4 text-emerald-600" />
+                      <span>تضمین عدم مشاهده پیام‌های دیگران و حریم خصوصی</span>
+                    </div>
+                    <p className="text-[11px] leading-relaxed text-emerald-800">
+                      سیستم سوشال‌من پیام‌ها را بر اساس مدل Multi-Tenant ایزوله می‌کند. در این ساختار:
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                      <h4 className="font-black text-slate-800 flex items-center gap-1.5 text-xs">
+                        <Key className="w-3.5 h-3.5 text-[#3b96cc]" />
+                        <span>۱. تفکیک با کلید کاربری یکتا (User ID Isolation):</span>
+                      </h4>
+                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                        هر پیامی که در سیستم ثبت می‌شود به شناسه اختصاصی حساب شما قفل می‌شود. کاربر دیگری حتی اگر همزمان با شما وارد برنامه شود، به پیام‌های پیج شما دسترسی نخواهد داشت.
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                      <h4 className="font-black text-slate-800 flex items-center gap-1.5 text-xs">
+                        <Bot className="w-3.5 h-3.5 text-purple-600" />
+                        <span>۲. پاسخگویی انحصاری با توکن اختصاصی شما:</span>
+                      </h4>
+                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                        هوش مصنوعی پاسخ را فقط از طریق توکن رباتِ خود شما به همان مشتری در تلگرام/اینستاگرام ریپلای می‌زند و پیام هرگز در چت ربات دیگری ظاهر نمی‌شود.
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                      <h4 className="font-black text-slate-800 flex items-center gap-1.5 text-xs">
+                        <CheckCheck className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>۳. حفظ ۱۰۰٪ هویت و برند شما:</span>
+                      </h4>
+                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                        مشتری شما هیچ نام یا نشانه‌ای از سوشال‌من نمی‌بیند؛ او حس می‌کند با پشتیبان رسمی پیج و برند خود شما در حال گفتگو است.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="pt-3 border-t border-slate-100 shrink-0 space-y-2">
+              {settingsSaved && (
+                <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-bold text-center flex items-center justify-center gap-1.5 border border-emerald-200 animate-in fade-in">
+                  <Check className="w-4 h-4 text-emerald-600 stroke-[3]" />
+                  <span>تنظیمات اختصاصی با موفقیت ذخیره و روی هوش مصنوعی اعمال شد.</span>
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={handleSaveSettings}
+                className="w-full py-3 rounded-2xl bg-[#3b96cc] hover:bg-[#2c7ead] text-white font-black text-xs shadow-md transition-all active:scale-95 flex items-center justify-center gap-2"
+              >
+                <Check className="w-4 h-4" />
+                <span>ذخیره تنظیمات و فعال‌سازی هوش مصنوعی اختصاصی</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
